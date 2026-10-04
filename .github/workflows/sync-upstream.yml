@@ -1,0 +1,128 @@
+name: Sync upstream
+
+on:
+  schedule:
+    # Run daily at 03:17 UTC (12:17 JST). The non-round minute reduces scheduler congestion.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-upstream-main
+  cancel-in-progress: false
+
+jobs:
+  prepare_sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    outputs:
+      has_updates: ${{ steps.sync.outputs.has_updates }}
+    steps:
+      - name: Check out fork
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Fetch upstream and sync branch
+        shell: bash
+        run: |
+          git fetch https://github.com/every-app/open-seo.git main:refs/remotes/upstream/main
+          git fetch origin refs/heads/sync/upstream-main:refs/remotes/origin/sync/upstream-main || true
+
+      - name: Prepare sync branch
+        id: sync
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          upstream_sha="$(git rev-parse upstream/main)"
+
+          if git merge-base --is-ancestor "$upstream_sha" origin/main; then
+            echo "has_updates=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          open_pr_sha="$(gh pr list \
+            --base main \
+            --head sync/upstream-main \
+            --state open \
+            --json headRefOid \
+            --jq '.[0].headRefOid // empty')"
+          if [[ "$open_pr_sha" == "$upstream_sha" ]]; then
+            echo "has_updates=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          last_merged_sha="$(gh pr list \
+            --base main \
+            --head sync/upstream-main \
+            --state merged \
+            --limit 1 \
+            --json headRefOid \
+            --jq '.[0].headRefOid // empty')"
+          if [[ "$last_merged_sha" == "$upstream_sha" ]]; then
+            echo "has_updates=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if git show-ref --verify --quiet refs/remotes/origin/sync/upstream-main; then
+            remote_sha="$(git rev-parse origin/sync/upstream-main)"
+            if ! git merge-base --is-ancestor "$remote_sha" "$upstream_sha"; then
+              echo "::error::The sync branch contains commits that are not in upstream/main. Resolve or remove them before retrying."
+              exit 1
+            fi
+            git push \
+              --force-with-lease="refs/heads/sync/upstream-main:$remote_sha" \
+              origin "$upstream_sha:refs/heads/sync/upstream-main"
+          else
+            git push origin "$upstream_sha:refs/heads/sync/upstream-main"
+          fi
+
+          echo "has_updates=true" >> "$GITHUB_OUTPUT"
+
+  open_pull_request:
+    needs: prepare_sync
+    if: needs.prepare_sync.outputs.has_updates == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Open or update pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          existing_pr="$(gh pr list \
+            --base main \
+            --head sync/upstream-main \
+            --state open \
+            --json url \
+            --jq '.[0].url // empty')"
+
+          if [[ -n "$existing_pr" ]]; then
+            echo "Updated existing pull request: $existing_pr"
+            exit 0
+          fi
+
+          gh pr create \
+            --repo "$GITHUB_REPOSITORY" \
+            --base main \
+            --head sync/upstream-main \
+            --title "chore: sync every-app/open-seo main" \
+            --body $'Automated upstream sync from [`every-app/open-seo`](https://github.com/every-app/open-seo).\n\nReview the upstream changes and CI results before merging. The `sync/upstream-main` branch is bot-managed; do not push manual changes to it.'
+
+  verify:
+    needs:
+      - prepare_sync
+      - open_pull_request
+    if: needs.prepare_sync.outputs.has_updates == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: sync/upstream-main
