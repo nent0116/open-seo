@@ -1,0 +1,64 @@
+name: Sync upstream
+
+on:
+  schedule:
+    # Run daily at 03:17 UTC (12:17 JST). The non-round minute reduces scheduler congestion.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-upstream-main
+  cancel-in-progress: false
+
+jobs:
+  open-pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch upstream
+        run: git fetch https://github.com/every-app/open-seo.git main:refs/remotes/upstream/main
+
+      - name: Prepare sync branch
+        id: sync
+        shell: bash
+        run: |
+          if [[ "$(git rev-list --count origin/main..upstream/main)" == "0" ]]; then
+            echo "has_updates=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git checkout -B sync/upstream-main upstream/main
+          git push --force-with-lease origin sync/upstream-main
+          echo "has_updates=true" >> "$GITHUB_OUTPUT"
+
+      - name: Open pull request
+        if: steps.sync.outputs.has_updates == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          existing_pr="$(gh pr list \
+            --base main \
+            --head sync/upstream-main \
+            --state open \
+            --json url \
+            --jq '.[0].url // empty')"
+
+          if [[ -n "$existing_pr" ]]; then
+            echo "Updated existing pull request: $existing_pr"
+            exit 0
+          fi
+
+          gh pr create \
+            --base main \
+            --head sync/upstream-main \
+            --title "chore: sync every-app/open-seo main" \
+            --body $'Automated upstream sync from [`every-app/open-seo`](https://github.com/every-app/open-seo).\n\nReview the upstream changes and CI results before merging.'
