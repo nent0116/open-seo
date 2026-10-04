@@ -49,7 +49,7 @@ export const reportTemplatesQueryKey = (projectId: string) =>
  */
 export function formatCreatedBy(report: ReportListItem): string {
   return report.createdByName
-    ? `${report.createdByName} · ${report.createdBy}`
+    ? `${report.createdByName}・${report.createdBy}`
     : report.createdBy;
 }
 
@@ -67,7 +67,7 @@ export function useDeleteReport(projectId: string, onDeleted?: () => void) {
         project_id: projectId,
         report_id: reportId,
       });
-      toast.success("Report deleted");
+      toast.success("レポートを削除しました");
       void queryClient.invalidateQueries({
         queryKey: reportsQueryKey(projectId),
       });
@@ -95,14 +95,14 @@ export function DeleteReportModal({
 }) {
   return (
     <ConfirmDialog
-      title={`Delete \u201c${title}\u201d?`}
-      confirmLabel="Delete report"
+      title={`「${title}」を削除しますか？`}
+      confirmLabel="レポートを削除"
       destructive
       pending={isPending}
       onClose={onClose}
       onConfirm={onConfirm}
     >
-      This cannot be undone.
+      この操作は取り消せません。
     </ConfirmDialog>
   );
 }
@@ -158,9 +158,9 @@ export function ShareReportModal({
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(url);
-      toast.success("Link copied");
+      toast.success("リンクをコピーしました");
     } catch {
-      toast.error("Clipboard not available");
+      toast.error("クリップボードを利用できません");
     }
   };
 
@@ -173,7 +173,7 @@ export function ShareReportModal({
     >
       <DialogContent className="sm:max-w-lg">
         <DialogHeader className="min-w-0 pr-8">
-          <DialogTitle>Share</DialogTitle>
+          <DialogTitle>共有</DialogTitle>
           <DialogDescription className="truncate">
             {report.title}
           </DialogDescription>
@@ -182,11 +182,11 @@ export function ShareReportModal({
         <div className="rounded-lg border border-border">
           <Field orientation="horizontal" className="p-4">
             <FieldContent>
-              <FieldLabel htmlFor={switchId}>Public link</FieldLabel>
+              <FieldLabel htmlFor={switchId}>公開リンク</FieldLabel>
               <FieldDescription id={`${switchId}-description`}>
                 {shared
-                  ? "Anyone with the link can view. No sign-in needed."
-                  : "Only members of your organization can open it. A link that was open can keep loading for up to a minute."}
+                  ? "リンクを知っている人は誰でも閲覧できます。ログインは不要です。"
+                  : "組織のメンバーだけが閲覧できます。公開を停止したリンクは、反映まで最長1分ほど閲覧できる場合があります。"}
               </FieldDescription>
             </FieldContent>
             <Switch
@@ -206,7 +206,7 @@ export function ShareReportModal({
                 <Input
                   readOnly
                   value={url}
-                  aria-label="Share link"
+                  aria-label="共有リンク"
                   onFocus={(event) => event.target.select()}
                   className="min-w-0 flex-1 basis-64"
                 />
@@ -215,22 +215,22 @@ export function ShareReportModal({
                     variant="outline"
                     size="icon"
                     nativeButton={false}
-                    aria-label="Open link"
-                    title="Open"
+                    aria-label="リンクを開く"
+                    title="開く"
                     render={<a href={url} target="_blank" rel="noreferrer" />}
                   >
                     <ExternalLink />
                   </Button>
                   <Button onClick={() => void copy()}>
                     <Copy data-icon="inline-start" />
-                    Copy link
+                    リンクをコピー
                   </Button>
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                Shows the latest saved version. Hidden from search engines.
+                最後に保存した内容を表示します。検索エンジンには公開されません。
                 {report.sharedAt
-                  ? ` Link created ${formatRelativeTime(report.sharedAt)}.`
+                  ? ` リンク作成：${formatRelativeTime(report.sharedAt)}。`
                   : ""}
               </p>
             </div>
@@ -243,7 +243,7 @@ export function ShareReportModal({
           <p className="text-sm text-destructive">
             {getStandardErrorMessage(
               mutation.error,
-              "Failed to update sharing",
+              "共有設定を更新できませんでした",
             )}
           </p>
         ) : null}

@@ -34,7 +34,7 @@ type SecondaryAction = {
 };
 
 function accountLabel(account: GooglePickerAccount) {
-  return account.email ?? `Google account · ${account.accountId.slice(-6)}`;
+  return account.email ?? `Googleアカウント・${account.accountId.slice(-6)}`;
 }
 
 export function GooglePropertyPicker({
@@ -48,7 +48,7 @@ export function GooglePropertyPicker({
   onSelect,
   onSave,
   saving,
-  saveLabel = "Save property",
+  saveLabel = "プロパティを保存",
   onRetry,
   onReconnect,
   secondaryAction,
@@ -129,7 +129,7 @@ export function GooglePropertyPicker({
       ) : null}
       <div>
         <p className="mb-2 text-sm font-medium">
-          {readOnly ? "Manage Google accounts" : "Choose property"}
+          {readOnly ? "Googleアカウントを管理" : "プロパティを選択"}
         </p>
         <Button
           ref={trigger}
@@ -145,7 +145,7 @@ export function GooglePropertyPicker({
         >
           <span className="min-w-0">
             <span className="block truncate">
-              {selected?.name ?? "Select a property…"}
+              {selected?.name ?? "プロパティを選択…"}
             </span>
             {selectedAccount ? (
               <span className="mt-0.5 block truncate text-xs text-muted-foreground">
@@ -159,7 +159,7 @@ export function GooglePropertyPicker({
           <div
             id={panelId}
             role="region"
-            aria-label="Google properties"
+            aria-label="Googleプロパティ"
             className="mt-2 overflow-hidden rounded-lg border border-border bg-popover shadow-sm"
             onKeyDown={(event) => handlePropertyKeyDown(event, close)}
           >
@@ -168,8 +168,8 @@ export function GooglePropertyPicker({
               <Input
                 autoFocus
                 type="search"
-                aria-label="Search properties or accounts"
-                placeholder="Search properties or accounts…"
+                aria-label="プロパティまたはアカウントを検索"
+                placeholder="プロパティまたはアカウントを検索…"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 className="h-auto min-w-0 border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
@@ -179,12 +179,12 @@ export function GooglePropertyPicker({
               {loading ? (
                 <Spinner
                   size="sm"
-                  label="Loading properties…"
+                  label="プロパティを読み込んでいます…"
                   className="p-3"
                 />
               ) : error ? (
                 <QueryError
-                  fallback="Couldn't load properties."
+                  fallback="プロパティを読み込めませんでした。"
                   onRetry={onRetry}
                 />
               ) : (
@@ -206,39 +206,39 @@ export function GooglePropertyPicker({
                           className="shrink-0 text-destructive"
                           disabled={saving}
                           onClick={() => setRemoving(account)}
-                          aria-label={`Remove ${accountLabel(account)}`}
+                          aria-label={`${accountLabel(account)}を削除`}
                         >
-                          Remove account
+                          アカウントを削除
                         </Button>
                       </div>
                       {account.requiresReconnect ? (
                         <div className="flex flex-wrap items-center justify-between gap-2 px-2 pb-2 text-sm">
                           <span className="text-muted-foreground">
-                            Connection expired
+                            連携の有効期限が切れました
                           </span>
                           <Button
                             variant="ghost"
                             size="xs"
                             onClick={onReconnect}
-                            aria-label={`Reconnect ${accountLabel(account)}`}
+                            aria-label={`${accountLabel(account)}を再連携`}
                             disabled={linking}
                             aria-busy={linking}
                           >
-                            {linking ? "Opening Google…" : "Reconnect"}
+                            {linking ? "Googleを開いています…" : "再連携"}
                           </Button>
                         </div>
                       ) : account.unavailable ? (
                         <div className="flex flex-wrap items-center justify-between gap-2 px-2 pb-2 text-sm">
                           <span className="text-muted-foreground">
-                            Couldn't load properties
+                            プロパティを読み込めませんでした
                           </span>
                           <Button variant="ghost" size="xs" onClick={onRetry}>
-                            Try again
+                            再試行
                           </Button>
                         </div>
                       ) : account.properties.length === 0 ? (
                         <p className="px-2 pb-3 text-sm text-muted-foreground">
-                          No properties available
+                          利用できるプロパティがありません
                         </p>
                       ) : (
                         account.properties.map((property) => {
@@ -275,7 +275,7 @@ export function GooglePropertyPicker({
                                 ) : null}
                                 {!property.selectable ? (
                                   <span className="block text-xs">
-                                    No verified access
+                                    確認済みのアクセス権がありません
                                   </span>
                                 ) : null}
                               </span>
@@ -291,8 +291,8 @@ export function GooglePropertyPicker({
                   {filtered.length === 0 ? (
                     <p className="p-3 text-sm text-muted-foreground">
                       {query
-                        ? "No matching properties or accounts"
-                        : "Add a Google account to find properties."}
+                        ? "一致するプロパティまたはアカウントがありません"
+                        : "Googleアカウントを追加してプロパティを検索してください。"}
                     </p>
                   ) : null}
                 </>
@@ -307,7 +307,7 @@ export function GooglePropertyPicker({
                 pending={linking}
               >
                 {linking ? null : <Plus className="size-4" />}
-                {linking ? "Opening Google…" : "Add Google account"}
+                {linking ? "Googleを開いています…" : "Googleアカウントを追加"}
               </Button>
             </div>
           </div>

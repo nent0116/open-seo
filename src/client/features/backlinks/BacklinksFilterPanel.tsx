@@ -46,28 +46,28 @@ export function BacklinksFilterPanel({
         textFields={[
           {
             key: "include",
-            label: "Source URL Contains",
+            label: "リンク元URLに含む",
             placeholder: "example.com, blog",
           },
           {
             key: "exclude",
-            label: "Source URL Excludes",
+            label: "リンク元URLから除外",
             placeholder: "spam, forum",
           },
         ]}
         rangeFields={[
           {
-            title: "Domain Authority",
+            title: "ドメイン評価",
             minKey: "minDomainRank",
             maxKey: "maxDomainRank",
           },
           {
-            title: "Link Authority",
+            title: "リンク評価",
             minKey: "minLinkAuthority",
             maxKey: "maxLinkAuthority",
           },
           {
-            title: "Spam Score",
+            title: "スパムスコア",
             minKey: "minSpamScore",
             maxKey: "maxSpamScore",
             step: "0.1",
@@ -101,24 +101,24 @@ export function BacklinksFilterPanel({
         textFields={[
           {
             key: "include",
-            label: "Domain Contains",
+            label: "ドメインに含む",
             placeholder: "example.com, blog",
           },
           {
             key: "exclude",
-            label: "Domain Excludes",
+            label: "ドメインから除外",
             placeholder: "spam, forum",
           },
         ]}
         rangeFields={[
           {
-            title: "Backlinks",
+            title: "被リンク",
             minKey: "minBacklinks",
             maxKey: "maxBacklinks",
           },
-          { title: "Rank", minKey: "minRank", maxKey: "maxRank" },
+          { title: "ランク", minKey: "minRank", maxKey: "maxRank" },
           {
-            title: "Spam Score",
+            title: "スパムスコア",
             minKey: "minSpamScore",
             maxKey: "maxSpamScore",
             step: "0.1",
@@ -148,23 +148,23 @@ export function BacklinksFilterPanel({
       textFields={[
         {
           key: "include",
-          label: "Page URL Contains",
+          label: "ページURLに含む",
           placeholder: "/blog, /products",
         },
         {
           key: "exclude",
-          label: "Page URL Excludes",
+          label: "ページURLから除外",
           placeholder: "/tag, /author",
         },
       ]}
       rangeFields={[
-        { title: "Backlinks", minKey: "minBacklinks", maxKey: "maxBacklinks" },
+        { title: "被リンク", minKey: "minBacklinks", maxKey: "maxBacklinks" },
         {
-          title: "Referring Domains",
+          title: "参照ドメイン",
           minKey: "minReferringDomains",
           maxKey: "maxReferringDomains",
         },
-        { title: "Rank", minKey: "minRank", maxKey: "maxRank" },
+        { title: "ランク", minKey: "minRank", maxKey: "maxRank" },
       ]}
       onApply={(values) => {
         state.apply(values);
@@ -179,7 +179,7 @@ export function BacklinksFilterPanel({
 }
 
 const LINK_TYPE_ITEMS = [
-  { value: "all", icon: <Link2 />, label: "All" },
+  { value: "all", icon: <Link2 />, label: "すべて" },
   { value: "dofollow", icon: <Link />, label: "Dofollow" },
   { value: "nofollow", icon: <Unlink />, label: "Nofollow" },
 ];
@@ -193,7 +193,7 @@ function BacklinksToggleControls({
 }) {
   return (
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-      <DataTableFilterGroup label="Link Type">
+      <DataTableFilterGroup label="リンク種別">
         <SegmentedToggle
           showLabels
           items={LINK_TYPE_ITEMS}
@@ -204,17 +204,17 @@ function BacklinksToggleControls({
         />
       </DataTableFilterGroup>
 
-      <DataTableFilterGroup label="Visibility">
+      <DataTableFilterGroup label="表示対象">
         <div className="flex h-7 items-center gap-4">
           <VisibilityCheckbox
-            label="Hide lost"
+            label="消失リンクを非表示"
             checked={draft.hideLost === "true"}
             onCheckedChange={(checked) =>
               setValue("hideLost", checked ? "true" : "")
             }
           />
           <VisibilityCheckbox
-            label="Hide broken"
+            label="リンク切れを非表示"
             checked={draft.hideBroken === "true"}
             onCheckedChange={(checked) =>
               setValue("hideBroken", checked ? "true" : "")

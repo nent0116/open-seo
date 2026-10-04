@@ -60,7 +60,7 @@ export function DashboardPage({ projectId }: { projectId: string }) {
       <div className="px-4 py-4 md:px-6 md:py-6">
         <QueryError
           error={activationQuery.error}
-          fallback="Failed to load dashboard"
+          fallback="ダッシュボードを読み込めませんでした"
           onRetry={() => void activationQuery.refetch()}
           isRetrying={activationQuery.isFetching}
         />
@@ -139,7 +139,7 @@ export function DashboardPage({ projectId }: { projectId: string }) {
   return (
     <div className="px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
       <div className="mx-auto flex max-w-7xl flex-col gap-5">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <h1 className="text-2xl font-semibold">ダッシュボード</h1>
 
         <WorkspaceMergeBanner />
 
@@ -152,7 +152,7 @@ export function DashboardPage({ projectId }: { projectId: string }) {
         {activationQuery.isError ? (
           <QueryError
             error={activationQuery.error}
-            fallback="Failed to refresh dashboard"
+            fallback="ダッシュボードを更新できませんでした"
             onRetry={() => void activationQuery.refetch()}
             isRetrying={activationQuery.isFetching}
           />
@@ -161,7 +161,7 @@ export function DashboardPage({ projectId }: { projectId: string }) {
         {overviewQuery.isError ? (
           <QueryError
             error={overviewQuery.error}
-            fallback="Failed to load site audit and backlink summaries"
+            fallback="サイト監査と被リンクの概要を読み込めませんでした"
             onRetry={() => void overviewQuery.refetch()}
             isRetrying={overviewQuery.isFetching}
           />

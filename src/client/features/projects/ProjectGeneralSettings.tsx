@@ -22,12 +22,12 @@ export function ProjectGeneralSettings({ projectId }: { projectId: string }) {
   return (
     <QueryState
       query={projectsQuery}
-      errorFallback="Failed to load the project"
+      errorFallback="プロジェクトを読み込めませんでした"
     >
       {(projects) => {
         const project = projects.find((entry) => entry.id === projectId);
         if (!project) {
-          return <QueryError fallback="This project was not found." />;
+          return <QueryError fallback="プロジェクトが見つかりませんでした。" />;
         }
         return (
           <div className="space-y-8">
@@ -42,7 +42,7 @@ export function ProjectGeneralSettings({ projectId }: { projectId: string }) {
 }
 
 const generalSchema = z.object({
-  name: z.string().trim().min(1, "Enter a project name."),
+  name: z.string().trim().min(1, "プロジェクト名を入力してください。"),
   domain: z.string(),
   market: z.object({ locationCode: z.number(), languageCode: z.string() }),
 });
@@ -64,7 +64,7 @@ function GeneralSection({ project }: { project: ProjectSummary }) {
       await queryClient.invalidateQueries({
         queryKey: projectsQueryOptions().queryKey,
       });
-      toast.success("Project updated");
+      toast.success("プロジェクトを更新しました");
     },
   });
 
@@ -90,12 +90,12 @@ function GeneralSection({ project }: { project: ProjectSummary }) {
 
   return (
     <section className="space-y-3">
-      <SectionHeader title="General" />
+      <SectionHeader title="一般" />
       <form.AppForm>
         <form.Form className="flex flex-col gap-4">
           <form.AppField name="name">
             {(field) => (
-              <field.TextField label="Name" maxLength={120} required />
+              <field.TextField label="名前" maxLength={120} required />
             )}
           </form.AppField>
 
@@ -104,9 +104,9 @@ function GeneralSection({ project }: { project: ProjectSummary }) {
               <field.TextField
                 label={
                   <>
-                    Domain{" "}
+                    ドメイン{" "}
                     <span className="font-normal text-muted-foreground">
-                      (optional)
+                      （任意）
                     </span>
                   </>
                 }
@@ -126,8 +126,7 @@ function GeneralSection({ project }: { project: ProjectSummary }) {
               )}
             </form.Field>
             <span className="text-xs text-muted-foreground">
-              Keyword, SERP, and domain data uses this country and language
-              unless a call asks for a different one.
+              キーワード、検索結果、ドメインのデータには、個別に指定しない限りこの国と言語が使われます。
             </span>
           </div>
 
@@ -135,7 +134,7 @@ function GeneralSection({ project }: { project: ProjectSummary }) {
             <form.Subscribe selector={(state) => state.isDefaultValue}>
               {(isDefaultValue) => (
                 <form.SubmitButton disabled={isDefaultValue}>
-                  Save changes
+                  変更を保存
                 </form.SubmitButton>
               )}
             </form.Subscribe>
@@ -162,7 +161,7 @@ function DangerSection({
       await queryClient.invalidateQueries({
         queryKey: projectsQueryOptions().queryKey,
       });
-      toast.success("Project archived");
+      toast.success("プロジェクトをアーカイブしました");
       // Re-resolve to a remaining project via the landing redirect.
       void navigate({ to: "/" });
     },
@@ -170,18 +169,18 @@ function DangerSection({
 
   return (
     <section className="space-y-3 border-t border-border pt-8">
-      <SectionHeader title="Archive project" />
+      <SectionHeader title="プロジェクトをアーカイブ" />
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm text-muted-foreground">
           {canArchive
-            ? "Archiving removes the project from your workspace and stops its scheduled rank tracking. You can restore it later from the Projects page."
-            : "You can't archive your only project."}
+            ? "アーカイブすると、このプロジェクトはワークスペースから非表示になり、定期的な順位計測も停止します。プロジェクト一覧から後で復元できます。"
+            : "唯一のプロジェクトはアーカイブできません。"}
         </p>
         <div className="flex shrink-0 gap-2">
           <InlineConfirm
-            label={`Archive ${project.name}`}
-            triggerLabel="Archive project"
-            confirmLabel="Yes, archive project"
+            label={`${project.name}をアーカイブ`}
+            triggerLabel="プロジェクトをアーカイブ"
+            confirmLabel="プロジェクトをアーカイブ"
             pending={archiveMutation.isPending}
             disabled={!canArchive}
             onConfirm={() => archiveMutation.mutate()}

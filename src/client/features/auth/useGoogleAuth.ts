@@ -33,7 +33,7 @@ export function useGoogleAuth({
           : {}),
       });
       if (!result.error) return;
-      setError(result.error.message || fallbackMessage);
+      setError(fallbackMessage);
     } catch {
       setError(fallbackMessage);
     }
@@ -41,8 +41,8 @@ export function useGoogleAuth({
   }
 
   const fallbackMessage = isSignUp
-    ? "Google sign up is not available right now."
-    : "Google sign in is not available right now.";
+    ? "現在、Googleで登録できません。もう一度お試しください。"
+    : "現在、Googleでログインできません。もう一度お試しください。";
 
   return { isStarting, error, start, clearError: () => setError(null) };
 }

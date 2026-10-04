@@ -44,14 +44,14 @@ export function AddKeywordsPanel({
           rows={3}
           // The field grows with its text; a long line must wrap, not widen the card.
           className="min-w-0"
-          aria-label="Keywords to add"
-          placeholder="Enter keywords, one per line"
+          aria-label="追加するキーワード"
+          placeholder="キーワードを1行に1つ入力"
           value={keywordInput}
           onChange={(e) => setKeywordInput(e.target.value)}
         />
         <div
           className="flex w-fit items-center gap-2"
-          title="Track these keywords exactly as typed instead of lowercasing them. Google can return different results for a capitalized brand name."
+          title="小文字に変換せず、入力どおりの表記で順位を計測します。大文字を含むブランド名ではGoogleの結果が異なる場合があります。"
         >
           <Checkbox
             id={matchCaseId}
@@ -59,7 +59,7 @@ export function AddKeywordsPanel({
             onCheckedChange={(checked) => setMatchCase(checked)}
           />
           <Label htmlFor={matchCaseId} className="text-xs font-normal">
-            Match case
+            大文字・小文字を区別
           </Label>
         </div>
       </div>
@@ -74,7 +74,7 @@ export function AddKeywordsPanel({
               .filter(Boolean);
             if (lines.some((l) => l.length > MAX_TRACKED_KEYWORD_LENGTH)) {
               toast.error(
-                `Keywords must be ${MAX_TRACKED_KEYWORD_LENGTH} characters or fewer.`,
+                `キーワードは${MAX_TRACKED_KEYWORD_LENGTH}文字以内で入力してください。`,
               );
               return;
             }
@@ -82,10 +82,10 @@ export function AddKeywordsPanel({
           }}
           disabled={!keywordInput.trim()}
         >
-          Add
+          追加
         </Button>
         <Button variant="ghost" size="sm" onClick={onCancel}>
-          Cancel
+          キャンセル
         </Button>
       </div>
     </div>

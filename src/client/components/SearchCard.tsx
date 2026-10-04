@@ -39,7 +39,7 @@ export function SearchCard({
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
             {children}
             <Button type="submit" className="px-6" pending={pending}>
-              Search
+              検索
             </Button>
           </div>
           {secondRow}

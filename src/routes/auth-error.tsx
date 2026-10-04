@@ -32,7 +32,7 @@ function AuthErrorPage() {
         footer={
           error ? (
             <p className="font-mono text-xs text-muted-foreground">
-              Code: {error}
+              コード： {error}
             </p>
           ) : undefined
         }
@@ -43,7 +43,7 @@ function AuthErrorPage() {
           variant="secondary"
           className="w-full"
         >
-          Back to OpenSEO
+          OpenSEOへ戻る
         </Button>
       </AuthPageCard>
     </AuthPageShell>

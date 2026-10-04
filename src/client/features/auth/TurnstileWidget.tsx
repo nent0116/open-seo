@@ -136,8 +136,7 @@ export function TurnstileWidget({
   if (scriptFailed) {
     return (
       <p role="alert" className="text-sm text-destructive">
-        The security check couldn&rsquo;t load. Allow challenges.cloudflare.com
-        in your browser or ad blocker, then reload the page.
+        セキュリティチェックを読み込めませんでした。ブラウザまたは広告ブロッカーでchallenges.cloudflare.comを許可し、ページを再読み込みしてください。
       </p>
     );
   }

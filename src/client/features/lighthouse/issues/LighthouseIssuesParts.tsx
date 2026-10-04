@@ -43,12 +43,12 @@ export function LighthouseIssuesHeader({
   return (
     <>
       <div className="flex items-center justify-between gap-3">
-        <BackButton onClick={onBack}>Site Audit</BackButton>
+        <BackButton onClick={onBack}>サイト監査</BackButton>
         <span className="text-xs text-muted-foreground">
           {scannedAt
-            ? `Scanned ${new Date(scannedAt).toLocaleString()}`
+            ? `監査日時：${new Date(scannedAt).toLocaleString("ja-JP")}`
             : isLoading
-              ? "Reading latest issues..."
+              ? "最新の問題を確認しています…"
               : null}
         </span>
       </div>
@@ -56,21 +56,21 @@ export function LighthouseIssuesHeader({
       <Card>
         <CardContent className="space-y-4">
           <div className="space-y-1">
-            <h1 className="text-2xl font-semibold">Lighthouse Issues</h1>
+            <h1 className="text-2xl font-semibold">Lighthouseの問題</h1>
             <p className="text-sm text-muted-foreground break-all">
-              {finalUrl ?? (isLoading ? "Loading URL..." : null)}
+              {finalUrl ?? (isLoading ? "URLを読み込んでいます…" : null)}
             </p>
           </div>
           <LighthouseIssuesSummary scores={scores} metrics={metrics} />
           <div className="flex flex-wrap gap-2">
             <SeverityBadge severity="critical">
-              Critical {severityCounts.critical}
+              重大 {severityCounts.critical}
             </SeverityBadge>
             <SeverityBadge severity="warning">
-              Warning {severityCounts.warning}
+              警告 {severityCounts.warning}
             </SeverityBadge>
             <SeverityBadge severity="info">
-              Info {severityCounts.info}
+              情報 {severityCounts.info}
             </SeverityBadge>
           </div>
         </CardContent>
@@ -123,25 +123,25 @@ export function LighthouseIssuesToolbar({
   }> = [
     {
       id: "current",
-      label: `${selectedCategoryLabel} issues`,
+      label: `${selectedCategoryLabel}の問題`,
       issues: visibleIssues,
       payload: exportCurrentCategory,
-      copied: `Copied ${categoryLabelLower} issues`,
+      copied: `${categoryLabelLower}の問題をコピーしました`,
     },
     {
       id: "all",
-      label: "All actionable issues",
+      label: "対応可能なすべての問題",
       issues: allIssues,
       payload: { mode: "issues" },
-      copied: "Copied all actionable issues",
+      copied: "対応可能なすべての問題をコピーしました",
     },
     {
       id: "full",
-      label: "Saved Lighthouse payload",
+      label: "保存済みLighthouseデータ",
       actions: ["copy-json", "json"],
       issues: [],
       payload: { mode: "full" },
-      copied: "Copied saved Lighthouse payload",
+      copied: "保存済みLighthouseデータをコピーしました",
     },
   ];
 
@@ -218,7 +218,7 @@ export function LighthouseIssueList({
   if (!issues.length) {
     return (
       <p className="p-4 text-sm text-muted-foreground">
-        {emptyMessage ?? "No actionable issues for this category."}
+        {emptyMessage ?? "このカテゴリには対応が必要な問題はありません。"}
       </p>
     );
   }
@@ -227,13 +227,13 @@ export function LighthouseIssueList({
       <TableHeader>
         <TableRow>
           <TableHead className="w-8" />
-          <TableHead className="w-24">Severity</TableHead>
-          <TableHead>Issue</TableHead>
-          <TableHead className="hidden w-28 sm:table-cell">Category</TableHead>
+          <TableHead className="w-24">重要度</TableHead>
+          <TableHead>問題</TableHead>
+          <TableHead className="hidden w-28 sm:table-cell">カテゴリ</TableHead>
           <TableHead className="hidden w-28 md:table-cell text-right">
-            Impact
+            影響
           </TableHead>
-          <TableHead className="w-14 text-right">Score</TableHead>
+          <TableHead className="w-14 text-right">スコア</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

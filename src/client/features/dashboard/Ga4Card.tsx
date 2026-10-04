@@ -22,14 +22,14 @@ import {
 } from "@/client/components/ui/chart";
 
 const sessionsChartConfig = {
-  sessions: { label: "Sessions", color: "var(--color-primary)" },
+  sessions: { label: "セッション", color: "var(--color-primary)" },
 } satisfies ChartConfig;
 
 function formatTrendDay(date: string): string {
   // Construct in local time: Date.parse("2026-08-01") is UTC midnight, which
   // toLocaleDateString would render as the previous day west of Greenwich.
   const [year, month, day] = date.split("-").map(Number);
-  return new Date(year, month - 1, day).toLocaleDateString(undefined, {
+  return new Date(year, month - 1, day).toLocaleDateString("ja-JP", {
     month: "short",
     day: "numeric",
   });
@@ -66,8 +66,8 @@ export function Ga4Card({
   // period would otherwise render an all-zero flatline chart in an empty box.
   return (
     <CardShell
-      title="Organic traffic"
-      stamp="Google Analytics · last 28 days"
+      title="自然検索トラフィック"
+      stamp="Google Analytics・過去28日間"
       action={
         <Link
           to="/p/$projectId/settings"
@@ -75,13 +75,14 @@ export function Ga4Card({
           hash="google-analytics"
           className={moreDetailsClass}
         >
-          Manage
+          管理
         </Link>
       }
     >
       {reportQuery.isError ? (
         <p className="text-sm text-muted-foreground">
-          Couldn&rsquo;t load Google Analytics data. Try again shortly.
+          Google
+          Analyticsのデータを読み込めませんでした。時間をおいて再試行してください。
         </p>
       ) : !report ? (
         <div className="space-y-3" aria-busy>
@@ -90,13 +91,13 @@ export function Ga4Card({
         </div>
       ) : !report.totals.sessions ? (
         <p className="text-sm text-muted-foreground">
-          No organic search traffic recorded in the last 28 days yet.
+          過去28日間の自然検索トラフィックはまだ記録されていません。
         </p>
       ) : (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <StatTile
-              label="Sessions"
+              label="セッション"
               value={statValue(report.totals.sessions, formatCount)}
               delta={{
                 current: report.totals.sessions,
@@ -104,7 +105,7 @@ export function Ga4Card({
               }}
             />
             <StatTile
-              label="Active users"
+              label="アクティブユーザー"
               value={statValue(report.totals.activeUsers, formatCount)}
               delta={{
                 current: report.totals.activeUsers,
@@ -112,11 +113,11 @@ export function Ga4Card({
               }}
             />
             <StatTile
-              label="Engagement rate"
+              label="エンゲージメント率"
               value={statValue(report.totals.engagementRate, formatCtr)}
             />
             <StatTile
-              label="Key events"
+              label="キーイベント"
               value={statValue(report.totals.keyEvents, formatCount)}
               delta={{
                 current: report.totals.keyEvents,

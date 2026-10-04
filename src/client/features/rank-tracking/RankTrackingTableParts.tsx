@@ -12,25 +12,24 @@ const FEATURE_SHORT_LABELS: Record<string, string> = {
   featured_snippet: "FS",
   people_also_ask: "PAA",
   ai_overview: "AI",
-  local_pack: "Local",
+  local_pack: "地域",
   knowledge_panel: "KP",
-  video: "Video",
-  images: "Img",
-  shopping: "Shop",
-  top_stories: "News",
+  video: "動画",
+  images: "画像",
+  shopping: "商品",
+  top_stories: "ニュース",
 };
 
 const FEATURE_TOOLTIPS: Record<string, string> = {
-  featured_snippet:
-    "Featured Snippet — highlighted answer box at top of results",
-  people_also_ask: "People Also Ask — expandable related questions",
-  ai_overview: "AI Overview — AI-generated summary at top of search",
-  local_pack: "Local Pack — map with local business listings",
-  knowledge_panel: "Knowledge Panel — info box about an entity",
-  video: "Video — video results shown in the SERP",
-  images: "Images — image results shown in the SERP",
-  shopping: "Shopping — product listings with prices",
-  top_stories: "Top Stories — news articles carousel",
+  featured_snippet: "強調スニペット — 検索結果上部に強調表示される回答枠",
+  people_also_ask: "関連する質問 — 展開できる関連質問",
+  ai_overview: "AI Overview — 検索上部に表示されるAI生成の要約",
+  local_pack: "ローカルパック — 地域の店舗情報を掲載した地図",
+  knowledge_panel: "ナレッジパネル — 対象に関する情報枠",
+  video: "動画 — 検索結果に表示される動画",
+  images: "画像 — 検索結果に表示される画像",
+  shopping: "ショッピング — 価格付きの商品一覧",
+  top_stories: "トップニュース — ニュース記事のカルーセル",
 };
 
 export function SerpFeatureTags({ features }: { features: string[] }) {
@@ -130,7 +129,7 @@ export function DeviceUrlCell({
   );
 }
 
-const compactFormatter = new Intl.NumberFormat("en-US", {
+const compactFormatter = new Intl.NumberFormat("ja-JP", {
   notation: "compact",
   maximumFractionDigits: 1,
 });
@@ -152,8 +151,8 @@ export function csvChange(
   current: number | null,
   previous: number | null,
 ): number | string {
-  if (previous === null) return current !== null ? "new" : "";
-  if (current === null) return "lost";
+  if (previous === null) return current !== null ? "新規" : "";
+  if (current === null) return "圏外";
   return previous - current;
 }
 
@@ -164,28 +163,18 @@ function buildRankTrackingExport(
   locationName?: string | null,
 ): { headers: string[]; rows: (string | number)[][] } {
   const headers = [
-    "Keyword",
+    "キーワード",
     // Exports lack the table's tooltip, so name the city inline.
     locationName
-      ? `Local volume (${formatLocationLabel(locationName, 2)})`
-      : "Volume",
+      ? `ローカル検索ボリューム（${formatLocationLabel(locationName, 2)}）`
+      : "検索ボリューム",
     "KD",
     "CPC",
     ...(showDesktop
-      ? [
-          "Desktop Position",
-          "Desktop Change",
-          "Desktop URL",
-          "Desktop SERP Features",
-        ]
+      ? ["パソコン順位", "パソコン前回比", "パソコンURL", "パソコンSERP機能"]
       : []),
     ...(showMobile
-      ? [
-          "Mobile Position",
-          "Mobile Change",
-          "Mobile URL",
-          "Mobile SERP Features",
-        ]
+      ? ["モバイル順位", "モバイル前回比", "モバイルURL", "モバイルSERP機能"]
       : []),
   ];
   // Emit empty cells (not "Not ranking" strings) so Sheets infers a numeric

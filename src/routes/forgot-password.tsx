@@ -14,7 +14,7 @@ import { getSignInSearch, normalizeAuthRedirect } from "@/lib/auth-redirect";
 import { z } from "zod";
 
 const forgotPasswordSchema = z.object({
-  email: z.string().trim().email("Enter a valid email address."),
+  email: z.string().trim().email("有効なメールアドレスを入力してください。"),
 });
 
 export const Route = createFileRoute("/forgot-password")({
@@ -47,7 +47,7 @@ function ForgotPasswordPage() {
         if (result.error) {
           formApi.setErrorMap({
             onSubmit: {
-              form: result.error.message || "We couldn't send the reset email.",
+              form: "再設定メールを送信できませんでした。",
               fields: {},
             },
           });
@@ -56,7 +56,7 @@ function ForgotPasswordPage() {
       } catch {
         formApi.setErrorMap({
           onSubmit: {
-            form: "We couldn't send the reset email right now. Please try again.",
+            form: "現在、再設定メールを送信できません。もう一度お試しください。",
             fields: {},
           },
         });
@@ -79,13 +79,17 @@ function ForgotPasswordPage() {
 
           return (
             <AuthPageCard
-              title={isSuccess ? "Check your email" : "Forgot password"}
+              title={
+                isSuccess
+                  ? "メールをご確認ください"
+                  : "パスワードをお忘れですか？"
+              }
               helperText={
                 isSuccess
                   ? undefined
                   : isHostedMode
-                    ? "Enter your email and we'll send you a password reset link."
-                    : "Password reset isn't available right now."
+                    ? "メールアドレスを入力すると、パスワード再設定用のリンクをお送りします。"
+                    : "現在、パスワードの再設定を利用できません。"
               }
               footer={
                 <p className="text-sm">
@@ -94,7 +98,7 @@ function ForgotPasswordPage() {
                     search={getSignInSearch(redirectTo)}
                     className="text-muted-foreground hover:text-foreground transition-colors"
                   >
-                    Back to sign in
+                    ログインへ戻る
                   </Link>
                 </p>
               }
@@ -102,8 +106,8 @@ function ForgotPasswordPage() {
               {isSuccess ? (
                 <Alert variant="success">
                   <AlertDescription>
-                    If an account exists for {submittedEmail}, you'll receive
-                    password reset instructions shortly.
+                    次のメールアドレスのアカウントが存在する場合：{" "}
+                    {submittedEmail}。まもなくパスワード再設定の案内が届きます。
                   </AlertDescription>
                 </Alert>
               ) : (
@@ -112,9 +116,9 @@ function ForgotPasswordPage() {
                     <form.AppField name="email">
                       {(field) => (
                         <field.TextField
-                          label="Email address"
+                          label="メールアドレス"
                           type="email"
-                          placeholder="Email address..."
+                          placeholder="メールアドレスを入力"
                           autoComplete="email"
                           disabled={!isHostedMode}
                           required
@@ -134,9 +138,7 @@ function ForgotPasswordPage() {
                       pending={isSubmitting}
                       disabled={!isHostedMode}
                     >
-                      {isSubmitting
-                        ? "Sending reset link..."
-                        : "Send reset link"}
+                      {isSubmitting ? "送信しています…" : "再設定リンクを送信"}
                     </Button>
                   </form.Form>
                 </form.AppForm>

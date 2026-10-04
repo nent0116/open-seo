@@ -168,7 +168,7 @@ export function SearchPerformancePage({
       });
       await exportDimensionRows(dimension, data.rows, report.range, target);
     } catch (error) {
-      toast.error(getStandardErrorMessage(error, "Export failed"));
+      toast.error(getStandardErrorMessage(error, "出力に失敗しました"));
     } finally {
       setIsExporting(false);
     }
@@ -189,7 +189,7 @@ export function SearchPerformancePage({
   const reportError = (
     <QueryError
       error={reportQuery.error}
-      fallback="Failed to load Search Console data"
+      fallback="Search Consoleのデータを読み込めませんでした"
       onRetry={() => void reportQuery.refetch()}
       isRetrying={reportQuery.isFetching}
     />
@@ -219,10 +219,10 @@ export function SearchPerformancePage({
       <div className="mx-auto max-w-7xl space-y-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">Search Performance</h1>
+            <h1 className="text-2xl font-semibold">検索パフォーマンス</h1>
             <p className="text-sm text-muted-foreground">
-              See your site&apos;s clicks, impressions, CTR, and position from
-              Google Search Console.
+              Google Search
+              Consoleのデータから、サイトのクリック数、表示回数、CTR、掲載順位を確認します。
             </p>
           </div>
           {report?.connected ? (
@@ -231,7 +231,7 @@ export function SearchPerformancePage({
               params={{ projectId }}
               className="shrink-0 self-start text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline sm:mt-1"
             >
-              Change property
+              プロパティを変更
             </Link>
           ) : null}
         </div>
@@ -276,11 +276,11 @@ export function SearchPerformancePage({
               >
                 <TabsTrigger value="striking">
                   {reportQuery.isPlaceholderData
-                    ? "Striking distance"
-                    : `Striking distance (${report.strikingDistance.length})`}
+                    ? "上位表示まであと一歩"
+                    : `上位表示まであと一歩（${report.strikingDistance.length}）`}
                 </TabsTrigger>
-                <TabsTrigger value="queries">Queries</TabsTrigger>
-                <TabsTrigger value="pages">Pages</TabsTrigger>
+                <TabsTrigger value="queries">検索文</TabsTrigger>
+                <TabsTrigger value="pages">ページ</TabsTrigger>
               </DataTableTabs>
               <div className="flex flex-wrap items-center gap-2 border-b border-border px-4 py-2">
                 <Button
@@ -290,10 +290,10 @@ export function SearchPerformancePage({
                   aria-expanded={showFilters}
                   aria-controls="search-performance-filters"
                   onClick={() => setShowFilters((current) => !current)}
-                  title="Toggle table filters"
+                  title="表の絞り込みを切り替える"
                 >
                   <SlidersHorizontal data-icon="inline-start" />
-                  Filters
+                  絞り込み
                   {activeFilterCount > 0 ? (
                     <Badge size="sm">{activeFilterCount}</Badge>
                   ) : null}
@@ -311,7 +311,7 @@ export function SearchPerformancePage({
               {showFilters ? filtersPanel : null}
               {reportQuery.isPlaceholderData ? (
                 <div className="p-8 text-sm" role="status">
-                  Loading matching results…
+                  一致する結果を読み込んでいます…
                 </div>
               ) : tab === "striking" ? (
                 <StrikingDistanceTable
@@ -332,7 +332,7 @@ export function SearchPerformancePage({
                 <DimensionSection
                   projectId={projectId}
                   tableQuery={tableQuery}
-                  keyLabel={tab === "queries" ? "Query" : "Page"}
+                  keyLabel={tab === "queries" ? "検索語句" : "ページ"}
                   page={page}
                   pageSize={pageSize}
                   onPageChange={(nextPage) =>

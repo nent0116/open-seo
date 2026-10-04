@@ -33,56 +33,56 @@ export function PagesFilterBar({
     <DataTableFilterPanel activeCount={activeFilterCount} onReset={onReset}>
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
         <TextFilter
-          label="Search"
+          label="検索"
           value={filters.query}
-          placeholder="URL, title, meta"
+          placeholder="URL、タイトル、メタ情報"
           onChange={(query) => onChange({ ...filters, query })}
         />
         <SelectFilter
-          label="Status"
+          label="ステータス"
           value={filters.status}
           onChange={(status) => onChange({ ...filters, status })}
           options={[
-            ["all", "All"],
+            ["all", "すべて"],
             ["ok", "2xx"],
             ["redirect", "3xx"],
             ["error", "4xx/5xx"],
-            ["missing", "Missing"],
+            ["missing", "なし"],
           ]}
         />
         <SelectFilter
-          label="Crawl result"
+          label="クロール結果"
           value={filters.fetchClass}
           onChange={(fetchClass) => onChange({ ...filters, fetchClass })}
           options={[
-            ["all", "All"],
-            ["ok", "Read"],
-            ["error", "Failed"],
-            ["blocked", "Blocked"],
-            ["rate_limited", "Rate limited"],
+            ["all", "すべて"],
+            ["ok", "読取成功"],
+            ["error", "失敗"],
+            ["blocked", "ブロック"],
+            ["rate_limited", "レート制限"],
           ]}
         />
         <SelectFilter
-          label="Alt text"
+          label="代替テキスト"
           value={filters.missingAlt}
           onChange={(missingAlt) => onChange({ ...filters, missingAlt })}
           options={[
-            ["all", "All"],
-            ["yes", "Missing alt"],
-            ["no", "No missing alt"],
+            ["all", "すべて"],
+            ["yes", "代替テキストなし"],
+            ["no", "代替テキストあり"],
           ]}
         />
       </div>
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
         <RangeFilter
-          label="Words"
+          label="文字数"
           min={filters.minWords}
           max={filters.maxWords}
           onMinChange={(minWords) => onChange({ ...filters, minWords })}
           onMaxChange={(maxWords) => onChange({ ...filters, maxWords })}
         />
         <RangeFilter
-          label="Speed ms"
+          label="速度（ms）"
           min={filters.minResponseMs}
           max={filters.maxResponseMs}
           onMinChange={(minResponseMs) =>
@@ -112,33 +112,33 @@ export function PerformanceFilterBar({
     <DataTableFilterPanel activeCount={activeFilterCount} onReset={onReset}>
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-4">
         <TextFilter
-          label="Search"
+          label="検索"
           value={filters.query}
           placeholder="URL"
           onChange={(query) => onChange({ ...filters, query })}
         />
         <SelectFilter
-          label="Device"
+          label="デバイス"
           value={filters.device}
           onChange={(device) => onChange({ ...filters, device })}
           options={[
-            ["all", "All"],
-            ["desktop", "Desktop"],
-            ["mobile", "Mobile"],
+            ["all", "すべて"],
+            ["desktop", "パソコン"],
+            ["mobile", "モバイル"],
           ]}
         />
         <SelectFilter
-          label="Status"
+          label="ステータス"
           value={filters.status}
           onChange={(status) => onChange({ ...filters, status })}
           options={[
-            ["all", "All"],
-            ["ok", "OK"],
-            ["failed", "Failed"],
+            ["all", "すべて"],
+            ["ok", "成功"],
+            ["failed", "失敗"],
           ]}
         />
         <TextFilter
-          label="Max LCP s"
+          label="最大LCP（秒）"
           value={filters.maxLcpSeconds}
           placeholder="2.5"
           type="number"
@@ -147,7 +147,7 @@ export function PerformanceFilterBar({
       </div>
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
         <RangeFilter
-          label="Perf"
+          label="性能"
           min={filters.minPerf}
           max={filters.maxPerf}
           onMinChange={(minPerf) => onChange({ ...filters, minPerf })}
@@ -183,7 +183,8 @@ export function ResultsTableToolbar({
     <DataTableToolbar
       actions={
         <span className="text-sm tabular-nums text-muted-foreground">
-          {resultCount.toLocaleString()} of {totalCount.toLocaleString()}
+          {resultCount.toLocaleString("ja-JP")}件 / 全
+          {totalCount.toLocaleString("ja-JP")}件
         </span>
       }
     >

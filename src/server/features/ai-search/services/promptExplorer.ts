@@ -106,13 +106,13 @@ async function runModel(
     const modelLabel = formatModelLabel(args.model);
     const limitation =
       args.model === "gemini"
-        ? `${modelLabel} doesn’t support country selection.`
-        : `${modelLabel} doesn’t support ${formatCountryLabel(country)} as a search country.`;
+        ? `${modelLabel}は国の指定をサポートしていません。`
+        : `${modelLabel}は${formatCountryLabel(country)}を検索対象国としてサポートしていません。`;
     return {
       status: "error",
       model: args.model,
       errorCode: "UNSUPPORTED_COUNTRY",
-      message: `${limitation} Select “No country preference” above, then run again to include ${modelLabel}.`,
+      message: `${limitation}上の「国を指定しない」を選択し、もう一度実行すると${modelLabel}も含められます。`,
     };
   }
   // Part of the cache key so a model upgrade refetches rather than serving
@@ -349,6 +349,6 @@ function mapErrorToResult(
     status: "error" as const,
     model,
     errorCode: "UPSTREAM_ERROR",
-    message: "This model is temporarily unavailable. Please try again.",
+    message: "このモデルは一時的に利用できません。もう一度お試しください。",
   };
 }

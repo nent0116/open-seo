@@ -43,6 +43,7 @@ describe("renderSharePage", () => {
       "text/html; charset=utf-8",
     );
     expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(html).toContain('<html lang="ja">');
     expect(html).toContain(
       `<iframe src="/s/${TOKEN}/raw" sandbox="${REPORT_IFRAME_SANDBOX}"`,
     );
@@ -66,6 +67,7 @@ describe("renderSharePage", () => {
     expect($('meta[name="twitter:image:alt"]').attr("content")).toBe(
       `${SHARED_REPORT.title} · OpenSEO`,
     );
+    expect($("#share span").text()).toBe("共有");
     // No app bundle: the reader has never signed in and needs none of it.
     expect(html).not.toContain("/assets/");
   });
@@ -82,7 +84,7 @@ describe("renderSharePage", () => {
     const html = await response.text();
 
     expect(response.status).toBe(404);
-    expect(html).toContain("This project has been archived.");
+    expect(html).toContain("このプロジェクトはアーカイブされています。");
     expect(html).not.toContain("badseo.dev");
     expect(html).not.toContain("og:image");
     expect(html).not.toContain("twitter:image");
@@ -114,7 +116,7 @@ describe("renderSharePage", () => {
 
     expect(response.status).toBe(404);
     const html = await response.text();
-    expect(html).toContain("This report isn&#x27;t shared.");
+    expect(html).toContain("このレポートは共有されていません。");
     expect(html).not.toContain("og:image");
     expect(html).not.toContain("twitter:image");
     if (token !== TOKEN) {

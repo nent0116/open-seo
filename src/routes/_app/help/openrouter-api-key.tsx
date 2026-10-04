@@ -13,19 +13,18 @@ export const Route = createFileRoute("/_app/help/openrouter-api-key")({
 function OpenrouterApiKeyHelpPage() {
   return (
     <SecretHelpPage
-      title="Set up your OpenRouter API key"
+      title="OpenRouter APIキーを設定"
       intro={
         <>
-          OpenSEO needs the <code>OPENROUTER_API_KEY</code> secret before AI
-          features like SAM, the in-app SEO agent, can run. It is optional —
-          everything else in OpenSEO works without it.
+          OpenSEOで機能を利用するには <code>OPENROUTER_API_KEY</code>{" "}
+          シークレットの設定が必要です。設定するとアプリ内SEOエージェントSAMなどのAI機能を利用できます。この設定は任意で、OpenSEOのその他の機能は設定なしでも利用できます。
         </>
       }
       secretName="OPENROUTER_API_KEY"
       steps={
         <>
           <li>
-            Create an account at{" "}
+            次のサイトでアカウントを作成します：{" "}
             <a
               className={helpLinkClassName}
               href="https://openrouter.ai"
@@ -34,10 +33,10 @@ function OpenrouterApiKeyHelpPage() {
             >
               openrouter.ai
             </a>{" "}
-            and add credits (pay-as-you-go, like DataForSEO).
+            でクレジットを追加します（DataForSEOと同様の従量課金制）。
           </li>
           <li>
-            Go to{" "}
+            次へ移動します：{" "}
             <a
               className={helpLinkClassName}
               href={OPENROUTER_KEYS_URL}
@@ -46,26 +45,26 @@ function OpenrouterApiKeyHelpPage() {
             >
               OpenRouter API Keys
             </a>{" "}
-            and click "Create API Key".
+            を開き、「Create API Key」をクリックします。
           </li>
           <li>
-            Save the key as the <code>OPENROUTER_API_KEY</code> secret in your
-            environment:
+            キーを次の名前の <code>OPENROUTER_API_KEY</code>{" "}
+            シークレットとして環境に保存します：
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li>
-                Docker self-hosting: <code>.env</code>
+                Dockerセルフホスト： <code>.env</code>
               </li>
-              <li>Cloudflare: set it in the Workers UI (see below)</li>
+              <li>Cloudflare：Workersの画面で設定します（下記参照）</li>
               <li>
-                Local development: <code>.env.local</code>
+                ローカル開発： <code>.env.local</code>
               </li>
             </ul>
           </li>
-          <li>Restart OpenSEO.</li>
+          <li>OpenSEOを再起動します。</li>
         </>
       }
-      dashboardPasteStep="Paste your OpenRouter API key and save."
-      terminalPromptHint="Paste your OpenRouter API key when prompted."
+      dashboardPasteStep="OpenRouter APIキーを貼り付けて保存します。"
+      terminalPromptHint="入力を求められたらOpenRouter APIキーを貼り付けてください。"
     />
   );
 }

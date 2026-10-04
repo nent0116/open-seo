@@ -47,7 +47,7 @@ const backlinksSearchHistoryItemSchema = z
         : LEGACY_SCOPES[item.scope],
     );
     if (!scope.success) {
-      ctx.addIssue({ code: "custom", message: "Unknown backlinks scope" });
+      ctx.addIssue({ code: "custom", message: "被リンクの対象範囲が不明です" });
       return z.NEVER;
     }
 

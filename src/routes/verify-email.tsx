@@ -34,14 +34,14 @@ export const Route = createFileRoute("/verify-email")({
 function getVerificationErrorMessage(error: string | undefined) {
   switch ((error ?? "").toLowerCase()) {
     case "invalid_token":
-      return "This link is no longer valid. Request a new email to keep going.";
+      return "このリンクは無効です。新しいメールをリクエストしてください。";
     case "token_expired":
-      return "This link has expired. Request a new email to keep going.";
+      return "このリンクは期限切れです。新しいメールをリクエストしてください。";
     case "user_not_found":
-      return "We couldn't find this account anymore. Try creating it again.";
+      return "このアカウントが見つかりません。もう一度作成してください。";
     default:
       return error
-        ? "We couldn't confirm this email. Request a new email and try again."
+        ? "メールアドレスを確認できませんでした。新しいメールをリクエストして、もう一度お試しください。"
         : null;
   }
 }
@@ -61,29 +61,29 @@ function getVerifyEmailPageCopy({
 }) {
   if (!isHostedMode) {
     return {
-      title: "Verify email",
-      helperText: "Email confirmation isn't available right now.",
+      title: "メールアドレスを確認",
+      helperText: "現在、メールアドレスの確認機能を利用できません。",
     };
   }
 
   if (errorMessage) {
     return {
-      title: "We couldn't confirm your email",
+      title: "メールアドレスを確認できませんでした",
       helperText: undefined,
     };
   }
 
   if (isRedirecting) {
     return {
-      title: "Email confirmed",
-      helperText: "You're all set. Taking you to your account now.",
+      title: "メールアドレスを確認しました",
+      helperText: "確認が完了しました。アカウント画面へ移動します。",
     };
   }
 
   if (isPending) {
     return {
-      title: "Verify email",
-      helperText: "Checking your email confirmation.",
+      title: "メールアドレスを確認",
+      helperText: "メールアドレスの確認状況を確認しています。",
     };
   }
 
@@ -92,10 +92,10 @@ function getVerifyEmailPageCopy({
   // unverified hosted user would be bounced straight back by the verification
   // gate.
   return {
-    title: "Verify your email",
+    title: "メールアドレスを確認してください",
     helperText: email
-      ? `Click the link we sent to ${email} to verify your email.`
-      : "Check your inbox for the link to verify your email.",
+      ? `${email}に送信したリンクをクリックして、メールアドレスを確認してください。`
+      : "受信トレイを確認し、メールアドレス確認用のリンクを開いてください。",
   };
 }
 
@@ -174,15 +174,13 @@ function VerifyEmailPage() {
         callbackURL: callbackURL.toString(),
       });
       if (result.error) {
-        toast.error(result.error.message || "We couldn't send another email.");
+        toast.error("確認メールを再送できませんでした。");
         return;
       }
       captureClientEvent("auth:verification_resend");
-      toast.success("A new email is on the way.");
+      toast.success("確認メールを再送しました。");
     } catch {
-      toast.error(
-        "We couldn't send another email right now. Please try again.",
-      );
+      toast.error("確認メールを再送できませんでした。もう一度お試しください。");
     } finally {
       setIsResending(false);
     }
@@ -200,7 +198,7 @@ function VerifyEmailPage() {
               search={getSignInSearch(redirectTo)}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Back to sign in
+              ログインへ戻る
             </Link>
           </p>
         }
@@ -219,7 +217,7 @@ function VerifyEmailPage() {
             pending={isResending}
             onClick={() => void handleResend()}
           >
-            {isResending ? "Sending email..." : "Resend email"}
+            {isResending ? "送信しています…" : "確認メールを再送"}
           </Button>
         ) : null}
       </AuthPageCard>

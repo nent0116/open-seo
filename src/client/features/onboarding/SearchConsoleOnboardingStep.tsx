@@ -45,11 +45,10 @@ export function SearchConsoleOnboardingStep(props: NavigationProps) {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
-          Connect Google Search Console now?
+          Google Search Consoleを今すぐ連携しますか？
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Bring your real clicks and queries into OpenSEO and your AI agent. You
-          can also do this later from the dashboard.
+          実際のクリック数と検索語句をOpenSEOとAIエージェントで利用できます。ダッシュボードから後で連携することもできます。
         </p>
       </div>
 
@@ -60,18 +59,18 @@ export function SearchConsoleOnboardingStep(props: NavigationProps) {
           {projectsQuery.isError ? (
             <QueryError
               error={projectsQuery.error}
-              fallback="Couldn't load your project."
+              fallback="プロジェクトを読み込めませんでした。"
               onRetry={() => void projectsQuery.refetch()}
               isRetrying={projectsQuery.isFetching}
             />
           ) : (
-            <Spinner size="sm" label="Checking…" />
+            <Spinner size="sm" label="確認しています…" />
           )}
           <WizardFooter
             onBack={props.onBack}
             onSkip={props.onSkip}
-            skipLabel="Skip for now"
-            continueLabel="Save and continue"
+            skipLabel="今はスキップ"
+            continueLabel="保存して続ける"
           />
         </>
       )}
@@ -144,10 +143,10 @@ function GscConnect({
   return (
     <fieldset disabled={busy} className="min-w-0">
       {connectionQuery.isLoading ? (
-        <Spinner size="sm" label="Checking…" />
+        <Spinner size="sm" label="確認しています…" />
       ) : connectionQuery.isError && !connection ? (
         <QueryError
-          fallback="Couldn't check your Google connection."
+          fallback="Googleとの連携状況を確認できませんでした。"
           onRetry={() => void connectionQuery.refetch()}
           isRetrying={connectionQuery.isFetching}
         />
@@ -157,7 +156,7 @@ function GscConnect({
             <Check className="size-3.5" />
           </span>
           <span className="min-w-0 text-foreground/80">
-            Connected to{" "}
+            連携先：{" "}
             <span className="font-mono break-all">{connection?.property}</span>.
           </span>
         </div>
@@ -176,12 +175,12 @@ function GscConnect({
               onSave={() =>
                 selection && !busy && setSiteMutation.mutate(selection)
               }
-              saveLabel="Save and continue"
+              saveLabel="保存して続ける"
               renderActions={(saveButton) => (
                 <WizardFooter
                   onBack={onBack}
                   onSkip={onSkip}
-                  skipLabel="Skip for now"
+                  skipLabel="今はスキップ"
                   continueAction={saveButton}
                 />
               )}
@@ -203,7 +202,7 @@ function GscConnect({
               ) : (
                 <GoogleGlyph className="size-[18px]" />
               )}
-              {linking ? "Opening Google…" : "Connect with Google"}
+              {linking ? "Googleを開いています…" : "Googleと連携"}
             </Button>
           )}
         </div>
@@ -212,9 +211,9 @@ function GscConnect({
         <WizardFooter
           onBack={onBack}
           onSkip={connected ? undefined : onSkip}
-          skipLabel="Skip for now"
+          skipLabel="今はスキップ"
           onContinue={connected ? onNext : undefined}
-          continueLabel={connected ? "Continue" : "Save and continue"}
+          continueLabel={connected ? "続ける" : "保存して続ける"}
         />
       )}
     </fieldset>

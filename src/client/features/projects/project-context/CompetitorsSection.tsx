@@ -40,11 +40,11 @@ export function CompetitorsSection({
 
   return (
     <EditableListSection
-      title="Competitors"
-      hint="The sites you measure yourself against."
-      addLabel="Add competitor"
-      emptyTitle="No competitors yet"
-      emptyDescription="Add the sites you compete with, or ask your agent to find them from your rankings and save them here."
+      title="競合サイト"
+      hint="比較対象として計測するサイトです。"
+      addLabel="競合を追加"
+      emptyTitle="競合サイトはまだありません"
+      emptyDescription="競合するサイトを追加するか、AIエージェントに検索順位から候補を探して保存するよう依頼できます。"
       items={competitors}
       getId={(item) => item.id}
       getLabel={(item) => item.domain}
@@ -113,22 +113,22 @@ function CompetitorForm({
           }
           placeholder="competitor.com"
           maxLength={255}
-          aria-label="Competitor domain"
+          aria-label="競合ドメイン"
         />
         <Input
           value={draft.name}
           onChange={(event) => setDraft({ ...draft, name: event.target.value })}
-          placeholder="Name (optional)"
+          placeholder="名前（任意）"
           maxLength={120}
-          aria-label="Competitor name"
+          aria-label="競合名"
         />
       </div>
       <Input
         value={draft.notes}
         onChange={(event) => setDraft({ ...draft, notes: event.target.value })}
-        placeholder="Why they matter — e.g. wins every comparison keyword (optional)"
+        placeholder="注目する理由（例：比較キーワードで常に上位）（任意）"
         maxLength={500}
-        aria-label="Competitor notes"
+        aria-label="競合メモ"
       />
       <FormActions
         pending={pending}

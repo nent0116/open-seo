@@ -18,7 +18,7 @@ export type PlanOffer = {
 
 export const BASE_PLAN_OFFER: PlanOffer = {
   planId: AUTUMN_PAID_PLAN_ID,
-  name: "Base Plan",
+  name: "ベースプラン",
   priceUsd: 10,
   monthlyCreditsUsd: 10,
   checkoutSessionParams: AUTUMN_CHECKOUT_SESSION_PARAMS,
@@ -26,12 +26,12 @@ export const BASE_PLAN_OFFER: PlanOffer = {
 
 export const YC_PLAN_OFFER: PlanOffer = {
   planId: AUTUMN_YC_PLAN_ID,
-  name: "YC Plan",
+  name: "YCプラン",
   priceUsd: 50,
   monthlyCreditsUsd: 50,
   checkoutSessionParams: AUTUMN_YC_CHECKOUT_SESSION_PARAMS,
 };
 
 export function monthlyCreditsFeature(offer: PlanOffer) {
-  return `Includes $${offer.monthlyCreditsUsd.toFixed(2)} of Usage Credits each month`;
+  return `月額$${offer.monthlyCreditsUsd.toFixed(2)}相当の利用クレジットを含みます`;
 }

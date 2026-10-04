@@ -25,8 +25,8 @@ export function GoogleProjectEmptyState({
     <div className="flex flex-1 flex-col gap-4">
       <p className="text-sm text-muted-foreground">
         {hasGrant
-          ? `Choose a ${name} property to finish connecting this project.`
-          : `Connect ${name} to see this project’s data.`}
+          ? `${name}のプロパティを選択して、このプロジェクトとの連携を完了してください。`
+          : `${name}を連携して、このプロジェクトのデータを表示します。`}
       </p>
       {/* Actions sit bottom-right, with Dismiss (children) just left of the
           connect action. */}
@@ -49,12 +49,12 @@ export function GoogleProjectEmptyState({
               <GoogleGlyph className="size-[18px]" />
             )}
             {disabled
-              ? "Opening Google…"
+              ? "Googleを開いています…"
               : canManage
                 ? hasGrant
-                  ? "Choose property"
-                  : "Connect"
-                : "Manage Google accounts"}
+                  ? "プロパティを選択"
+                  : "連携する"
+                : "Googleアカウントを管理"}
           </Button>
         ) : null}
       </div>

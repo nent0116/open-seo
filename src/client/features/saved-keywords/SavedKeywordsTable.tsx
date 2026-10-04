@@ -53,7 +53,7 @@ export function SavedKeywordsTable({
       makeSelectionColumn<SavedKeywordRow>(selectAnchorRef),
       columnHelper.accessor("keyword", {
         header: ({ column }) => (
-          <SortableHeader column={column} label="Keyword" />
+          <SortableHeader column={column} label="キーワード" />
         ),
         cell: ({ getValue }) => (
           <span className="font-medium">{getValue()}</span>
@@ -61,7 +61,7 @@ export function SavedKeywordsTable({
       }),
       columnHelper.accessor("searchVolume", {
         header: ({ column }) => (
-          <SortableHeader column={column} label="Volume" />
+          <SortableHeader column={column} label="検索ボリューム" />
         ),
         cell: ({ getValue }) => formatSavedKeywordNumber(getValue()),
       }),
@@ -76,8 +76,8 @@ export function SavedKeywordsTable({
         header: ({ column }) => (
           <SortableHeader
             column={column}
-            label="Competition"
-            helpText="Paid-search competition from Google Ads (0-1): higher means more advertisers bidding."
+            label="競合度"
+            helpText="Google広告における有料検索の競合度（0～1）です。数値が高いほど入札する広告主が多いことを示します。"
           />
         ),
         cell: ({ getValue }) => {
@@ -89,14 +89,14 @@ export function SavedKeywordsTable({
         header: ({ column }) => (
           <SortableHeader
             column={column}
-            label="Difficulty"
-            helpText="Organic ranking difficulty (0-100): higher means harder to reach Google's top 10."
+            label="難易度"
+            helpText="自然検索の上位表示難易度（0～100）です。数値が高いほどGoogleの上位10件に入るのが難しくなります。"
           />
         ),
         cell: ({ getValue }) => <ScoreBadge value={getValue()} />,
       }),
       columnHelper.accessor("intent", {
-        header: () => "Intent",
+        header: () => "検索意図",
         cell: ({ getValue }) => (
           <IntentBadge intent={normalizeIntent(getValue())} />
         ),
@@ -104,14 +104,14 @@ export function SavedKeywordsTable({
       }),
       columnHelper.display({
         id: "tags",
-        header: () => "Tags",
+        header: () => "タグ",
         cell: ({ row }) => <TagList tags={row.original.tags} />,
         enableSorting: false,
         meta: { cellClassName: "min-w-40 max-w-64" },
       }),
       columnHelper.accessor("fetchedAt", {
         header: ({ column }) => (
-          <SortableHeader column={column} label="Last Fetched" />
+          <SortableHeader column={column} label="最終取得日時" />
         ),
         cell: ({ getValue }) => (
           <span className="text-xs text-muted-foreground">
@@ -144,8 +144,8 @@ export function SavedKeywordsTable({
       isFiltered={hasActiveFilters}
       onClearFilters={onClearFilters}
       empty={{
-        title: "No saved keywords yet",
-        description: "Use the Keyword Research page to find and save keywords.",
+        title: "保存済みキーワードはまだありません",
+        description: "キーワード調査ページで候補を探して保存してください。",
       }}
       toolbar={toolbar}
       footer={footer}

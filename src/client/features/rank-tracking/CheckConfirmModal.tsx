@@ -27,27 +27,26 @@ export function CheckConfirmModal({
   const liveTime =
     Math.ceil(totalChecks / KEYWORDS_PER_BATCH) * SECONDS_PER_BATCH;
 
-  const eta =
-    liveTime < 60 ? `${liveTime}s` : `${Math.ceil(liveTime / 60)} min`;
+  const eta = liveTime < 60 ? `${liveTime}秒` : `${Math.ceil(liveTime / 60)}分`;
 
   return (
     <ConfirmDialog
-      title={`Check ${keywordCount} keyword${keywordCount !== 1 ? "s" : ""}?`}
-      confirmLabel="Run now"
+      title={`${keywordCount}件のキーワードをチェックしますか？`}
+      confirmLabel="今すぐ実行"
       pending={isPending}
       onConfirm={onRunNow}
       onClose={onCancel}
     >
-      {keywordCount} keywords &times; {dc} device{dc !== 1 ? "s" : ""} ={" "}
-      {totalChecks} SERP checks. Results in ~{eta}.
+      {keywordCount}キーワード × {dc}デバイス = {totalChecks}
+      回の検索結果チェック。結果取得まで約{eta}です。
       {costUsd != null ? (
         <>
           {" "}
-          Costs about{" "}
+          推定費用：{" "}
           <span className="font-mono font-semibold text-foreground">
             ${costUsd.toFixed(2)}
           </span>
-          .
+          。
         </>
       ) : null}
     </ConfirmDialog>

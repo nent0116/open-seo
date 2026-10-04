@@ -21,10 +21,10 @@ export function FormActions({
         onClick={onCancel}
         disabled={pending}
       >
-        Cancel
+        キャンセル
       </Button>
       <Button type="submit" size={size} disabled={disabled} pending={pending}>
-        Save
+        保存
       </Button>
     </div>
   );

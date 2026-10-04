@@ -22,8 +22,8 @@ import {
 import { z } from "zod";
 
 const signInSchema = z.object({
-  email: z.string().trim().email("Enter a valid email address."),
-  password: z.string().min(1, "Enter your password."),
+  email: z.string().trim().email("有効なメールアドレスを入力してください。"),
+  password: z.string().min(1, "パスワードを入力してください。"),
 });
 
 export const Route = createFileRoute("/_auth/sign-in")({
@@ -85,14 +85,14 @@ function SignInPage() {
 
         formApi.setErrorMap({
           onSubmit: {
-            form: result.error.message || "We couldn't sign you in.",
+            form: "ログインできませんでした。入力内容をご確認ください。",
             fields: {},
           },
         });
       } catch {
         formApi.setErrorMap({
           onSubmit: {
-            form: "Unable to sign in right now. Please try again.",
+            form: "現在ログインできません。もう一度お試しください。",
             fields: {},
           },
         });
@@ -102,7 +102,7 @@ function SignInPage() {
 
   return (
     <AuthPageCard
-      title="Sign in"
+      title="ログイン"
       footer={
         isHostedMode ? (
           <div
@@ -118,7 +118,7 @@ function SignInPage() {
                 search={getSignInSearch(redirectTo)}
                 className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
               >
-                Forgot password?
+                パスワードをお忘れですか？
               </Link>
             ) : null}
             <Link
@@ -126,7 +126,7 @@ function SignInPage() {
               search={getSignInSearch(redirectTo)}
               className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
             >
-              Create account
+              アカウントを作成
             </Link>
           </div>
         ) : null
@@ -135,7 +135,7 @@ function SignInPage() {
       {!showEmailForm ? (
         <>
           <AuthMethodChooser
-            googleLabel="Continue with Google"
+            googleLabel="Googleで続行"
             disabled={!isHostedMode}
             isBusy={google.isStarting}
             onContinueWithGoogle={() => {
@@ -156,11 +156,11 @@ function SignInPage() {
             <form.AppField name="email">
               {(field) => (
                 <field.TextField
-                  label="Email address"
+                  label="メールアドレス"
                   hideLabel
                   className={authInputClassName}
                   type="email"
-                  placeholder="Email address..."
+                  placeholder="メールアドレスを入力"
                   autoComplete="email"
                   required
                 />
@@ -169,11 +169,11 @@ function SignInPage() {
             <form.AppField name="password">
               {(field) => (
                 <field.TextField
-                  label="Password"
+                  label="パスワード"
                   hideLabel
                   className={authInputClassName}
                   type="password"
-                  placeholder="Password..."
+                  placeholder="パスワードを入力"
                   autoComplete="current-password"
                   required
                 />
@@ -199,7 +199,7 @@ function SignInPage() {
                       className={authSubmitClassName}
                       pending={isSubmitting}
                     >
-                      {isSubmitting ? "Signing in..." : "Sign in"}
+                      {isSubmitting ? "ログインしています…" : "ログイン"}
                     </Button>
                   </>
                 );

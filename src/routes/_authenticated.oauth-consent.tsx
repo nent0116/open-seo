@@ -19,13 +19,13 @@ export const Route = createFileRoute("/_authenticated/oauth-consent")({
 const SCOPES = [
   {
     icon: Database,
-    label: "Read your OpenSEO data",
-    description: "Projects, keyword reports, and audit results.",
+    label: "OpenSEOのデータを読み取る",
+    description: "プロジェクト、キーワードレポート、監査結果。",
   },
   {
     icon: KeyRound,
-    label: "Act on your behalf via MCP",
-    description: "Run tools and write results back to your organization.",
+    label: "MCPから代理で操作する",
+    description: "ツールを実行し、結果を組織へ保存します。",
   },
 ];
 
@@ -64,15 +64,15 @@ function OAuthConsentPage() {
       } = await response.json();
 
       if (!response.ok) {
-        setError(data.error ?? "Unable to complete authorization.");
+        setError(data.error ?? "認証を完了できませんでした。");
       } else if (data.redirectTo) {
         window.location.assign(data.redirectTo);
         return;
       } else {
-        setError("Authorization response did not include a redirect URL.");
+        setError("認証応答にリダイレクトURLが含まれていません。");
       }
     } catch {
-      setError("We couldn't reach OpenSEO. Please try again.");
+      setError("OpenSEOへ接続できませんでした。再試行してください。");
     }
     setPendingAction(null);
   }
@@ -86,10 +86,10 @@ function OAuthConsentPage() {
           className="size-10 rounded-lg"
         />
         <CardTitle className="mt-5 text-xl">
-          <h1>Authorize MCP access</h1>
+          <h1>MCPアクセスを許可</h1>
         </CardTitle>
         <p className="mt-2 text-sm text-muted-foreground">
-          An MCP client is requesting access to your OpenSEO workspace.
+          MCPクライアントがOpenSEOワークスペースへのアクセスを要求しています。
         </p>
       </CardHeader>
       <CardContent>
@@ -99,14 +99,14 @@ function OAuthConsentPage() {
             <User className="size-4" />
           </div>
           <div className="flex-1">
-            <div className="text-xs text-muted-foreground">Signed in as</div>
+            <div className="text-xs text-muted-foreground">ログイン中：</div>
             <div className="font-medium">{session?.user.email}</div>
           </div>
         </div>
 
         <div className="mt-6">
           <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            This will allow it to
+            許可される操作：
           </div>
           <ul className="mt-3 space-y-3">
             {SCOPES.map((scope) => (
@@ -138,7 +138,9 @@ function OAuthConsentPage() {
             disabled={pendingAction !== null}
             onClick={() => void respond(false)}
           >
-            {pendingAction === "cancel" ? "Canceling..." : "Cancel"}
+            {pendingAction === "cancel"
+              ? "キャンセルしています…"
+              : "キャンセル"}
           </Button>
           <Button
             type="button"
@@ -147,12 +149,12 @@ function OAuthConsentPage() {
             disabled={pendingAction !== null}
             onClick={() => void respond(true)}
           >
-            {pendingAction === "authorize" ? "Authorizing..." : "Authorize"}
+            {pendingAction === "authorize" ? "許可しています…" : "許可"}
           </Button>
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          You can revoke access at any time in Settings.
+          アクセス権は設定からいつでも取り消せます。
         </p>
       </CardContent>
     </Card>

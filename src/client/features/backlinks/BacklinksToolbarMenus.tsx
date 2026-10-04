@@ -22,7 +22,7 @@ export function BacklinksBestLinksMenu({
     <DropdownMenu>
       <DropdownMenuTrigger render={<Button variant="ghost" size="sm" />}>
         <Link2 data-icon="inline-start" />
-        Best links: {hideSpam ? "On" : "Off"}
+        高品質リンク： {hideSpam ? "オン" : "オフ"}
         <ChevronDown data-icon="inline-end" className="opacity-60" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-72">
@@ -32,17 +32,17 @@ export function BacklinksBestLinksMenu({
         >
           <DropdownMenuRadioItem value="best">
             <span>
-              <span className="block">Best links only</span>
+              <span className="block">高品質リンクのみ</span>
               <span className="block text-xs text-muted-foreground">
-                Scores below {DEFAULT_BACKLINKS_SPAM_THRESHOLD} or unknown
+                スコアが {DEFAULT_BACKLINKS_SPAM_THRESHOLD} 未満または不明
               </span>
             </span>
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem value="all">
             <span>
-              <span className="block">All links (spammy included)</span>
+              <span className="block">すべてのリンク（スパムを含む）</span>
               <span className="block text-xs text-muted-foreground">
-                Includes scores {DEFAULT_BACKLINKS_SPAM_THRESHOLD} or higher
+                スコア {DEFAULT_BACKLINKS_SPAM_THRESHOLD} 以上を含む
               </span>
             </span>
           </DropdownMenuRadioItem>
@@ -68,8 +68,8 @@ export function BacklinksActionsMenu({
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="Backlinks table actions"
-            title="Backlinks table actions"
+            aria-label="被リンク表の操作"
+            title="被リンク表の操作"
           />
         }
       >
@@ -79,7 +79,7 @@ export function BacklinksActionsMenu({
         <DropdownMenuItem
           onClick={() => void loadRatings(ratableDomains)}
           disabled={isLoadingRatings}
-          title="Look up Ahrefs Domain Rating for each domain in the table"
+          title="表内の各ドメインについてAhrefs Domain Ratingを取得"
         >
           {isLoadingRatings ? <Spinner /> : <Gauge />}
           Ahrefs DR

@@ -46,7 +46,7 @@ export function LaunchFormCard({
     <Card>
       <CardHeader>
         <CardTitle>
-          <h2>Start New Audit</h2>
+          <h2>新しい監査を開始</h2>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -64,7 +64,7 @@ export function LaunchFormCard({
               return (
                 <Input
                   className="lg:col-span-9"
-                  aria-label="Site URL"
+                  aria-label="サイトURL"
                   aria-invalid={urlError ? true : undefined}
                   placeholder="https://example.com"
                   value={field.state.value}
@@ -87,7 +87,7 @@ export function LaunchFormCard({
                 className="w-full lg:col-span-3"
                 pending={isSubmitting}
               >
-                {isSubmitting ? "Starting..." : "Start Audit"}
+                {isSubmitting ? "開始しています…" : "監査を開始"}
               </Button>
             )}
           </launchForm.Subscribe>
@@ -124,7 +124,7 @@ function LaunchOptions({
 }: Props) {
   return (
     <Field className="rounded-lg border border-border p-3">
-      <FieldLabel htmlFor="audit-max-pages">Max pages</FieldLabel>
+      <FieldLabel htmlFor="audit-max-pages">最大ページ数</FieldLabel>
       <launchForm.Field name="maxPagesInput">
         {(field) => (
           <Input
@@ -147,17 +147,19 @@ function LaunchOptions({
         )}
       </launchForm.Field>
       <FieldDescription>
-        Enter any value from {MIN_PAGES} to {maxPagesLimit.toLocaleString()}.
+        {MIN_PAGES}～{maxPagesLimit.toLocaleString("ja-JP")}
+        の範囲で入力してください。
         {maxPagesLimit === RENDERED_MAX_AUDIT_PAGES
-          ? " Audits that render JavaScript are limited to this many pages."
+          ? "JavaScriptをレンダリングする監査では、このページ数が上限です。"
           : null}
         {maxPagesLimit < paidMaxPagesLimit ? (
           <>
             {" "}
             <Link to={SUBSCRIBE_ROUTE} search={{ upgrade: true }}>
-              Upgrade
+              アップグレード
             </Link>{" "}
-            to crawl up to {paidMaxPagesLimit.toLocaleString()} pages.
+            すると最大{paidMaxPagesLimit.toLocaleString("ja-JP")}
+            ページまでクロールできます。
           </>
         ) : null}
       </FieldDescription>
@@ -180,9 +182,9 @@ function LighthouseOptions({ launchForm }: Pick<Props, "launchForm">) {
         </launchForm.Field>
         <FieldLabel
           htmlFor="audit-run-lighthouse"
-          title="Lighthouse measures the performance of your pages and identifies issues."
+          title="Lighthouseでページの性能を測定し、問題を検出します。"
         >
-          Include Lighthouse
+          Lighthouseを含める
         </FieldLabel>
       </div>
 
@@ -192,8 +194,7 @@ function LighthouseOptions({ launchForm }: Pick<Props, "launchForm">) {
         {(runLighthouse) =>
           runLighthouse ? (
             <FieldDescription>
-              We choose a sample of 20 pages to audit, removing pages from
-              duplicate templates.
+              重複したテンプレートのページを除き、代表的な20ページを監査します。
             </FieldDescription>
           ) : null
         }
@@ -222,9 +223,9 @@ function RenderingOptions({
         </launchForm.Field>
         <FieldLabel
           htmlFor="audit-render-javascript"
-          title="Loads each page in a browser before auditing it. Slower."
+          title="監査前に各ページをブラウザで読み込みます。処理時間が長くなります。"
         >
-          Render JavaScript
+          JavaScriptを実行
         </FieldLabel>
       </div>
 
@@ -248,15 +249,15 @@ function RenderingOptions({
       )}
       {canRenderJavaScript === false && (
         <FieldDescription>
-          This deployment has no browser, so rendering needs a Context.dev API
-          key. Set <code>CONTEXT_API_KEY</code>, restart OpenSEO, then reload
-          this page.{" "}
+          この環境にはブラウザがないため、レンダリングにはContext.dev
+          APIキーが必要です。 <code>CONTEXT_API_KEY</code>
+          を設定し、OpenSEOを再起動してからこのページを再読み込みしてください。{" "}
           <a
             href="https://github.com/every-app/open-seo/blob/main/docs/SELF_HOSTING_CLOUDFLARE_OPERATIONS.md#render-javascript-in-site-audits"
             target="_blank"
             rel="noreferrer"
           >
-            Setup guide
+            セットアップガイド
           </a>
         </FieldDescription>
       )}

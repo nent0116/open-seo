@@ -17,22 +17,22 @@ export function FreePlanBanner() {
       search={{ upgrade: true }}
       className="font-medium text-primary underline-offset-4 hover:underline"
     >
-      Upgrade your plan
+      プランをアップグレード
     </Link>
   ) : (
     <Link
       to={BILLING_ROUTE}
       className="font-medium text-primary underline-offset-4 hover:underline"
     >
-      Buy more credits
+      クレジットを追加購入
     </Link>
   );
 
   if (isOutOfCredits) {
     return (
       <AppBanner variant="destructive">
-        You&rsquo;ve used all your credits. {creditsActionLink} to continue
-        using OpenSEO.
+        クレジットをすべて使用しました。{creditsActionLink}
+        してOpenSEOの利用を続けてください。
       </AppBanner>
     );
   }
@@ -40,8 +40,8 @@ export function FreePlanBanner() {
   if (isLowCredits) {
     return (
       <AppBanner variant="warning">
-        You&rsquo;re running low on credits. {creditsActionLink} to keep using
-        OpenSEO.
+        クレジットの残高が少なくなっています。{creditsActionLink}
+        してOpenSEOを引き続き利用できます。
       </AppBanner>
     );
   }
@@ -49,22 +49,22 @@ export function FreePlanBanner() {
   if (isFreePlan) {
     return (
       <AppBanner variant="info">
-        We hope you&rsquo;re enjoying OpenSEO!{" "}
+        OpenSEOをご利用いただきありがとうございます。
         <Link
           to={SUBSCRIBE_ROUTE}
           search={{ upgrade: true }}
           className="font-medium text-primary underline-offset-4 hover:underline"
         >
-          Upgrade anytime
-        </Link>{" "}
-        or{" "}
+          いつでもアップグレードできます
+        </Link>
+        。または、
         <Link
           to="/support"
           className="font-medium text-primary underline-offset-4 hover:underline"
         >
-          reach out with questions
+          ご不明点はお問い合わせください
         </Link>
-        .
+        。
       </AppBanner>
     );
   }

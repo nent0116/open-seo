@@ -10,7 +10,7 @@ import {
 
 export function TableBulkActionBar({
   selectedCount,
-  selectedLabel = "selected",
+  selectedLabel = "件を選択中",
   actions,
   onClear,
 }: {
@@ -25,21 +25,25 @@ export function TableBulkActionBar({
     <div className="pointer-events-none fixed inset-x-0 bottom-6 z-30 flex justify-center px-4">
       <div
         role="toolbar"
-        aria-label="Bulk actions"
+        aria-label="一括操作"
         className="pointer-events-auto flex items-stretch rounded-xl border border-border bg-popover/90 text-popover-foreground shadow-2xl backdrop-blur"
       >
         <div className="flex items-center gap-2 border-r border-border py-2 pr-3 pl-2 text-sm">
           <Button
             variant="ghost"
             size="icon-xs"
-            aria-label="Clear selection"
+            aria-label="選択を解除"
             className="text-muted-foreground"
             onClick={onClear}
           >
             <X />
           </Button>
-          <span className="font-medium tabular-nums">{selectedCount}</span>
-          <span className="text-muted-foreground">{selectedLabel}</span>
+          <span className="text-muted-foreground">
+            <span className="font-medium text-foreground tabular-nums">
+              {selectedCount}
+            </span>
+            {selectedLabel}
+          </span>
         </div>
         {actions}
       </div>
@@ -96,7 +100,7 @@ export function TableBulkExportMenu({
         render={<Button variant="ghost" size="sm" pending={busy} />}
       >
         {busy ? null : <Download data-icon="inline-start" />}
-        Export
+        エクスポート
       </DropdownMenuTrigger>
       <DropdownMenuContent side="top" align="end" className="w-52">
         {actions.map((action, index) => (

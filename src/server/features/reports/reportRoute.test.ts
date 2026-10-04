@@ -140,7 +140,7 @@ describe("handleReportRequest", () => {
 
     expect(response.status).toBe(404);
     expect(await response.text()).toBe(
-      "This project is archived, so its reports are hidden. Restore badseo.dev to read them.",
+      "このプロジェクトはアーカイブされているため、レポートは非表示です。badseo.devを復元すると閲覧できます。",
     );
     expect(mocks.getReportHtml).not.toHaveBeenCalled();
   });

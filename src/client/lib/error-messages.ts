@@ -2,36 +2,38 @@ import { FREE_MAX_AUDIT_PAGES } from "@/shared/audit-limits";
 import { isErrorCode, type ErrorCode } from "@/shared/error-codes";
 
 const STANDARD_MESSAGES: Record<ErrorCode, string> = {
-  UNAUTHENTICATED: "Please sign in and try again.",
+  UNAUTHENTICATED: "ログインしてから、もう一度お試しください。",
   AUTH_CONFIG_MISSING:
-    "OpenSEO auth is not configured. Follow the README setup steps for Cloudflare Access.",
+    "OpenSEOの認証が設定されていません。READMEの手順に従ってCloudflare Accessを設定してください。",
   PAYMENT_REQUIRED:
-    "An active hosted subscription is required before you can use OpenSEO.",
+    "OpenSEOを利用するには、有効なホスト版サブスクリプションが必要です。",
   INSUFFICIENT_CREDITS:
-    "You've run out of credits. Add more credits or upgrade your plan to continue.",
-  FORBIDDEN: "You do not have access to this resource.",
-  NOT_FOUND: "The requested resource was not found.",
+    "クレジットを使い切りました。続行するにはクレジットを追加するか、プランをアップグレードしてください。",
+  FORBIDDEN: "このリソースへのアクセス権がありません。",
+  NOT_FOUND: "指定されたリソースが見つかりませんでした。",
   AUDIT_CAPACITY_REACHED:
-    "You've reached audit capacity for your account. Delete old audits from your projects to start a new one.",
-  AUDIT_PAGE_LIMIT_EXCEEDED: `Free plan audits are limited to ${FREE_MAX_AUDIT_PAGES} pages. Upgrade to run larger audits.`,
+    "アカウントで同時に保存できる監査数の上限に達しました。新しい監査を始めるには、プロジェクトから古い監査を削除してください。",
+  AUDIT_PAGE_LIMIT_EXCEEDED: `無料プランの監査は${FREE_MAX_AUDIT_PAGES}ページまでです。より大規模な監査を実行するにはアップグレードしてください。`,
   AUDIT_ALREADY_RUNNING:
-    "You've reached the limit of audits running at once. Wait for one to finish or delete it before starting another.",
-  VALIDATION_ERROR: "Please check your input and try again.",
+    "同時に実行できる監査数の上限に達しました。いずれかの完了を待つか、削除してから新しい監査を開始してください。",
+  VALIDATION_ERROR: "入力内容を確認して、もう一度お試しください。",
   UNKNOWN_LOCATION:
-    "We couldn't find that city, county, or region. Pick a location from the list, or clear the field to search the whole country.",
-  CRAWL_TARGET_BLOCKED: "This crawl target is blocked by security policy.",
+    "指定された市区町村または地域が見つかりませんでした。一覧から選択するか、入力を消して国全体を検索してください。",
+  CRAWL_TARGET_BLOCKED:
+    "このクロール対象はセキュリティポリシーによりブロックされています。",
   BACKLINKS_BILLING_ISSUE:
-    "The connected DataForSEO account has a billing or balance issue.",
+    "連携中のDataForSEOアカウントで、請求または残高の問題が発生しています。",
   AI_SEARCH_BILLING_ISSUE:
-    "The connected DataForSEO account has a billing or balance issue.",
+    "連携中のDataForSEOアカウントで、請求または残高の問題が発生しています。",
   DATAFORSEO_AUTH_FAILED:
-    "DataForSEO rejected the API key. Check that DATAFORSEO_API_KEY is the base64 of your DataForSEO login:password.",
-  RATE_LIMITED: "Too many requests. Please wait and try again.",
+    "DataForSEOがAPIキーを拒否しました。DATAFORSEO_API_KEYにDataForSEOの「ログイン名:パスワード」をBase64エンコードした値が設定されているか確認してください。",
+  RATE_LIMITED:
+    "リクエストが多すぎます。時間をおいて、もう一度お試しください。",
   UPSTREAM_UNAVAILABLE:
-    "The data provider is temporarily unavailable. Please retry in a moment.",
-  CONFLICT: "This request conflicts with existing data.",
+    "データ提供元を一時的に利用できません。時間をおいて再試行してください。",
+  CONFLICT: "このリクエストは既存のデータと競合しています。",
   INTERNAL_ERROR:
-    "An unexpected error occurred. Please check server logs and try again.",
+    "予期しないエラーが発生しました。サーバーログを確認して、もう一度お試しください。",
 };
 
 export function getStandardErrorMessage(

@@ -14,18 +14,18 @@ export const Route = createFileRoute("/_app/help/dataforseo-api-key")({
 function DataforseoApiKeyHelpPage() {
   return (
     <SecretHelpPage
-      title="Set up your DataForSEO API key"
+      title="DataForSEO APIキーを設定"
       intro={
         <>
-          OpenSEO needs the <code>DATAFORSEO_API_KEY</code> secret before
-          keyword, domain, and SEO data workflows can run.
+          OpenSEOで機能を利用するには <code>DATAFORSEO_API_KEY</code>{" "}
+          シークレットの設定が必要です。設定後にキーワード、ドメイン、SEOデータのワークフローを実行できます。
         </>
       }
       secretName="DATAFORSEO_API_KEY"
       steps={
         <>
           <li>
-            Go to{" "}
+            次へ移動します：{" "}
             <a
               className={helpLinkClassName}
               href={DATAFORSEO_API_ACCESS_URL}
@@ -34,22 +34,23 @@ function DataforseoApiKeyHelpPage() {
             >
               DataForSEO API Access
             </a>{" "}
-            and request API credentials by email.
+            を開き、メールでAPI認証情報を申請します。
           </li>
           <li>
-            Base64 encode your DataForSEO login and API password in this format:
+            DataForSEOのログイン名とAPIパスワードを次の形式でBase64エンコードします：
             <CommandBlock command="printf '%s' 'YOUR_LOGIN:YOUR_PASSWORD' | base64" />
           </li>
           <li>
-            Save the output as the <code>DATAFORSEO_API_KEY</code> secret in
-            your environment.
+            出力を次の名前の <code>DATAFORSEO_API_KEY</code>{" "}
+            シークレットとして環境に保存します。
           </li>
         </>
       }
-      dashboardPasteStep="Paste the base64 value from the terminal command above and save."
+      dashboardPasteStep="上のターミナルコマンドで作成したBase64値を貼り付けて保存します。"
       terminalPromptHint={
         <>
-          Use the base64 value of <code>login:password</code> when prompted.
+          入力を求められたら、次のBase64値を使用します：{" "}
+          <code>login:password</code> 。
         </>
       }
     />

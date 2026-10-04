@@ -29,10 +29,10 @@ import type {
 } from "@/types/schemas/dashboard";
 import { parseResearchTarget } from "@/shared/researchScope";
 
-const projectPrompt = `Use OpenSEO to set up a separate project for each website below. List my existing projects first and reuse matches so you don’t create duplicates. Set the country and language for each site, and ask me about anything missing.
+const projectPrompt = `OpenSEOを使って、以下のWebサイトごとに個別のプロジェクトを設定してください。最初に既存のプロジェクト一覧を確認し、一致するものがあれば再利用して重複を避けてください。各サイトに国と言語を設定し、不足している情報があれば質問してください。
 
-Replace this list with my websites:
-- Project name — website — country — language`;
+この一覧を自分のWebサイトに置き換えてください：
+- プロジェクト名 — Webサイト — 国 — 言語`;
 
 export function DashboardSetupAction({
   step,
@@ -76,10 +76,10 @@ export function DashboardSetupAction({
   if (step === "competitor")
     return (
       <StepInputForm
-        description="Explore a competitor’s domain to discover the topics they rank for and the websites linking to them."
-        label="Competitor website"
+        description="競合ドメインを調べ、上位表示されているトピックやリンク元サイトを確認します。"
+        label="競合サイト"
         placeholder="competitor.com"
-        submitLabel="Explore competitor"
+        submitLabel="競合を調査"
         validate={validateDomain}
         pending={clickThrough.isPending}
         onSubmit={(value) =>
@@ -93,12 +93,12 @@ export function DashboardSetupAction({
   if (step === "keywords")
     return (
       <StepInputForm
-        description="Start from one keyword that describes what you offer. You’ll get related searches with volume and difficulty."
-        label="Seed keyword"
-        placeholder="e.g. running shoes"
-        submitLabel="Get keyword ideas"
+        description="商品やサービスを表すキーワードを1つ入力すると、関連キーワードの検索ボリュームと難易度を確認できます。"
+        label="起点キーワード"
+        placeholder="例：ランニングシューズ"
+        submitLabel="キーワード候補を探す"
         validate={(value) =>
-          value.trim() ? undefined : "Enter a keyword to start from"
+          value.trim() ? undefined : "起点となるキーワードを入力してください"
         }
         pending={clickThrough.isPending}
         onSubmit={(value) =>
@@ -109,11 +109,11 @@ export function DashboardSetupAction({
   if (step === "audit")
     return (
       <StepInputForm
-        description="Crawl your site to find broken links, missing tags, and pages search engines can’t index. You can adjust the crawl size before it starts."
-        label="Site URL"
+        description="サイトをクロールし、リンク切れ、タグの不足、検索エンジンが登録できないページを検出します。開始前にクロール規模を調整できます。"
+        label="サイトURL"
         placeholder="https://example.com"
         defaultValue={domain ? `https://${domain}` : ""}
-        submitLabel="Set up audit"
+        submitLabel="監査を設定"
         validate={validateDomain}
         pending={false}
         onSubmit={(value) => {
@@ -156,29 +156,27 @@ export function DashboardSetupAction({
   if (!canManage)
     return org.isPending ? (
       <p className="text-sm text-muted-foreground">
-        Checking workspace permissions…
+        ワークスペースの権限を確認しています…
       </p>
     ) : org.isError ? (
       <p className="text-sm text-muted-foreground">
         {getStandardErrorMessage(org.error)}
       </p>
     ) : (
-      <PermissionHint action="help with this step" />
+      <PermissionHint action="この手順の対応" />
     );
   if (step === "project")
     return (
       <div className="space-y-4">
         <p className="text-sm leading-relaxed text-muted-foreground">
-          Keep each website’s research, rankings, and connections in its own
-          project. Use the project switcher in the sidebar → New project
-          anytime.
+          サイトごとに調査、順位、連携情報をプロジェクトへ分けて管理できます。サイドバーのプロジェクト切替から、いつでも新しいプロジェクトを作成できます。
         </p>
         <Button onClick={() => setShowModal(true)}>
-          Create another project
+          別のプロジェクトを作成
         </Button>
         <Collapsible className="rounded-lg border border-border p-4">
           <CollapsibleTrigger className="cursor-pointer text-sm font-medium">
-            Have a list of websites? Let your agent set them up.
+            複数サイトの一覧がある場合は、AIエージェントに設定を任せられます。
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3 space-y-3">
             <p className="text-sm text-muted-foreground">
@@ -186,17 +184,17 @@ export function DashboardSetupAction({
                 to="/ai"
                 className="text-primary underline-offset-4 hover:underline"
               >
-                Connect your agent
+                AIエージェントを連携
               </Link>
-              , then paste this prompt with your list of websites.
+              し、サイト一覧と一緒にこのプロンプトを貼り付けてください。
             </p>
             <pre className="whitespace-pre-wrap break-words font-sans text-sm leading-relaxed text-muted-foreground">
               {projectPrompt}
             </pre>
             <CopyButton
               value={projectPrompt}
-              label="Copy project prompt"
-              successMessage="Project prompt copied"
+              label="プロジェクト作成用プロンプトをコピー"
+              successMessage="プロジェクト作成用プロンプトをコピーしました"
             />
           </CollapsibleContent>
         </Collapsible>
@@ -208,10 +206,9 @@ export function DashboardSetupAction({
   return (
     <div className="space-y-4">
       <p className="text-sm leading-relaxed text-muted-foreground">
-        Bring a teammate into your workspace to share projects, research, and
-        results.
+        メンバーをワークスペースへ招待し、プロジェクト、調査、結果を共有できます。
       </p>
-      <Button onClick={() => setShowModal(true)}>Invite a teammate</Button>
+      <Button onClick={() => setShowModal(true)}>メンバーを招待</Button>
       {showModal && (
         <InviteTeammateModal
           onClose={() => setShowModal(false)}

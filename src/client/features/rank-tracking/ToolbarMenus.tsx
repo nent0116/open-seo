@@ -48,8 +48,8 @@ export function MoreMenu({
             <Button
               variant="ghost"
               size="icon-sm"
-              aria-label="More actions"
-              title="More actions"
+              aria-label="その他の操作"
+              title="その他の操作"
             />
           }
         >
@@ -59,8 +59,8 @@ export function MoreMenu({
           <DropdownMenuItem onClick={onCheckNow} disabled={checkBusy}>
             <Play />
             <ItemText
-              label={checkBusy ? "Running..." : "Check rankings"}
-              description="Fetch current Google positions"
+              label={checkBusy ? "確認しています…" : "順位を確認"}
+              description="現在のGoogle掲載順位を取得"
             />
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -70,27 +70,25 @@ export function MoreMenu({
             <RefreshCw className={metricsRefreshing ? "animate-spin" : ""} />
             <ItemText
               label={
-                metricsRefreshing ? "Refreshing..." : "Update keyword stats"
+                metricsRefreshing ? "更新しています…" : "キーワード指標を更新"
               }
-              description="Volume, difficulty & CPC — not rankings"
+              description="検索ボリューム、難易度、クリック単価を更新（順位は更新しません）"
             />
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       {confirmingRefresh ? (
         <ConfirmDialog
-          title="Update keyword stats?"
-          confirmLabel="Update stats"
+          title="キーワード指標を更新しますか？"
+          confirmLabel="指標を更新"
           onConfirm={() => {
             setConfirmingRefresh(false);
             onRefreshMetrics();
           }}
           onClose={() => setConfirmingRefresh(false)}
         >
-          This fetches new volume, difficulty, and CPC for all{" "}
-          {trackedKeywordCount} tracked keyword
-          {trackedKeywordCount !== 1 ? "s" : ""}. Each keyword uses credits.
-          Rankings do not change.
+          計測中の全{trackedKeywordCount}
+          件について、検索ボリューム、難易度、クリック単価を再取得します。キーワードごとにクレジットを使用します。順位は変わりません。
         </ConfirmDialog>
       ) : null}
     </>

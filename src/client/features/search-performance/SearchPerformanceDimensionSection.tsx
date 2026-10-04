@@ -39,7 +39,7 @@ export function DimensionSection({
     <div className="px-4 pt-4">
       <QueryError
         error={tableQuery.error}
-        fallback="Failed to load Search Console data"
+        fallback="Search Consoleのデータを読み込めませんでした"
         onRetry={() => void tableQuery.refetch()}
         isRetrying={tableQuery.isFetching}
       />

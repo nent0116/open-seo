@@ -22,6 +22,21 @@ type BillingFeatureBreakdownRow = {
   usd: number;
 };
 
+const BILLING_FEATURE_LABELS_JA: Record<string, string> = {
+  "Keyword Research": "キーワード調査",
+  "Domain Overview": "ドメイン概要",
+  Backlinks: "被リンク",
+  "Site Audit": "サイト監査",
+  "Rank Tracking": "順位計測",
+  "AI Citations": "AI引用",
+  "AI Prompt Responses": "AIプロンプト回答",
+  "AI Search": "AI検索",
+  "Local SEO": "ローカルSEO",
+  Onboarding: "初期設定",
+  "SAM Agent": "SAMエージェント",
+  Other: "その他",
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
 }
@@ -116,10 +131,10 @@ export function BillingFeatureBreakdown() {
   const eventsQuery = useBillingUsageEvents();
 
   return (
-    <BillingUsageCard title="Usage by feature">
+    <BillingUsageCard title="機能別の使用量">
       <QueryState
         query={eventsQuery}
-        errorFallback="Failed to load usage"
+        errorFallback="使用量を読み込めませんでした"
         loading={
           <div className="space-y-3">
             {[0, 1, 2, 3].map((i) => (
@@ -140,7 +155,9 @@ function BreakdownRows({ events }: { events: BillingUsageEvent[] }) {
 
   if (rows.length === 0) {
     return (
-      <div className="text-sm text-muted-foreground">No usage recorded yet</div>
+      <div className="text-sm text-muted-foreground">
+        使用履歴はまだありません
+      </div>
     );
   }
 
@@ -149,7 +166,7 @@ function BreakdownRows({ events }: { events: BillingUsageEvent[] }) {
       {rows.map((row) => (
         <li key={row.label} className="space-y-1">
           <div className="flex items-baseline justify-between gap-4 text-sm">
-            <span>{row.label}</span>
+            <span>{BILLING_FEATURE_LABELS_JA[row.label] ?? row.label}</span>
             <span className="tabular-nums text-muted-foreground">
               ${row.usd.toFixed(2)}
             </span>

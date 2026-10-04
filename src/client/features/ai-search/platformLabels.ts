@@ -53,7 +53,7 @@ export function getModelAccent(model: PromptExplorerModel): ModelAccent {
   return MODEL_ACCENTS[model];
 }
 
-const NUMBER_FORMATTER = new Intl.NumberFormat("en-US");
+const NUMBER_FORMATTER = new Intl.NumberFormat("ja-JP");
 
 /** Render a count for display. Null/undefined renders as an em-dash. */
 export function formatCount(value: number | null | undefined): string {

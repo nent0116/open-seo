@@ -42,10 +42,9 @@ function SignedOutInvitationCard({ invitationId }: { invitationId: string }) {
   const redirect = `/accept-invitation/${invitationId}`;
 
   return (
-    <AuthPageCard title="You&rsquo;re invited">
+    <AuthPageCard title="招待が届いています">
       <p className="text-sm text-muted-foreground">
-        You&rsquo;ve been invited to join an organization on OpenSEO. Sign in
-        with the email address that received the invitation to accept it.
+        OpenSEOの組織へ招待されています。招待を受け取ったメールアドレスでログインして参加してください。
       </p>
       <div className="space-y-2">
         <Button
@@ -54,7 +53,7 @@ function SignedOutInvitationCard({ invitationId }: { invitationId: string }) {
           variant="secondary"
           className="w-full"
         >
-          Create account
+          アカウントを作成
         </Button>
         <Button
           nativeButton={false}
@@ -62,7 +61,7 @@ function SignedOutInvitationCard({ invitationId }: { invitationId: string }) {
           variant="ghost"
           className="w-full"
         >
-          Sign in
+          ログイン
         </Button>
       </div>
     </AuthPageCard>
@@ -89,7 +88,7 @@ function InvitationCard({
         query: { id: invitationId },
       });
       if (result.error) {
-        throw new Error(result.error.message || "Invitation not found");
+        throw new Error(result.error.message || "招待が見つかりませんでした");
       }
       return result.data;
     },
@@ -105,7 +104,7 @@ function InvitationCard({
       });
       if (accepted.error) {
         setActionError(
-          accepted.error.message || "We couldn't accept the invitation.",
+          accepted.error.message || "招待を承認できませんでした。",
         );
         setPendingAction(null);
         return;
@@ -122,7 +121,7 @@ function InvitationCard({
       // workspace.
       window.location.assign("/");
     } catch {
-      setActionError("We couldn't accept the invitation. Please try again.");
+      setActionError("招待を承認できませんでした。もう一度お試しください。");
       setPendingAction(null);
     }
   }
@@ -135,23 +134,21 @@ function InvitationCard({
         invitationId,
       });
       if (result.error) {
-        setActionError(
-          result.error.message || "We couldn't decline the invitation.",
-        );
+        setActionError(result.error.message || "招待を辞退できませんでした。");
         setPendingAction(null);
         return;
       }
       captureClientEvent("team:invitation_decline");
       setDeclined(true);
     } catch {
-      setActionError("We couldn't decline the invitation. Please try again.");
+      setActionError("招待を辞退できませんでした。もう一度お試しください。");
       setPendingAction(null);
     }
   }
 
   if (invitationQuery.isPending) {
     return (
-      <AuthPageCard title="Checking invitation...">
+      <AuthPageCard title="招待を確認しています…">
         <div className="flex justify-center py-4">
           <Spinner />
         </div>
@@ -161,18 +158,16 @@ function InvitationCard({
 
   if (invitationQuery.isError) {
     return (
-      <AuthPageCard title="Invitation unavailable">
+      <AuthPageCard title="この招待は利用できません">
         <p className="text-sm text-muted-foreground">
-          This invitation may have expired, been canceled, or belong to a
-          different email address. You&rsquo;re signed in as{" "}
+          この招待は期限切れ、取り消し済み、または別のメールアドレス宛ての可能性があります。現在のログイン：{" "}
           <span className="font-medium" data-ph-mask>
             {userEmail}
           </span>
-          .
+          。
         </p>
         <p className="text-sm text-muted-foreground">
-          If the invitation was sent to another address, sign out and sign back
-          in with that email. Otherwise ask your teammate to send a new invite.
+          別のメールアドレス宛ての場合はログアウトし、そのアドレスでログインし直してください。それ以外の場合は、メンバーに招待の再送を依頼してください。
         </p>
         <div className="space-y-2">
           <Button
@@ -185,7 +180,7 @@ function InvitationCard({
               signOutAndRedirect();
             }}
           >
-            Use a different account
+            別のアカウントを使用
           </Button>
           <Button
             nativeButton={false}
@@ -193,7 +188,7 @@ function InvitationCard({
             variant="ghost"
             className="w-full"
           >
-            Go to dashboard
+            ダッシュボードへ
           </Button>
         </div>
       </AuthPageCard>
@@ -202,13 +197,13 @@ function InvitationCard({
 
   if (declined) {
     return (
-      <AuthPageCard title="Invitation declined">
+      <AuthPageCard title="招待を辞退しました">
         <p className="text-sm text-muted-foreground">
-          You declined the invitation to join{" "}
+          次の組織への招待を辞退しました：{" "}
           <span className="font-medium">
             {invitationQuery.data.organizationName}
           </span>
-          .
+          。
         </p>
         <Button
           nativeButton={false}
@@ -216,23 +211,23 @@ function InvitationCard({
           variant="ghost"
           className="w-full"
         >
-          Go to dashboard
+          ダッシュボードへ
         </Button>
       </AuthPageCard>
     );
   }
 
   return (
-    <AuthPageCard title="Join organization">
+    <AuthPageCard title="組織に参加">
       <p className="text-sm text-muted-foreground">
         <span className="font-medium" data-ph-mask>
           {invitationQuery.data.inviterEmail}
         </span>{" "}
-        invited you to join{" "}
+        から次の組織へ招待されています：{" "}
         <span className="font-medium">
           {invitationQuery.data.organizationName}
         </span>{" "}
-        on OpenSEO.
+        （OpenSEO）
       </p>
       {actionError ? (
         <Alert variant="destructive">
@@ -248,7 +243,7 @@ function InvitationCard({
           disabled={pendingAction !== null}
           onClick={() => void handleAccept()}
         >
-          {pendingAction === "accept" ? "Joining..." : "Accept invitation"}
+          {pendingAction === "accept" ? "参加しています…" : "招待を承諾"}
         </Button>
         <Button
           type="button"

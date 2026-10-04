@@ -45,8 +45,8 @@ const baseColumns: ColumnDef<SuggestedKeyword>[] = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Keyword"
-        title="The search term this domain ranks for"
+        label="キーワード"
+        title="このドメインが上位表示されている検索語句"
         className={RANK_TRACKING_HEADER_CLASS}
       />
     ),
@@ -61,8 +61,8 @@ const baseColumns: ColumnDef<SuggestedKeyword>[] = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Position"
-        title="Current Google ranking position"
+        label="掲載順位"
+        title="現在のGoogle掲載順位"
         className={RANK_TRACKING_HEADER_CLASS}
       />
     ),
@@ -86,15 +86,15 @@ const baseColumns: ColumnDef<SuggestedKeyword>[] = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Volume"
-        title="Monthly search volume"
+        label="検索ボリューム"
+        title="月間検索ボリューム"
         className={RANK_TRACKING_HEADER_CLASS}
       />
     ),
     cell: ({ getValue }) => {
       const vol = getValue<number | null>();
       return vol != null ? (
-        vol.toLocaleString()
+        vol.toLocaleString("ja-JP")
       ) : (
         <span className="text-muted-foreground">—</span>
       );
@@ -111,15 +111,15 @@ const baseColumns: ColumnDef<SuggestedKeyword>[] = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Traffic"
-        title="Estimated monthly organic traffic"
+        label="トラフィック"
+        title="推定月間自然検索トラフィック"
         className={RANK_TRACKING_HEADER_CLASS}
       />
     ),
     cell: ({ getValue }) => {
       const traffic = getValue<number | null>();
       return traffic != null ? (
-        Math.round(traffic).toLocaleString()
+        Math.round(traffic).toLocaleString("ja-JP")
       ) : (
         <span className="text-muted-foreground">—</span>
       );
@@ -217,7 +217,7 @@ export function KeywordSuggestionStep({
     mutationFn: (keywords: string[]) =>
       addTrackingKeywords({ data: { projectId, configId, keywords } }),
     onSuccess: (result) => {
-      toast.success(`Added ${result.added} keywords for tracking`);
+      toast.success(`${result.added}件のキーワードを順位計測に追加しました`);
       onDone(configId);
     },
   });
@@ -235,11 +235,11 @@ export function KeywordSuggestionStep({
     return (
       <>
         <StepHeader
-          title="Add keywords manually"
-          description="Ranked-keyword suggestions aren't available for this country. Continue and add the keywords you want to track manually."
+          title="キーワードを手動で追加"
+          description="この国では上位キーワードの候補を取得できません。続行して、計測したいキーワードを手動で追加してください。"
         />
         <DialogFooter>
-          <Button onClick={onClose}>Continue</Button>
+          <Button onClick={onClose}>続行</Button>
         </DialogFooter>
       </>
     );
@@ -248,9 +248,9 @@ export function KeywordSuggestionStep({
   if (suggestionsQuery.isLoading) {
     return (
       <>
-        <StepHeader title="Finding your top keywords..." />
+        <StepHeader title="上位キーワードを探しています…" />
         <div className="flex flex-col items-center justify-center py-16">
-          <Spinner label="This usually takes a few seconds" />
+          <Spinner label="通常は数秒で完了します" />
         </div>
       </>
     );
@@ -260,11 +260,11 @@ export function KeywordSuggestionStep({
     return (
       <>
         <StepHeader
-          title="Couldn't fetch keywords"
-          description="You can skip this step and add keywords manually later."
+          title="キーワードを取得できませんでした"
+          description="この手順をスキップし、後からキーワードを手動で追加できます。"
         />
         <DialogFooter>
-          <Button onClick={onClose}>Skip</Button>
+          <Button onClick={onClose}>スキップ</Button>
         </DialogFooter>
       </>
     );
@@ -274,11 +274,11 @@ export function KeywordSuggestionStep({
     return (
       <>
         <StepHeader
-          title="No rankings found"
-          description={`We couldn't find any keywords ${domain} currently ranks for. You can add keywords manually.`}
+          title="検索順位が見つかりませんでした"
+          description={`${domain}が現在上位表示されているキーワードは見つかりませんでした。キーワードは手動で追加できます。`}
         />
         <DialogFooter>
-          <Button onClick={onClose}>Skip</Button>
+          <Button onClick={onClose}>スキップ</Button>
         </DialogFooter>
       </>
     );
@@ -287,13 +287,13 @@ export function KeywordSuggestionStep({
   return (
     <>
       <StepHeader
-        title="Choose keywords to track"
-        description={`We found ${data.length} keywords ${domain} ranks for.`}
+        title="計測するキーワードを選択"
+        description={`${domain}が上位表示されているキーワードを${data.length}件見つけました。`}
       />
 
       <DataTable
         table={table}
-        empty={{ title: "No keywords" }}
+        empty={{ title: "キーワードがありません" }}
         scrollClassName="max-h-[400px]"
         onRowClick={(row, event) => {
           if (applyShiftRangeSelection(event, row, table, selectAnchorRef)) {
@@ -305,18 +305,18 @@ export function KeywordSuggestionStep({
 
       <DialogFooter className="items-center sm:justify-between">
         <p className="text-xs text-muted-foreground">
-          {selectedCount} of {data.length} selected
+          全{data.length}件中{selectedCount}件を選択
         </p>
         <div className="flex items-center gap-2">
           <Button variant="ghost" onClick={onClose}>
-            Skip
+            スキップ
           </Button>
           <Button
             onClick={handleAdd}
             pending={addMutation.isPending}
             disabled={selectedCount === 0}
           >
-            Save Keyword{selectedCount !== 1 ? "s" : ""}
+            キーワードを保存
           </Button>
         </div>
       </DialogFooter>

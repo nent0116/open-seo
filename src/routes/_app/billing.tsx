@@ -98,10 +98,10 @@ function BillingPage() {
   if (billingRouteState === "error") {
     return (
       <div className="mx-auto box-content max-w-7xl space-y-4 px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
-        <PageHeader title="Billing unavailable" />
+        <PageHeader title="請求機能を利用できません" />
         <QueryError
           error={customerQuery.error}
-          fallback="We couldn't load your billing details right now. Please try again."
+          fallback="現在、請求情報を読み込めません。もう一度お試しください。"
           onRetry={() => void customerQuery.refetch()}
           isRetrying={customerQuery.isFetching}
         />
@@ -148,21 +148,19 @@ function BillingPage() {
   if (isPending) {
     return (
       <div className="flex h-full items-center justify-center">
-        <p className="text-sm text-muted-foreground">
-          Redirecting to Stripe...
-        </p>
+        <p className="text-sm text-muted-foreground">Stripeへ移動しています…</p>
       </div>
     );
   }
 
   return (
     <div className="mx-auto box-content max-w-7xl space-y-5 px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
-      <PageHeader title="Billing" />
+      <PageHeader title="請求・利用状況" />
 
       {customerQuery.isError ? (
         <QueryError
           error={customerQuery.error}
-          fallback="Failed to refresh billing details"
+          fallback="請求情報を更新できませんでした"
           onRetry={() => void customerQuery.refetch()}
           isRetrying={customerQuery.isFetching}
         />
@@ -182,49 +180,48 @@ function BillingPage() {
               {!isFreePlan ? (
                 <div className="mt-1 flex gap-3 text-xs text-muted-foreground">
                   <span className="tabular-nums">
-                    Monthly ${monthlyRemaining.toFixed(2)}
+                    月間 ${monthlyRemaining.toFixed(2)}
                   </span>
                   <span>&middot;</span>
                   <span className="tabular-nums">
-                    Top-ups ${topUpRemaining.toFixed(2)}
+                    追加購入 ${topUpRemaining.toFixed(2)}
                   </span>
                 </div>
               ) : null}
               {isOutOfCredits ? (
                 <p className="mt-2 text-xs text-destructive">
-                  You&rsquo;ve used all your credits.{" "}
+                  クレジットをすべて使用しました。{" "}
                   {isFreePlan
-                    ? "Upgrade your plan to continue."
-                    : "Buy more credits below to continue."}
+                    ? "続行するにはプランをアップグレードしてください。"
+                    : "続行するには下からクレジットを追加購入してください。"}
                 </p>
               ) : isLowCredits ? (
                 <p className="mt-2 text-xs text-amber-600">
-                  You&rsquo;re running low on credits.{" "}
+                  クレジットの残高が少なくなっています。{" "}
                   {isFreePlan
-                    ? `Upgrade to get $${BASE_PLAN_OFFER.monthlyCreditsUsd}/month.`
-                    : "Buy more credits below."}
+                    ? `アップグレードすると月額$${BASE_PLAN_OFFER.monthlyCreditsUsd}相当のクレジットを利用できます。`
+                    : "下からクレジットを追加購入できます。"}
                 </p>
               ) : null}
             </div>
 
             <div className="text-sm">
-              <span className="font-medium">Plan</span>{" "}
+              <span className="font-medium">プラン</span>{" "}
               <span className="text-muted-foreground">
-                {paidPlan?.name ?? "Free Plan"}
+                {paidPlan?.name ?? "無料プラン"}
               </span>
               {paidPlan ? (
                 <span className="text-muted-foreground">
                   {" "}
-                  &middot; ${paidPlan.monthlyCreditsUsd.toFixed(2)} of Usage
-                  Credits each month
+                  &middot; ${paidPlan.monthlyCreditsUsd.toFixed(2)}{" "}
+                  相当の利用クレジット／月
                 </span>
               ) : null}
             </div>
 
             {!canManageBilling ? (
               <p className="border-t border-border pt-3 text-sm text-muted-foreground">
-                Only the organization owner can change the plan or buy credits.
-                Ask them if you need more.
+                プラン変更とクレジット購入は組織の所有者だけが行えます。追加が必要な場合は所有者へ依頼してください。
               </p>
             ) : isFreePlan ? (
               <div className="space-y-3 border-t border-border pt-3">
@@ -233,12 +230,12 @@ function BillingPage() {
                     {BASE_PLAN_OFFER.name}
                   </span>
                   <span className="text-sm font-medium tabular-nums">
-                    ${BASE_PLAN_OFFER.priceUsd}/month
+                    ${BASE_PLAN_OFFER.priceUsd}/月
                   </span>
                 </div>
                 <ul className="space-y-1.5">
                   {[
-                    "Access to all OpenSEO features",
+                    "OpenSEOのすべての機能を利用可能",
                     monthlyCreditsFeature(BASE_PLAN_OFFER),
                   ].map((item) => (
                     <li
@@ -259,11 +256,11 @@ function BillingPage() {
                     void runAction(
                       "plan",
                       startUpgradeCheckout,
-                      "We couldn't start the checkout. Please try again.",
+                      "決済を開始できませんでした。もう一度お試しください。",
                     )
                   }
                 >
-                  Upgrade Plan
+                  プランをアップグレード
                 </Button>
                 {actionError("plan")}
               </div>
@@ -279,11 +276,11 @@ function BillingPage() {
                         customerQuery.openCustomerPortal({
                           returnUrl: window.location.href,
                         }),
-                      "We couldn't open the billing portal. Please try again.",
+                      "請求ポータルを開けませんでした。もう一度お試しください。",
                     )
                   }
                 >
-                  Manage subscription
+                  サブスクリプションを管理
                 </Button>
                 {actionError("plan")}
               </div>
@@ -295,10 +292,9 @@ function BillingPage() {
         {!isFreePlan && canManageBilling ? (
           <Card>
             <CardHeader>
-              <CardTitle>Buy credits</CardTitle>
+              <CardTitle>クレジットを購入</CardTitle>
               <CardDescription>
-                Top-up credits never expire and are used after your monthly
-                credits.
+                追加購入したクレジットに有効期限はなく、月間クレジットを使い切った後に使用されます。
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -311,14 +307,14 @@ function BillingPage() {
                     max={99}
                     step={1}
                     inputMode="numeric"
-                    aria-label="Top-up amount in USD"
+                    aria-label="追加購入額（USD）"
                     aria-invalid={showTopUpError}
                     value={topUpAmount}
                     onChange={(e) => setTopUpAmount(e.target.value)}
                   />
                 </InputGroup>
                 {showTopUpError ? (
-                  <FieldError>Enter between $10–$99.</FieldError>
+                  <FieldError>$10～$99の範囲で入力してください。</FieldError>
                 ) : null}
               </Field>
 
@@ -345,11 +341,11 @@ function BillingPage() {
                           },
                         ],
                       }),
-                    "We couldn't start the checkout. Please try again.",
+                    "決済を開始できませんでした。もう一度お試しください。",
                   )
                 }
               >
-                Buy credits
+                クレジットを購入
               </Button>
               {actionError("topUp")}
             </CardContent>
@@ -362,7 +358,7 @@ function BillingPage() {
       <BillingFeatureBreakdown />
 
       <p className="text-xs text-muted-foreground">
-        Billing is powered by Stripe.
+        決済にはStripeを利用しています。
       </p>
     </div>
   );

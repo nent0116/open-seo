@@ -15,8 +15,7 @@ import { reportDocumentResponse, textResponse } from "@/shared/report-sandbox";
 // ids cannot be probed for existence. An archived project of the reader's own
 // organization gets its own message: the reader is already a member, so naming
 // it leaks nothing and "does not exist" would send them hunting.
-const NOT_FOUND_BODY =
-  "This report does not exist or you do not have access to it.";
+const NOT_FOUND_BODY = "このレポートは存在しないか、アクセス権がありません。";
 
 const reportNotFound = () => textResponse(NOT_FOUND_BODY, 404);
 
@@ -33,7 +32,7 @@ async function handleReportRequest(
     // out", and the self-hosted modes have no sign-in page to complete.
     if (asAppError(error)?.code !== "UNAUTHENTICATED") throw error;
     if (!isHostedAuthMode(env.AUTH_MODE)) {
-      return textResponse("Sign in to read this report.", 401);
+      return textResponse("このレポートを読むにはログインしてください。", 401);
     }
     // The most likely real entry: someone opening a report link in a browser
     // whose session expired.
@@ -69,7 +68,7 @@ async function handleReportRequest(
     );
     if (!archived) return reportNotFound();
     return textResponse(
-      `This project is archived, so its reports are hidden. Restore ${archived.name} to read them.`,
+      `このプロジェクトはアーカイブされているため、レポートは非表示です。${archived.name}を復元すると閲覧できます。`,
       404,
     );
   }

@@ -35,7 +35,7 @@ export function SearchTargetingField({
   return (
     <FieldSet className="gap-2" data-invalid={error ? true : undefined}>
       <FieldLegend variant="label" className="mb-0">
-        Search Targeting
+        検索対象地域
       </FieldLegend>
       <RadioGroup
         value={mode}
@@ -51,39 +51,39 @@ export function SearchTargetingField({
         <Field orientation="horizontal" className="w-auto">
           <RadioGroupItem value="national" id={`${id}-national`} />
           <FieldLabel htmlFor={`${id}-national`} className="font-normal">
-            National
+            国全体
           </FieldLabel>
         </Field>
         <Field orientation="horizontal" className="w-auto">
           <RadioGroupItem value="local" id={`${id}-local`} />
           <FieldLabel htmlFor={`${id}-local`} className="font-normal">
-            Local
+            地域指定
           </FieldLabel>
         </Field>
       </RadioGroup>
       <FieldDescription>
         {mode === "local" ? (
           <>
-            <span className="font-medium text-success">Best for:</span> "near
-            me" queries, city/county keywords, service-area pages.
+            <span className="font-medium text-success">適している検索：</span>{" "}
+            「近くの」検索、地域名を含むキーワード、サービス提供地域のページ。
           </>
         ) : (
           <>
-            Local targeting can understate rankings for non-geo-modified terms.
+            地域指定では、地域名を含まない語句の順位が実際より低く出る場合があります。
           </>
         )}
       </FieldDescription>
       {mode === "local" && (
         <>
           <FieldLabel htmlFor={`${id}-city`} className="sr-only">
-            City or region
+            市区町村または地域
           </FieldLabel>
           <SerpLocationCombobox
             id={`${id}-city`}
             value={locationName}
             onChange={onLocationNameChange}
             countryCode={countryCode}
-            placeholder="Search cities..."
+            placeholder="地域を検索…"
             invalid={Boolean(error)}
           />
         </>

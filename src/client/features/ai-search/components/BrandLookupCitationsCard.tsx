@@ -159,22 +159,22 @@ export function CitationTabsCard({
               {pagesActive ? (
                 <>
                   {isUrlScoped
-                    ? "Cited pages within "
-                    : "Pages cited alongside "}
+                    ? "引用された範囲内のページ："
+                    : "AI回答で一緒に引用されたページ："}
                   <strong className="text-foreground">
                     {result.resolvedTarget}
                   </strong>
-                  {isUrlScoped ? "." : " in AI answers."} Prompt examples come
-                  from the fetched sample.
+                  。 プロンプト例は取得したサンプルから表示しています。
                 </>
               ) : (
                 <>
-                  Fetched sample of prompts whose AI answer cited{" "}
-                  {isUrlScoped ? "a page within " : null}
+                  AI回答で
+                  {isUrlScoped ? "次の範囲内のページ" : "次の対象"}
+                  を引用したプロンプトの取得サンプル：{" "}
                   <strong className="text-foreground">
                     {result.resolvedTarget}
                   </strong>
-                  {isUrlScoped ? "." : " in its text or sources."}
+                  。
                 </>
               )}
             </p>
@@ -189,8 +189,8 @@ export function CitationTabsCard({
           </div>
         }
       >
-        <TabsTrigger value="queries">Queries</TabsTrigger>
-        <TabsTrigger value="pages">Cited sources</TabsTrigger>
+        <TabsTrigger value="queries">検索文</TabsTrigger>
+        <TabsTrigger value="pages">引用元</TabsTrigger>
       </DataTableTabs>
       <DataTableToolbar
         actions={
@@ -228,10 +228,10 @@ export function CitationTabsCard({
       table={pagesTable}
       empty={{
         title: isUrlScoped
-          ? `None of this domain's top cited pages fall under ${result.resolvedTarget}.`
-          : "No cited sources to show.",
+          ? `このドメインで引用数の多いページに、${result.resolvedTarget}配下のページはありません。`
+          : "表示できる引用元はありません。",
         description: isUrlScoped
-          ? "Broaden the scope to see domain-level citations."
+          ? "対象範囲を広げると、ドメイン全体の引用を確認できます。"
           : undefined,
       }}
       {...tableProps}
@@ -241,10 +241,10 @@ export function CitationTabsCard({
       table={queriesTable}
       empty={{
         title: isUrlScoped
-          ? `No sampled prompts cited a page under ${result.resolvedTarget}.`
-          : "No matching queries found.",
+          ? `収集したプロンプトでは、${result.resolvedTarget}配下のページは引用されていません。`
+          : "一致する検索語句が見つかりません。",
         description: isUrlScoped
-          ? "Broaden the scope to see domain-level prompts."
+          ? "対象範囲を広げると、ドメイン全体のプロンプトを確認できます。"
           : undefined,
       }}
       {...tableProps}

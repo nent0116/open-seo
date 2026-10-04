@@ -52,21 +52,26 @@ const EMPTY_KEYWORDS: KeywordRow[] = [];
 const KEYWORD_TEXT_FILTERS = [
   {
     key: "include",
-    label: "Include Terms",
+    label: "含める語句",
     placeholder: "audit, checker, template",
   },
   {
     key: "exclude",
-    label: "Exclude Terms",
+    label: "除外する語句",
     placeholder: "jobs, salary, course",
   },
 ] as const;
 const KEYWORD_RANGE_FILTERS = [
-  { title: "Traffic", minKey: "minTraffic", maxKey: "maxTraffic" },
-  { title: "Volume", minKey: "minVol", maxKey: "maxVol" },
-  { title: "CPC (USD)", minKey: "minCpc", maxKey: "maxCpc", step: "0.01" },
-  { title: "Score (KD)", minKey: "minKd", maxKey: "maxKd" },
-  { title: "Rank", minKey: "minRank", maxKey: "maxRank" },
+  { title: "トラフィック", minKey: "minTraffic", maxKey: "maxTraffic" },
+  { title: "検索ボリューム", minKey: "minVol", maxKey: "maxVol" },
+  {
+    title: "クリック単価（USD）",
+    minKey: "minCpc",
+    maxKey: "maxCpc",
+    step: "0.01",
+  },
+  { title: "難易度スコア", minKey: "minKd", maxKey: "maxKd" },
+  { title: "順位", minKey: "minRank", maxKey: "maxRank" },
 ] as const;
 
 type Props = {
@@ -240,17 +245,17 @@ export function KeywordsTab({
               onClick={handleSaveKeywords}
               disabled={!canSaveKeywords}
             >
-              Save Keywords
+              キーワードを保存
             </TableBulkActionButton>
             <TableBulkExportMenu
               actions={[
                 {
-                  label: "Export to Sheets",
+                  label: "Google スプレッドシートへ出力",
                   icon: <Sheet className="size-4" />,
                   onClick: () => exportSelection("sheets"),
                 },
                 {
-                  label: "Download CSV",
+                  label: "CSVをダウンロード",
                   icon: <Download className="size-4" />,
                   onClick: () => exportSelection("csv"),
                 },
@@ -276,7 +281,7 @@ export function KeywordsTab({
           query.isError ? (
             <QueryError
               error={query.error}
-              fallback="Failed to load keywords."
+              fallback="キーワードを読み込めませんでした。"
               onRetry={() => void query.refetch()}
               isRetrying={isFetching}
             />
@@ -290,7 +295,7 @@ export function KeywordsTab({
               showFilters={showFilters}
               onToggleFilters={() => setShowFilters((prev) => !prev)}
               activeFilterCount={activeFilterCount}
-              countLabel="keywords"
+              countLabel="件のキーワード"
               totalCount={totalCount}
               fallbackCount={rows.length}
               onExport={exportAll}
@@ -309,10 +314,10 @@ export function KeywordsTab({
               }
             >
               <span className="text-sm text-muted-foreground">
-                ·{" "}
+                ・
                 {selectedKeywords.size > 0
-                  ? `${selectedKeywords.size} selected`
-                  : "Select keywords to save"}
+                  ? `${selectedKeywords.size}件を選択中`
+                  : "保存するキーワードを選択"}
               </span>
             </DomainTableToolbar>
           </>

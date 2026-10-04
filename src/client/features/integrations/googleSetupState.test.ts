@@ -87,9 +87,9 @@ describe.each(["gsc", "ga4", "onboarding"] as const)(
   (surface) => {
     it("opens property selection without a browser resume flag after authorization", () => {
       const html = renderSetup(surface, true);
-      expect(html).toContain("Choose property");
-      expect(html).toContain("Select a property");
-      expect(html).not.toContain("Connect with Google");
+      expect(html).toContain("プロパティを選択");
+      expect(html).toContain("プロパティを選択…");
+      expect(html).not.toContain("Googleと連携");
     });
   },
 );
@@ -98,33 +98,33 @@ it.each(["gsc", "ga4"] as const)(
   "does not automatically open property editing for a %s viewer",
   (surface) => {
     const html = renderSetup(surface, true, false, false);
-    expect(html).not.toContain("Select a property");
-    expect(html).toContain("Manage Google accounts");
+    expect(html).not.toContain("プロパティを選択…");
+    expect(html).toContain("Googleアカウントを管理");
   },
 );
 
 describe("onboarding connection actions", () => {
   it("keeps cached property setup and a single footer after a failed refetch", () => {
     const html = renderSetup("onboarding", true, false, true, "refetch");
-    expect(html).toContain("Choose property");
-    expect(html).not.toContain("check your Google connection.");
-    expect(html.match(/Save and continue/g)).toHaveLength(1);
-    expect(html.match(/Skip for now/g)).toHaveLength(1);
-    expect(html.match(/ Back<\/button>/g)).toHaveLength(1);
+    expect(html).toContain("プロパティを選択");
+    expect(html).not.toContain("Googleとの連携状況を確認できませんでした。");
+    expect(html.match(/保存して続ける/g)).toHaveLength(1);
+    expect(html.match(/今はスキップ/g)).toHaveLength(1);
+    expect(html.match(/ 戻る<\/button>/g)).toHaveLength(1);
   });
 
   it("keeps a saved connection usable after a failed refetch", () => {
     const html = renderSetup("onboarding", true, true, true, "refetch");
     expect(html).toContain("https://example.com/");
-    expect(html).toMatch(/>Continue[ <]/);
-    expect(html).not.toContain("Save and continue");
+    expect(html).toMatch(/>続ける[ <]/);
+    expect(html).not.toContain("保存して続ける");
   });
 
   it("offers retry and disables saving when the initial connection check fails", () => {
     const html = renderSetup("onboarding", false, false, true, "initial");
-    expect(html).toContain("Couldn&#x27;t check your Google connection.");
-    expect(html).toContain("Try again");
-    expect(html).not.toContain("Choose property");
-    expect(html).toMatch(/disabled=""[^>]*>Save and continue/);
+    expect(html).toContain("Googleとの連携状況を確認できませんでした。");
+    expect(html).toContain("再試行");
+    expect(html).not.toContain("プロパティを選択");
+    expect(html).toMatch(/disabled=""[^>]*>保存して続ける/);
   });
 });

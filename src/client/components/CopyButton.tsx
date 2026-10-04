@@ -12,7 +12,7 @@ type ButtonProps = ComponentProps<typeof Button>;
 export function CopyButton({
   value,
   successMessage,
-  label = "Copy",
+  label = "コピー",
   onCopy,
   variant = "outline",
   size = "xs",
@@ -48,7 +48,7 @@ export function CopyButton({
         className={copied && variant !== "default" ? "text-success" : undefined}
         aria-hidden
       />
-      {iconOnly ? null : copied ? "Copied" : label}
+      {iconOnly ? null : copied ? "コピーしました" : label}
     </Button>
   );
 }

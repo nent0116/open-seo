@@ -29,7 +29,7 @@ export function SortableHeader({
       className={`inline-flex items-center gap-1 font-medium transition-colors hover:text-foreground ${className ?? ""}`}
       onClick={column.getToggleSortingHandler()}
       title={title}
-      aria-label={`Sort by ${label}`}
+      aria-label={`${label}で並べ替え`}
       aria-pressed={!!sorted}
     >
       {helpText ? <HelpLabel label={label} helpText={helpText} /> : label}

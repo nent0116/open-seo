@@ -104,10 +104,10 @@ export function ResearchPageShell<TData>({
             badge={
               <Badge variant="soft">
                 <Sparkles data-icon="inline-start" />
-                Paid plan
+                有料プラン
               </Badge>
             }
-            title={`Unlock ${gate.feature}`}
+            title={`${gate.feature}を利用する`}
             description={<p className="max-w-xl">{gate.description}</p>}
             actions={
               <Button
@@ -117,7 +117,7 @@ export function ResearchPageShell<TData>({
                   <Link to={SUBSCRIBE_ROUTE} search={{ upgrade: true }} />
                 }
               >
-                Upgrade
+                アップグレード
               </Button>
             }
             features={gate.bullets}
@@ -131,7 +131,7 @@ export function ResearchPageShell<TData>({
                 cause={query.error}
                 fallback={
                   resultData
-                    ? `${errorMessage} Showing earlier results.`
+                    ? `${errorMessage} 前回の結果を表示しています。`
                     : errorMessage
                 }
                 onRetry={() => void query.refetch()}

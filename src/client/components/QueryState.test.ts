@@ -25,7 +25,7 @@ describe("QueryState", () => {
     });
 
     expect(markup).toContain("Server down");
-    expect(markup).toContain("Try again");
+    expect(markup).toContain("再試行");
     expect(markup).not.toContain("content:");
   });
 

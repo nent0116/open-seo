@@ -10,7 +10,7 @@ import { Button } from "@/client/components/ui/button";
 export function InlineConfirm({
   label,
   triggerLabel,
-  confirmLabel = "Remove",
+  confirmLabel = "削除",
   pending,
   disabled = false,
   onConfirm,
@@ -46,7 +46,7 @@ export function InlineConfirm({
           size={size}
           onClick={() => setConfirming(false)}
         >
-          Cancel
+          キャンセル
         </Button>
       </>
     );

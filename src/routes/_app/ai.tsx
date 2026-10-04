@@ -33,25 +33,31 @@ const LINK_CLASS =
 const MUTED_LINK_CLASS =
   "inline-flex items-center gap-1 text-sm text-muted-foreground underline decoration-foreground/25 underline-offset-4 hover:text-foreground";
 const SKILLS = [
-  ["seo-coach", "Explains where you stand and picks your next step."],
+  ["seo-coach", "現在の状況を整理し、次に取り組む施策を提案します。"],
   [
     "seo-project-setup",
-    "Saves your goals, competitors, and key pages as shared context.",
+    "目標、競合、重要ページを共有コンテキストとして保存します。",
   ],
   [
     "seo-audit",
-    "One-page site audit built around a single do-this-week action.",
+    "今週取り組む施策を1つに絞った、1ページのサイト監査を作成します。",
   ],
-  ["keyword-research", "Finds keyword opportunities from a few seed topics."],
-  ["keyword-clustering", "Groups keywords by intent and maps them to pages."],
-  ["competitive-landscape", "Maps who wins in your market and why."],
+  ["keyword-research", "いくつかのテーマからキーワード機会を見つけます。"],
+  [
+    "keyword-clustering",
+    "キーワードを検索意図ごとに分類し、対応するページを整理します。",
+  ],
+  ["competitive-landscape", "市場で優位な競合と、その理由を整理します。"],
   [
     "competitor-analysis",
-    "Studies one competitor's keywords, content, and backlinks.",
+    "競合1社のキーワード、コンテンツ、被リンクを分析します。",
   ],
-  ["link-prospecting", "Finds link prospects and drafts outreach."],
-  ["local-seo", "Audits a Google Business Profile and Maps visibility."],
-  ["seo-report", "Saves any of the above as a report on your Reports page."],
+  ["link-prospecting", "被リンク候補を見つけ、依頼文の下書きを作成します。"],
+  [
+    "local-seo",
+    "GoogleビジネスプロフィールとGoogleマップでの露出を監査します。",
+  ],
+  ["seo-report", "上記の結果をレポートページへ保存します。"],
 ];
 
 const aiSearchSchema = z.object({
@@ -75,8 +81,8 @@ function AiPage() {
     <div className="h-full overflow-auto px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
       <div className="mx-auto max-w-7xl">
         <PageHeader
-          title="Agent setup"
-          description="The most powerful way to use OpenSEO is through the AI agent you already use. Set it up once, then ask it anything."
+          title="AIエージェント設定"
+          description="OpenSEOは、普段お使いのAIエージェントから利用すると最大限に活用できます。一度設定すれば、あとは自由に依頼できます。"
         />
 
         <Tabs
@@ -90,20 +96,18 @@ function AiPage() {
           className="mt-8"
         >
           <TabsList variant="line">
-            <TabsTrigger value="setup">Set up your agent</TabsTrigger>
-            <TabsTrigger value="skills">Skills</TabsTrigger>
+            <TabsTrigger value="setup">AIエージェントを設定</TabsTrigger>
+            <TabsTrigger value="skills">スキル</TabsTrigger>
           </TabsList>
           <TabsContent value="setup">
             <div className="mt-6 space-y-5">
               <Card size="lg">
                 <CardHeader>
                   <CardTitle>
-                    <h2>Set up your agent</h2>
+                    <h2>AIエージェントを設定</h2>
                   </CardTitle>
                   <CardDescription>
-                    Paste the setup prompt into your agent to connect OpenSEO
-                    and install its SEO skills. It will guide you through any
-                    manual steps.
+                    セットアップ用プロンプトをAIエージェントへ貼り付け、OpenSEOの連携とSEOスキルのインストールを行います。手動操作が必要な場合はエージェントが案内します。
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -113,8 +117,8 @@ function AiPage() {
                       variant="default"
                       size="lg"
                       value={prompt}
-                      label="Copy setup prompt"
-                      successMessage="Setup prompt copied"
+                      label="セットアップ用プロンプトをコピー"
+                      successMessage="セットアップ用プロンプトをコピーしました"
                       onCopy={() => captureClientEvent("mcp:setup_prompt_copy")}
                     />
                     <a
@@ -123,23 +127,23 @@ function AiPage() {
                       rel="noreferrer"
                       className={MUTED_LINK_CLASS}
                     >
-                      Setup instructions
+                      セットアップ手順
                       <ArrowUpRight className="size-3.5" />
                     </a>
                   </div>
                 </CardContent>
                 <CardFooter className="text-muted-foreground">
                   <p>
-                    Once connected, ask your agent to use{" "}
+                    連携後、AIエージェントに次のスキルを使うよう依頼できます：{" "}
                     <a
                       href={COACH_DOCS_URL}
                       target="_blank"
                       rel="noreferrer"
                       className={LINK_CLASS}
                     >
-                      SEO Coach
+                      SEOコーチ
                     </a>{" "}
-                    to help you choose what to do next.
+                    。次に取り組む施策の選定を支援します。
                   </p>
                 </CardFooter>
               </Card>
@@ -147,12 +151,10 @@ function AiPage() {
               <Card size="lg">
                 <CardHeader>
                   <CardTitle>
-                    <h2>Update your skills</h2>
+                    <h2>スキルを更新</h2>
                   </CardTitle>
                   <CardDescription>
-                    Already connected? Paste the update prompt into your agent
-                    to get the latest OpenSEO skills while preserving your
-                    connection settings and personal edits.
+                    すでに連携済みの場合は、更新用プロンプトをAIエージェントへ貼り付けてください。接続設定と個別の編集内容を保持したまま、OpenSEOスキルを最新版へ更新できます。
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-wrap items-center gap-x-5 gap-y-3">
@@ -160,8 +162,8 @@ function AiPage() {
                     variant="default"
                     size="lg"
                     value={agentUpdatePrompt}
-                    label="Copy update prompt"
-                    successMessage="Update prompt copied"
+                    label="更新用プロンプトをコピー"
+                    successMessage="更新用プロンプトをコピーしました"
                     onCopy={() => captureClientEvent("mcp:update_prompt_copy")}
                   />
                   <a
@@ -170,7 +172,7 @@ function AiPage() {
                     rel="noreferrer"
                     className={MUTED_LINK_CLASS}
                   >
-                    Update instructions
+                    更新手順
                     <ArrowUpRight className="size-3.5" />
                   </a>
                 </CardContent>
@@ -181,16 +183,16 @@ function AiPage() {
               <Alert variant="warning" className="mt-8">
                 <ShieldAlert />
                 <AlertDescription>
-                  This instance is behind Cloudflare Access. MCP clients cannot
-                  connect until Managed OAuth is enabled on your Access
-                  application.{" "}
+                  この環境はCloudflare
+                  Accessで保護されています。AccessアプリケーションでManaged
+                  OAuthを有効にするまで、MCPクライアントは接続できません。{" "}
                   <a
                     href="https://openseo.so/docs/self-hosting/cloudflare#connect-the-mcp-server-through-cloudflare-access"
                     target="_blank"
                     rel="noreferrer"
                     className="font-medium"
                   >
-                    Setup guide
+                    セットアップガイド
                   </a>
                 </AlertDescription>
               </Alert>
@@ -198,12 +200,12 @@ function AiPage() {
 
             <div className="mt-10 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-border pt-5 text-xs text-muted-foreground">
               <span>
-                MCP server URL for this instance:{" "}
+                この環境のMCPサーバーURL：{" "}
                 <code className="font-mono text-foreground/80">{mcpUrl}</code>
               </span>
               <CopyButton
                 value={mcpUrl}
-                successMessage="MCP URL copied"
+                successMessage="MCP URLをコピーしました"
                 onCopy={() => captureClientEvent("mcp:setup_url_copy")}
               />
             </div>
@@ -211,8 +213,7 @@ function AiPage() {
           <TabsContent value="skills">
             <section className="mt-6">
               <p className="text-sm text-muted-foreground">
-                The setup prompt installs these. Run one by name when you want a
-                full report instead of a quick answer.
+                セットアップ用プロンプトで次のスキルがインストールされます。簡単な回答ではなく完全なレポートが必要なときは、名前を指定して実行してください。
               </p>
               <ul className="mt-5 space-y-3 text-sm sm:space-y-2">
                 {SKILLS.map(([name, blurb]) => (

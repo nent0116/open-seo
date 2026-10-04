@@ -22,9 +22,9 @@ import { SUPPORT_EMAIL } from "@/client/lib/support";
 import { Button } from "@/client/components/ui/button";
 
 const PLAN_FEATURES = [
-  "Keyword research, backlinks, rank tracking, and site audits",
-  "MCP server and agent skills for Claude, Cursor, and ChatGPT",
-  "Google Search Console Integration",
+  "キーワード調査、被リンク、順位計測、サイト監査",
+  "Claude、Cursor、ChatGPT向けのMCPサーバーとエージェントスキル",
+  "Google Search Console連携",
   monthlyCreditsFeature(BASE_PLAN_OFFER),
 ];
 
@@ -137,19 +137,19 @@ function SubscribePage() {
       <StatusScreen
         logo
         size="sm"
-        title="Finalizing your subscription…"
+        title="サブスクリプションを開始しています…"
         pending
-        description="This usually takes a few seconds."
+        description="通常は数秒で完了します。"
         footer={
           <>
-            Taking longer?{" "}
+            時間がかかっていますか？{" "}
             <a
               className="underline underline-offset-2 hover:text-foreground"
               href={`mailto:${SUPPORT_EMAIL}`}
             >
-              Email {SUPPORT_EMAIL}
+              メールアドレス {SUPPORT_EMAIL}
             </a>
-            .
+            。
           </>
         }
       />
@@ -158,10 +158,10 @@ function SubscribePage() {
 
   if (subscribeRouteState === "error") {
     return (
-      <StatusScreen logo title="Billing unavailable" size="sm">
+      <StatusScreen logo title="請求機能を利用できません" size="sm">
         <QueryError
           error={customerQuery.error}
-          fallback="We couldn't verify your billing status right now. Please try again."
+          fallback="現在、請求状況を確認できません。もう一度お試しください。"
           onRetry={() => void customerQuery.refetch()}
           isRetrying={customerQuery.isFetching}
         />
@@ -187,7 +187,7 @@ function SubscribePage() {
       setError(
         getStandardErrorMessage(
           err,
-          "We couldn't start the checkout. Please try again.",
+          "決済手続きを開始できませんでした。もう一度お試しください。",
         ),
       );
       setIsAttaching(false);
@@ -208,13 +208,13 @@ function SubscribePage() {
         />
         <h1 className="text-xl font-semibold">
           {isUpgradeFlow
-            ? "Upgrade your plan"
+            ? "プランをアップグレード"
             : firstName
-              ? `Welcome to OpenSEO, ${firstName}!`
-              : "Welcome to OpenSEO!"}
+              ? `${firstName}さん、OpenSEOへようこそ！`
+              : "OpenSEOへようこそ！"}
         </h1>
         <p className="text-sm text-muted-foreground">
-          SEO on your terms. All your SEO tools in one place at a fair price.
+          自分らしいSEOを。必要なSEOツールを1か所に、適正な価格で。
         </p>
       </div>
 
@@ -233,7 +233,7 @@ function SubscribePage() {
                 captureClientEvent("billing:pricing_estimator_click")
               }
             >
-              How far do usage credits go?{" "}
+              利用クレジットで何ができますか？{" "}
               <span aria-hidden="true">&#8599;</span>
             </a>
           </li>
@@ -252,26 +252,25 @@ function SubscribePage() {
             pending={isAttaching}
             onClick={() => void handleSubscribe()}
           >
-            {isAttaching ? "Redirecting..." : "Subscribe"}
+            {isAttaching ? "移動しています…" : "申し込む"}
           </Button>
         ) : (
           <p className="text-sm text-muted-foreground">
-            Only the organization owner can subscribe. Ask them to upgrade this
-            organization.
+            サブスクリプションを開始できるのは組織の所有者だけです。所有者にアップグレードを依頼してください。
           </p>
         )}
       </PlanOfferCard>
 
       <div className="text-center space-y-2">
         <p className="text-sm text-muted-foreground">
-          Questions? Email{" "}
+          ご質問はメールでお問い合わせください：{" "}
           <a
             className="underline underline-offset-2 hover:text-foreground"
             href={`mailto:${SUPPORT_EMAIL}`}
           >
             {SUPPORT_EMAIL}
           </a>
-          .
+          。
         </p>
         {isUpgradeFlow ? (
           <Button
@@ -280,7 +279,7 @@ function SubscribePage() {
             onClick={() => void navigate({ to: "/", replace: true })}
           >
             <ArrowRight className="size-3.5 rotate-180" />
-            Back to app
+            アプリへ戻る
           </Button>
         ) : null}
       </div>

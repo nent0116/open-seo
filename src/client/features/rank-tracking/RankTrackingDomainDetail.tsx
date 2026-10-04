@@ -163,17 +163,15 @@ export function RankTrackingDomainDetail({
     });
     setShowAddKeywords(false);
     captureClientEvent("rank_tracking:keywords_add");
-    toast.success(
-      `${result.added} keyword${result.added !== 1 ? "s" : ""} added`,
-    );
+    toast.success(`${result.added}件のキーワードを追加しました`);
     if (result.checkScheduledSoon) {
-      toast.info("The scheduled check within the hour covers these keywords");
+      toast.info("1時間以内の定期チェックで、これらのキーワードを確認します");
     } else if (
       !result.checkTriggered &&
       result.added > 0 &&
       planStatus === "paid"
     ) {
-      toast.info("Use 'Check rankings' to check these keywords");
+      toast.info("「順位をチェック」でこれらのキーワードを確認してください");
     }
   };
 
@@ -238,8 +236,7 @@ export function RankTrackingDomainDetail({
         <Alert variant="warning">
           <AlertTriangle />
           <AlertDescription className="text-foreground">
-            Last scheduled check was skipped due to insufficient credits. Top up
-            your balance to resume automatic tracking.
+            クレジット不足のため前回の定期チェックをスキップしました。残高を追加すると自動計測が再開します。
           </AlertDescription>
         </Alert>
       )}
@@ -248,7 +245,7 @@ export function RankTrackingDomainDetail({
         <Alert variant="warning">
           <AlertTriangle />
           <AlertDescription className="text-foreground">
-            This run may be unresponsive and will be cleaned up automatically.
+            この実行は応答していない可能性があり、自動的に終了処理されます。
           </AlertDescription>
         </Alert>
       )}
@@ -258,7 +255,9 @@ export function RankTrackingDomainDetail({
           <AlertTriangle />
           <AlertDescription className="text-foreground">
             <p>
-              <span className="font-medium">Last check failed.</span>{" "}
+              <span className="font-medium">
+                前回のチェックは失敗しました。
+              </span>{" "}
               {latestRun.errorMessage}
             </p>
           </AlertDescription>
@@ -324,7 +323,7 @@ export function RankTrackingDomainDetail({
             void navigator.clipboard.writeText(
               filtered.map((r) => r.keyword).join("\n"),
             );
-            toast.success("Keywords copied to clipboard");
+            toast.success("キーワードをクリップボードにコピーしました");
           }}
           onCheckNow={() => {
             if (trackedKeywordCount > 0) requestCheck(trackedKeywordCount);
@@ -361,7 +360,7 @@ export function RankTrackingDomainDetail({
           ) : (
             <QueryState
               query={resultsQuery}
-              errorFallback="Failed to load rank data"
+              errorFallback="順位データを読み込めませんでした"
               loading={<SkeletonCard />}
             >
               {(results) => (

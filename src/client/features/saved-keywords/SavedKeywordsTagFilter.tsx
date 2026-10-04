@@ -82,15 +82,15 @@ export function SavedKeywordsTagFilter({
             }
           </ComboboxValue>
           <ComboboxChipsInput
-            aria-label="Filter by tag"
-            placeholder={selectedTags.length > 0 ? "" : "Filter by tag…"}
+            aria-label="タグで絞り込む"
+            placeholder={selectedTags.length > 0 ? "" : "タグで絞り込む…"}
           />
         </ComboboxChips>
         <ComboboxContent anchor={anchor}>
           <ComboboxEmpty className="px-3">
             {availableTags.length === 0
-              ? "No tags yet. Add tags from a selection of keywords."
-              : "No tags match that search."}
+              ? "タグはまだありません。キーワードを選択してタグを追加してください。"
+              : "検索条件に一致するタグがありません。"}
           </ComboboxEmpty>
           <ComboboxList>
             {(tag: SavedKeywordTagSummary) => (
@@ -109,8 +109,8 @@ export function SavedKeywordsTagFilter({
       <Button
         variant="ghost"
         size="icon-sm"
-        aria-label="Manage tags"
-        title="Manage tags"
+        aria-label="タグを管理"
+        title="タグを管理"
         disabled={availableTags.length === 0}
         onClick={() => setManaging(true)}
       >
@@ -154,16 +154,16 @@ function TagManagerDialog({
     >
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Manage tags</DialogTitle>
+          <DialogTitle>タグを管理</DialogTitle>
           <DialogDescription>
-            Rename, recolor, or delete the tags in this project.
+            このプロジェクトのタグ名、色を変更したり、タグを削除したりできます。
           </DialogDescription>
         </DialogHeader>
 
         <div className="-mx-4 -mb-4 max-h-96 overflow-y-auto border-t border-border py-1">
           {tags.length === 0 ? (
             <p className="px-4 py-6 text-center text-sm text-muted-foreground">
-              No tags yet. Add tags from a selection of keywords.
+              タグはまだありません。キーワードを選択してタグを追加してください。
             </p>
           ) : null}
           {tags.map((tag) => {
@@ -179,7 +179,7 @@ function TagManagerDialog({
                   <Button
                     variant="ghost"
                     size="icon-xs"
-                    aria-label={`Edit ${tag.name}`}
+                    aria-label={`${tag.name}を編集`}
                     aria-pressed={editing}
                     className="aria-pressed:bg-muted"
                     onClick={() => setEditingTagId(editing ? null : tag.id)}

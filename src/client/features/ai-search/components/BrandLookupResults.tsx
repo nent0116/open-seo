@@ -28,7 +28,7 @@ type PlatformRow = BrandLookupResult["perPlatform"][number];
 type MetricKey = "mentions" | "aiSearchVolume";
 
 const DOMAIN_LEVEL_TIP =
-  "AI search providers report mentions per domain, not per page. This number covers the whole domain — the cited pages below are limited to your scope.";
+  "AI検索プロバイダーはページ単位ではなくドメイン単位で言及数を報告します。この数値はドメイン全体を対象とし、下の引用ページだけが指定範囲に限定されます。";
 
 export function BrandLookupResults({ result, projectId }: Props) {
   if (!result.hasData) {
@@ -44,8 +44,9 @@ export function BrandLookupResults({ result, projectId }: Props) {
         <Alert variant="warning">
           <TriangleAlert aria-hidden />
           <AlertTitle className="font-normal">
-            AI mention data is temporarily unavailable for{" "}
-            <strong>{result.resolvedTarget}</strong>. Please try again shortly.
+            AIでの言及データを一時的に取得できません：{" "}
+            <strong>{result.resolvedTarget}</strong>
+            。時間をおいて再試行してください。
           </AlertTitle>
         </Alert>
       );
@@ -55,17 +56,17 @@ export function BrandLookupResults({ result, projectId }: Props) {
         <Alert variant="info">
           <Info aria-hidden />
           <AlertTitle className="font-normal">
-            No AI mentions found for <strong>{result.resolvedTarget}</strong>.
+            AIでの言及が見つかりませんでした：{" "}
+            <strong>{result.resolvedTarget}</strong>。
           </AlertTitle>
         </Alert>
         {erroredPlatforms.length > 0 ? (
           <p className="text-xs text-muted-foreground">
-            Note:{" "}
+            注：{" "}
             {erroredPlatforms
               .map((p) => formatPlatformLabel(p.platform))
-              .join(" and ")}{" "}
-            {erroredPlatforms.length === 1 ? "was" : "were"} unavailable — some
-            mentions may be missing.
+              .join("、")}
+            は利用できないため、一部の言及が含まれていない可能性があります。
           </p>
         ) : null}
       </div>
@@ -121,7 +122,7 @@ function BrandHeader({ result }: { result: BrandLookupResult }) {
         ) : null}
       </div>
       <p className="text-xs text-muted-foreground">
-        Updated {formatRelative(result.fetchedAt)}
+        更新日時 {formatRelative(result.fetchedAt)}
       </p>
     </section>
   );
@@ -132,16 +133,16 @@ function StatsCard({ result }: { result: BrandLookupResult }) {
     <div className="rounded-lg border border-border">
       <div className="flex h-full flex-col divide-y divide-border">
         <StatBlock
-          label="Mentions"
-          tooltip="Estimated count of AI answers where the searched brand or domain appeared in the answer text or cited sources."
+          label="言及数"
+          tooltip="検索したブランドまたはドメインが回答本文や引用元に登場したAI回答の推定数です。"
           value={result.totalMentions}
           perPlatform={result.perPlatform}
           metric="mentions"
           isDomainLevel={result.aggregatesAreDomainLevel}
         />
         <StatBlock
-          label="AI search volume"
-          tooltip="Estimated monthly search demand for prompts where the searched brand or domain appears in AI answers. This is prompt demand, not mention count."
+          label="AI検索ボリューム"
+          tooltip="検索したブランドまたはドメインがAI回答に登場するプロンプトの推定月間需要です。言及数ではなく、プロンプトの需要を示します。"
           value={result.totalAiSearchVolume}
           perPlatform={result.perPlatform}
           metric="aiSearchVolume"
@@ -203,10 +204,10 @@ function PlatformStatRow({
         />
         {formatPlatformLabel(row.platform)}
         {row.platform === "chat_gpt" ? (
-          <InfoTooltip text="DataForSEO indexes ChatGPT mentions for US English only — country selection is not available for this platform." />
+          <InfoTooltip text="DataForSEOが収集するChatGPTの言及データは米国英語のみです。このプラットフォームでは国を選択できません。" />
         ) : null}
         {row.status === "error" ? (
-          <span className="text-destructive">unavailable</span>
+          <span className="text-destructive">利用不可</span>
         ) : null}
       </span>
       <span className="font-medium text-foreground tabular-nums">
@@ -220,7 +221,7 @@ function MentionTrendCard({ result }: { result: BrandLookupResult }) {
   return (
     <div className="rounded-lg border border-border">
       <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
-        <h3 className="text-sm font-medium">Mention trend (last 12 months)</h3>
+        <h3 className="text-sm font-medium">言及数の推移（過去12か月）</h3>
         {result.aggregatesAreDomainLevel ? (
           <DomainLevelBadge tooltip={DOMAIN_LEVEL_TIP} />
         ) : null}
@@ -237,7 +238,7 @@ function InfoTooltip({ text }: { text: string }) {
     <Tooltip>
       <TooltipTrigger
         delay={150}
-        aria-label="More info"
+        aria-label="詳細情報"
         className="inline-flex rounded-sm text-muted-foreground/70 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/50"
       >
         <Info className="size-3" />
@@ -251,15 +252,15 @@ function InfoTooltip({ text }: { text: string }) {
 
 function formatRelative(iso: string): string {
   const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "just now";
+  if (Number.isNaN(date.getTime())) return "たった今";
 
   const diffMs = Date.now() - date.getTime();
   const diffMin = Math.floor(diffMs / 60_000);
 
-  if (diffMin < 1) return "just now";
-  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffMin < 1) return "たった今";
+  if (diffMin < 60) return `${diffMin}分前`;
   const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
+  if (diffHr < 24) return `${diffHr}時間前`;
   const diffDay = Math.floor(diffHr / 24);
-  return `${diffDay}d ago`;
+  return `${diffDay}日前`;
 }

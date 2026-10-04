@@ -79,7 +79,7 @@ describe("report social image access", () => {
       expect(response.status).toBe(404);
       expect(response.headers.get("Location")).toBeNull();
       expect(response.headers.get("Cache-Control")).toContain("no-store");
-      expect(await response.text()).toBe("This report isn't shared.");
+      expect(await response.text()).toBe("このレポートは共有されていません。");
       expect(mocks.renderReportSocialImage).not.toHaveBeenCalled();
     },
   );

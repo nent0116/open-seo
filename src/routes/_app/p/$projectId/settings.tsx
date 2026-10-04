@@ -15,7 +15,7 @@ function ProjectSettingsLayout() {
         <div className="space-y-4">
           <ProjectPageHeader
             projectId={projectId}
-            title="Project settings"
+            title="プロジェクト設定"
             showBackLink
           />
           <SettingsTabs projectId={projectId} />

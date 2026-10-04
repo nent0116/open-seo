@@ -37,7 +37,7 @@ export const moreDetailsClass = buttonVariants({
 });
 
 export function newLost(value: number | null): string {
-  return value === null ? "—" : String(value);
+  return value === null ? "—" : value.toLocaleString("ja-JP");
 }
 
 export function formatDay(timestamp: string): string {
@@ -49,7 +49,7 @@ export function formatDay(timestamp: string): string {
       : timestamp,
   );
   if (Number.isNaN(ms)) return timestamp;
-  return new Date(ms).toLocaleDateString(undefined, {
+  return new Date(ms).toLocaleDateString("ja-JP", {
     month: "short",
     day: "numeric",
   });

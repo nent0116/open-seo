@@ -34,7 +34,7 @@ export function AuditHistorySection({
   return (
     <QueryState
       query={historyQuery}
-      errorFallback="Failed to load audit history"
+      errorFallback="監査履歴を読み込めませんでした"
     >
       {(history) => (
         <AuditHistoryTable
@@ -57,21 +57,21 @@ function AuditHistoryTable({
   onDelete: (auditId: string) => void;
 }) {
   if (history.length === 0) {
-    return <EmptyState icon={ScanSearch} title="No audits yet" />;
+    return <EmptyState icon={ScanSearch} title="監査履歴はまだありません" />;
   }
 
   return (
     <TableCard>
       <DataTableToolbar>
-        <h2 className="text-sm font-semibold">Previous Audits</h2>
+        <h2 className="text-sm font-semibold">過去の監査</h2>
       </DataTableToolbar>
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Date</TableHead>
+            <TableHead>日時</TableHead>
             <TableHead>URL</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Pages</TableHead>
+            <TableHead>ステータス</TableHead>
+            <TableHead>ページ</TableHead>
             <TableHead>Lighthouse</TableHead>
             <TableHead />
           </TableRow>
@@ -92,7 +92,7 @@ function AuditHistoryTable({
               <TableCell>
                 {audit.ranLighthouse ? (
                   <Badge variant="outline" size="sm">
-                    Yes
+                    はい
                   </Badge>
                 ) : null}
               </TableCell>
@@ -133,15 +133,15 @@ function HistoryActions({
           />
         }
       >
-        View
+        表示
       </Button>
-      <RowActionsMenu label="Audit actions">
+      <RowActionsMenu label="監査の操作">
         <DropdownMenuItem
           variant="destructive"
           onClick={() => onDelete(auditId)}
         >
           <Trash2 />
-          Delete audit
+          監査を削除
         </DropdownMenuItem>
       </RowActionsMenu>
     </div>

@@ -23,7 +23,7 @@ export function OverviewStats({ keyword }: { keyword: KeywordResearchRow }) {
 
       <div className="flex items-center gap-4 text-sm flex-wrap min-w-0">
         <div className="flex items-center gap-1.5">
-          <span className="text-muted-foreground">Vol</span>
+          <span className="text-muted-foreground">検索数</span>
           <span className="font-semibold tabular-nums">
             {formatNumber(keyword.searchVolume)}
           </span>
@@ -35,7 +35,7 @@ export function OverviewStats({ keyword }: { keyword: KeywordResearchRow }) {
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-muted-foreground">Comp</span>
+          <span className="text-muted-foreground">競合度</span>
           <span className="font-semibold tabular-nums">
             {keyword.competition == null ? "-" : keyword.competition.toFixed(2)}
           </span>

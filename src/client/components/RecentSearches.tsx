@@ -49,7 +49,7 @@ export function RecentSearches<TItem extends { timestamp: number }>({
     <Card size="lg">
       <CardHeader className="flex items-center gap-2 text-muted-foreground">
         <History className="size-4" aria-hidden />
-        {items.length} recent search{items.length !== 1 ? "es" : ""}
+        最近の検索 {items.length.toLocaleString("ja-JP")}件
       </CardHeader>
 
       <CardContent>
@@ -81,7 +81,7 @@ export function RecentSearches<TItem extends { timestamp: number }>({
               })}
               <div className="flex shrink-0 items-center gap-1">
                 <span className="text-xs text-muted-foreground">
-                  {new Date(item.timestamp).toLocaleDateString(undefined, {
+                  {new Date(item.timestamp).toLocaleDateString("ja-JP", {
                     month: "short",
                     day: "numeric",
                   })}
@@ -91,7 +91,7 @@ export function RecentSearches<TItem extends { timestamp: number }>({
                   size="icon-xs"
                   className="reveal-on-hover"
                   onClick={() => onRemove(item.timestamp)}
-                  aria-label="Remove from recent searches"
+                  aria-label="最近の検索から削除"
                 >
                   <X />
                 </Button>

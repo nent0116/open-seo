@@ -45,7 +45,7 @@ export function SerpLocationCombobox({
   value,
   onChange,
   countryCode,
-  placeholder = "Search cities...",
+  placeholder = "都市を検索…",
   id,
   invalid,
 }: Props) {
@@ -72,12 +72,12 @@ export function SerpLocationCombobox({
     : null;
 
   const emptyMessage = !trimmed
-    ? "Type a city, county, or region"
+    ? "都市、郡、地域を入力してください"
     : searching
-      ? "Searching..."
+      ? "検索しています…"
       : searchQuery.isError
-        ? "Unable to load locations"
-        : `No locations found for "${trimmed}"`;
+        ? "地域を読み込めませんでした"
+        : `「${trimmed}」に一致する地域が見つかりません`;
 
   return (
     <Combobox

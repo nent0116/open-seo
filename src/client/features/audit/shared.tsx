@@ -31,7 +31,7 @@ export function extractHostname(url: string): string {
 }
 
 export function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("en-US", {
+  return new Date(dateStr).toLocaleDateString("ja-JP", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -39,7 +39,7 @@ export function formatDate(dateStr: string): string {
 }
 
 export function formatStartedAt(dateStr: string): string {
-  return new Date(dateStr).toLocaleString("en-US", {
+  return new Date(dateStr).toLocaleString("ja-JP", {
     month: "short",
     day: "numeric",
     hour: "numeric",
@@ -51,7 +51,7 @@ export function StatusBadge({ status }: { status: string }) {
   if (status === "running") {
     return (
       <Badge variant="info">
-        <Spinner /> Running
+        <Spinner /> 実行中
       </Badge>
     );
   }
@@ -59,14 +59,14 @@ export function StatusBadge({ status }: { status: string }) {
   if (status === "completed") {
     return (
       <Badge variant="success">
-        <CheckCircle /> Done
+        <CheckCircle /> 完了
       </Badge>
     );
   }
 
   return (
     <Badge variant="destructive">
-      <AlertCircle /> Failed
+      <AlertCircle /> 失敗
     </Badge>
   );
 }
@@ -166,7 +166,7 @@ export function BotProtectionAdvice({
       >
         LibreCrawl
       </a>{" "}
-      or{" "}
+      または{" "}
       <a
         href="https://www.screamingfrog.co.uk/seo-spider/"
         target="_blank"
@@ -180,15 +180,15 @@ export function BotProtectionAdvice({
   if (!rendered && canRender) {
     return (
       <>
-        Turn on Render JavaScript and run the audit again. To avoid the extra
-        cost, use a free desktop crawler like {desktopCrawlers}.
+        「JavaScriptを実行」を有効にして監査を再実行してください。追加費用を避ける場合は、次のような無料のデスクトップクローラーを利用できます：{" "}
+        {desktopCrawlers}。
       </>
     );
   }
   return (
     <>
-      {rendered ? "Rendering couldn't get past it. " : null}
-      Try a free desktop crawler like {desktopCrawlers}.
+      {rendered ? "レンダリングしてもアクセスできませんでした。" : null}
+      次のような無料のデスクトップクローラーも利用できます： {desktopCrawlers}。
     </>
   );
 }

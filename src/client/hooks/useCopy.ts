@@ -13,7 +13,7 @@ export function useCopy() {
     try {
       await navigator.clipboard.writeText(value);
     } catch {
-      toast.error("Could not copy to clipboard");
+      toast.error("クリップボードにコピーできませんでした");
       return false;
     }
     toast.success(successMessage);

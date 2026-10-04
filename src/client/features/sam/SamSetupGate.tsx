@@ -17,31 +17,31 @@ export function SamSetupGate({
     <GateCard
       icon={Wrench}
       tone="warning"
-      title="Enable AI Features"
+      title="AI機能を有効化"
       description={
         <>
           <p>
-            SAM, OpenSEO&apos;s in-app AI agent, needs an OpenRouter API key.
-            Create a key on OpenRouter, set it as the{" "}
-            <code>OPENROUTER_API_KEY</code> environment variable, restart
-            OpenSEO, then confirm here.
+            OpenSEOのアプリ内AIエージェントSAMにはOpenRouter
+            APIキーが必要です。OpenRouterでキーを作成し、{" "}
+            <code>OPENROUTER_API_KEY</code>{" "}
+            環境変数に設定してOpenSEOを再起動し、ここで確認してください。
           </p>
           <p className="text-xs">
-            Step-by-step instructions for every deployment are in the{" "}
+            各環境の詳しい手順は次のガイドにあります：{" "}
             <Link
               className="underline underline-offset-2 hover:text-foreground"
               to="/help/openrouter-api-key"
             >
-              OpenRouter API key setup guide
+              OpenRouter APIキー設定ガイド
             </Link>
-            .
+            。
           </p>
         </>
       }
       actions={
         <>
           <Button size="lg" pending={isRefetching} onClick={onRetry}>
-            Confirm API Key
+            APIキーを確認
           </Button>
           <Button
             size="lg"
@@ -55,7 +55,7 @@ export function SamSetupGate({
               />
             }
           >
-            Open OpenRouter Keys
+            OpenRouterのキー管理を開く
           </Button>
         </>
       }

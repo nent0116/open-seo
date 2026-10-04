@@ -236,12 +236,10 @@ function SavedKeywordsPage() {
       captureClientEvent("saved_keywords:bulk_remove", {
         count: result.deletedCount,
       });
-      toast.success(
-        `${result.deletedCount} keyword${result.deletedCount !== 1 ? "s" : ""} removed`,
-      );
+      toast.success(`${result.deletedCount}件のキーワードを削除しました`);
     },
     onError: (error) => {
-      setRemoveError(getStandardErrorMessage(error, "Remove failed."));
+      setRemoveError(getStandardErrorMessage(error, "削除に失敗しました。"));
     },
   });
 
@@ -263,9 +261,7 @@ function SavedKeywordsPage() {
       setRowSelection({});
       setShowTagModal(false);
       void invalidateSavedKeywords();
-      toast.success(
-        `Updated tags for ${result.taggedCount} keyword${result.taggedCount !== 1 ? "s" : ""}`,
-      );
+      toast.success(`${result.taggedCount}件のキーワードのタグを更新しました`);
     },
   });
 
@@ -273,9 +269,7 @@ function SavedKeywordsPage() {
     mutationFn: () => refreshSavedKeywordMetrics({ data: { projectId } }),
     onSuccess: (result) => {
       void invalidateSavedKeywords();
-      toast.success(
-        `Updated stats for ${result.updated} keyword${result.updated !== 1 ? "s" : ""}`,
-      );
+      toast.success(`${result.updated}件のキーワード指標を更新しました`);
     },
   });
 
@@ -326,7 +320,7 @@ function SavedKeywordsPage() {
         {savedKeywordsQuery.isError ? (
           <QueryError
             error={savedKeywordsQuery.error}
-            fallback="Failed to load saved keywords."
+            fallback="保存済みキーワードを読み込めませんでした。"
             onRetry={() => void savedKeywordsQuery.refetch()}
             isRetrying={isFetching}
           />
@@ -386,9 +380,9 @@ function SavedKeywordsPage() {
               .then(
                 () =>
                   toast.success(
-                    `${selectedCount} keyword${selectedCount !== 1 ? "s" : ""} copied`,
+                    `${selectedCount}件のキーワードをコピーしました`,
                   ),
-                () => toast.error("Could not copy to clipboard"),
+                () => toast.error("クリップボードにコピーできませんでした"),
               );
           }}
           onOpenTags={() => setShowTagModal(true)}

@@ -20,13 +20,13 @@ import {
 } from "./backlinksPageUtils";
 
 const trendChartConfig = {
-  backlinks: { label: "Backlinks", color: "#2563eb" },
-  referringDomains: { label: "Referring domains", color: "#14b8a6" },
+  backlinks: { label: "被リンク", color: "#2563eb" },
+  referringDomains: { label: "参照ドメイン", color: "#14b8a6" },
 } satisfies ChartConfig;
 
 const newLostChartConfig = {
-  lostBacklinks: { label: "Lost backlinks", color: "#ef4444" },
-  newBacklinks: { label: "New backlinks", color: "#16a34a" },
+  lostBacklinks: { label: "消失した被リンク", color: "#ef4444" },
+  newBacklinks: { label: "新規の被リンク", color: "#16a34a" },
 } satisfies ChartConfig;
 
 const tooltip = (
@@ -55,7 +55,7 @@ export function BacklinksTrendChart({
     <ChartContainer
       config={trendChartConfig}
       className="h-56"
-      aria-label="Backlink trend chart"
+      aria-label="被リンクの推移グラフ"
     >
       <LineChart data={data} margin={{ left: 8, right: 8, top: 8, bottom: 0 }}>
         <ChartGrid />
@@ -107,7 +107,7 @@ export function BacklinksNewLostChart({
     <ChartContainer
       config={newLostChartConfig}
       className="h-56"
-      aria-label="New and lost backlinks chart"
+      aria-label="新規・消失被リンクグラフ"
     >
       <LineChart data={data} margin={{ left: 8, right: 8, top: 8, bottom: 0 }}>
         <ChartGrid />
@@ -141,7 +141,7 @@ export function BacklinksNewLostChart({
 function EmptyChartState() {
   return (
     <div className="flex h-56 items-center justify-center text-sm text-muted-foreground">
-      Not enough historical data yet.
+      推移を表示できるだけの履歴データがまだありません。
     </div>
   );
 }

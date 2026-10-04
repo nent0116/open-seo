@@ -52,7 +52,7 @@ export function saveSelectedKeywords({
           source_feature: "domain_overview",
           keyword_count: selectedKeywords.size,
         });
-        toast.success(`Saved ${selectedKeywords.size} keywords`);
+        toast.success(`${selectedKeywords.size}件のキーワードを保存しました`);
       },
     },
   );

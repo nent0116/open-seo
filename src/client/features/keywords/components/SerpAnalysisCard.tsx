@@ -24,7 +24,7 @@ const columns = [
   }),
   columnHelper.display({
     id: "page",
-    header: "Page",
+    header: "ページ",
     cell: ({ row }) => {
       const label = row.original.title || row.original.url;
       // Provider URLs are untrusted: only http(s) links become clickable.
@@ -95,7 +95,7 @@ export function SerpAnalysisCard({
 
   const retryButton = onRetry ? (
     <Button variant="outline" size="sm" pending={retrying} onClick={onRetry}>
-      {deepFetchFailed ? "Show top 20" : "Retry"}
+      {deepFetchFailed ? "上位20件を表示" : "再試行"}
     </Button>
   ) : null;
 
@@ -114,7 +114,7 @@ export function SerpAnalysisCard({
                     void exportRows({
                       format,
                       feature: "serp_analysis",
-                      headers: ["Rank", "Title", "URL", "Domain"],
+                      headers: ["順位", "タイトル", "URL", "ドメイン"],
                       rows: items.map((item) => [
                         item.rank,
                         item.title ?? "",
@@ -131,7 +131,7 @@ export function SerpAnalysisCard({
             <div className="flex min-w-0 flex-col">
               <h3 className="flex min-w-0 items-center gap-1.5 text-sm font-semibold">
                 <Globe className="size-3.5 shrink-0" />
-                SERP Analysis
+                検索結果分析
                 {keyword ? (
                   <span className="truncate font-normal text-muted-foreground">
                     : {keyword}
@@ -140,7 +140,7 @@ export function SerpAnalysisCard({
               </h3>
               {hasItems ? (
                 <span className="text-xs text-muted-foreground">
-                  {items.length} organic results
+                  {items.length}件の自然検索結果
                 </span>
               ) : null}
             </div>
@@ -160,9 +160,9 @@ export function SerpAnalysisCard({
         error
           ? { kind: "error", title: error, action: retryButton }
           : {
-              title: "No SERP details available for this keyword yet.",
+              title: "このキーワードの検索結果詳細はまだありません。",
               description: keyword
-                ? "Try clicking another keyword to load data."
+                ? "別のキーワードをクリックしてデータを読み込んでください。"
                 : undefined,
             }
       }
@@ -175,7 +175,7 @@ export function SerpAnalysisCard({
             isLoading={loadingMore}
             // Past the loaded results, "Next" buys a deeper crawl. The button
             // says so rather than spending silently.
-            loadMoreLabel={canLoadMore ? "Load top 100" : undefined}
+            loadMoreLabel={canLoadMore ? "上位100件を読み込む" : undefined}
             onPageChange={(nextPage) => onPageChange(nextPage - 1)}
           />
         ) : null

@@ -54,7 +54,7 @@ export function useSaveConfigMutations(input: {
       }),
     onSuccess: (result) => {
       captureClientEvent("rank_tracking:config_create");
-      toast.success("Domain added for rank tracking");
+      toast.success("順位計測にドメインを追加しました");
       onCreated(result.id);
     },
   });
@@ -74,7 +74,7 @@ export function useSaveConfigMutations(input: {
       }),
     onSuccess: () => {
       captureClientEvent("rank_tracking:config_update");
-      toast.success("Configuration updated");
+      toast.success("設定を更新しました");
       onUpdated();
     },
   });

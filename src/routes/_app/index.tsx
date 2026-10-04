@@ -59,7 +59,7 @@ function IndexRedirect() {
       return (
         <StatusScreen
           pending
-          description="Redirecting you to billing so you can start a hosted subscription."
+          description="ホスト版のサブスクリプションを開始するため、請求画面へ移動しています。"
         />
       );
     }
@@ -72,7 +72,7 @@ function IndexRedirect() {
           <StatusScreen>
             <QueryError
               error={error}
-              fallback="An unexpected error occurred. Please check server logs."
+              fallback="予期しないエラーが発生しました。サーバーログを確認してください。"
               onRetry={() => void refetch()}
               isRetrying={isFetching}
             />

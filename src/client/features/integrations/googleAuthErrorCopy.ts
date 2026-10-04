@@ -12,32 +12,32 @@ export function googleAuthErrorCopy(
   code: string,
   providerLabel?: string,
 ): { title: string; description: string } {
-  const what = providerLabel ? `${providerLabel} connection` : "Google sign-in";
+  const what = providerLabel ? `${providerLabel}との連携` : "Googleログイン";
 
   switch (code) {
     case "state_mismatch":
       return {
-        title: `${what} didn't finish`,
+        title: `${what}を完了できませんでした`,
         description:
-          "The attempt expired or was interrupted. Try again in a single browser tab and finish the Google steps within 10 minutes. If it keeps happening, make sure your browser allows cookies for this site.",
+          "操作が期限切れになったか中断されました。1つのブラウザタブで再試行し、10分以内にGoogleの手順を完了してください。繰り返し発生する場合は、このサイトのCookieがブラウザで許可されているか確認してください。",
       };
     case "access_denied":
       return {
-        title: `${what} was canceled`,
+        title: `${what}がキャンセルされました`,
         description:
-          "Google's permission screen was closed or declined. Try again whenever you're ready.",
+          "Googleの権限画面が閉じられたか、許可されませんでした。準備ができたら再試行してください。",
       };
     case "connection_save_failed":
       return {
-        title: `${what} didn't finish`,
+        title: `${what}を完了できませんでした`,
         description:
-          "We couldn't save the connection. Please try again — if it keeps failing, contact support.",
+          "連携を保存できませんでした。再試行し、失敗が続く場合はサポートへお問い合わせください。",
       };
     default:
       return {
-        title: `${what} didn't finish`,
+        title: `${what}を完了できませんでした`,
         description:
-          "Something went wrong while talking to Google. Please try again — if it keeps failing, contact support.",
+          "Googleとの通信中に問題が発生しました。再試行し、失敗が続く場合はサポートへお問い合わせください。",
       };
   }
 }

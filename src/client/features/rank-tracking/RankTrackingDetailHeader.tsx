@@ -19,10 +19,10 @@ import {
 } from "@/types/schemas/rank-tracking-search";
 
 const COMPARE_ITEMS: { value: ComparePeriod; label: string }[] = [
-  { value: "1d", label: "vs yesterday" },
-  { value: "7d", label: "vs last week" },
-  { value: "30d", label: "vs last month" },
-  { value: "90d", label: "vs 90 days ago" },
+  { value: "1d", label: "前日比" },
+  { value: "7d", label: "前週比" },
+  { value: "30d", label: "前月比" },
+  { value: "90d", label: "90日前比" },
 ];
 
 export function RankTrackingDetailHeader({
@@ -59,12 +59,13 @@ export function RankTrackingDetailHeader({
           &middot; {devicesLabel(config.devices)} &middot;{" "}
           {scheduleLabel(config.scheduleInterval)}
           {config.scheduleInterval !== "manual" && config.nextCheckAt && (
-            <> &middot; Next: {formatNextCheck(config.nextCheckAt)}</>
+            <> ・次回： {formatNextCheck(config.nextCheckAt)}</>
           )}
           {run?.lastCheckedAt && (
             <>
               {" "}
-              &middot; Last: {new Date(run.lastCheckedAt).toLocaleDateString()}
+              ・前回：
+              {new Date(run.lastCheckedAt).toLocaleDateString("ja-JP")}
             </>
           )}
           {costEstimate && costEstimate.keywordCount > 0 && (
@@ -79,12 +80,12 @@ export function RankTrackingDetailHeader({
               {
                 value: "desktop" as const,
                 icon: <Monitor className="size-3.5" />,
-                label: "Desktop",
+                label: "パソコン",
               },
               {
                 value: "mobile" as const,
                 icon: <Smartphone className="size-3.5" />,
-                label: "Mobile",
+                label: "モバイル",
               },
             ]}
             value={activeDevice}
@@ -101,8 +102,8 @@ export function RankTrackingDetailHeader({
         >
           <SelectTrigger
             size="sm"
-            aria-label="Comparison period"
-            title="Comparison period"
+            aria-label="比較期間"
+            title="比較期間"
             className="text-xs"
           >
             <SelectValue />
@@ -118,11 +119,11 @@ export function RankTrackingDetailHeader({
         <div className="hidden h-6 w-px bg-border sm:block" />
         <Button variant="outline" size="sm" onClick={onEdit}>
           <Settings data-icon="inline-start" />
-          Configure
+          設定
         </Button>
         <Button size="sm" onClick={onToggleAddKeywords}>
           <Plus data-icon="inline-start" />
-          Add Keywords
+          キーワードを追加
         </Button>
       </div>
     </div>

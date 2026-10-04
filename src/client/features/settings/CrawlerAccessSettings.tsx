@@ -23,7 +23,8 @@ import {
 } from "@/client/components/ui/table";
 import { SectionHeader } from "@/client/components/PageHeader";
 
-const formatDate = (value: string) => new Date(value).toLocaleDateString();
+const formatDate = (value: string) =>
+  new Date(value).toLocaleDateString("ja-JP");
 
 /**
  * Shopify crawler-access signatures saved on this project. The audit crawler
@@ -46,7 +47,7 @@ export function CrawlerAccessSettings({ projectId }: { projectId: string }) {
       await queryClient.invalidateQueries({
         queryKey: crawlerCredentialsQueryKey,
       });
-      toast.success("Crawler access removed");
+      toast.success("クローラーアクセスを削除しました");
     },
   });
 
@@ -54,14 +55,12 @@ export function CrawlerAccessSettings({ projectId }: { projectId: string }) {
 
   return (
     <section className="space-y-3">
-      <SectionHeader title="Crawler access" />
+      <SectionHeader title="クローラーアクセス" />
       <div className="flex items-start justify-between gap-6">
         <div>
-          <p className="text-sm">Let the audit crawler through Shopify</p>
+          <p className="text-sm">Shopifyで監査クローラーを許可</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Paste the signature you created in Shopify admin under Online Store
-            &rarr; Preferences &rarr; Crawler access. Every audit of that domain
-            in your organization sends it with each request.
+            Shopify管理画面の「オンラインストア」→「各種設定」→「クローラーアクセス」で作成した署名を貼り付けます。組織内でこのドメインを監査する際、各リクエストと一緒に送信されます。
           </p>
         </div>
         <Button
@@ -69,7 +68,7 @@ export function CrawlerAccessSettings({ projectId }: { projectId: string }) {
           size="sm"
           onClick={() => setIsAdding((value) => !value)}
         >
-          {isAdding ? "Cancel" : "Add signature"}
+          {isAdding ? "キャンセル" : "署名を追加"}
         </Button>
       </div>
 
@@ -85,17 +84,17 @@ export function CrawlerAccessSettings({ projectId }: { projectId: string }) {
 
       {credentialsQuery.isError ? (
         <p className="text-sm text-destructive">
-          We couldn't load your crawler access.
+          クローラーアクセスを読み込めませんでした。
         </p>
       ) : credentials.length > 0 ? (
         <TableCard>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Domain</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Added</TableHead>
-                <TableHead>Expires</TableHead>
+                <TableHead>ドメイン</TableHead>
+                <TableHead>種類</TableHead>
+                <TableHead>追加日時</TableHead>
+                <TableHead>有効期限</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>
@@ -104,7 +103,7 @@ export function CrawlerAccessSettings({ projectId }: { projectId: string }) {
                 <TableRow key={credential.id}>
                   <TableCell className="font-mono">{credential.host}</TableCell>
                   <TableCell className="text-muted-foreground">
-                    Shopify signature
+                    Shopify署名
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {formatDate(credential.createdAt)}
@@ -112,16 +111,16 @@ export function CrawlerAccessSettings({ projectId }: { projectId: string }) {
                   <TableCell className="text-muted-foreground">
                     {credential.expiresAt
                       ? formatDate(credential.expiresAt)
-                      : "Unknown"}
+                      : "不明"}
                     {isCrawlerAccessExpired(credential.expiresAt) && (
-                      <span className="ml-2 text-destructive">Expired</span>
+                      <span className="ml-2 text-destructive">期限切れ</span>
                     )}
                   </TableCell>
                   <TableCell>
                     <Button
                       variant="ghost"
                       size="icon-xs"
-                      aria-label={`Remove crawler access for ${credential.host}`}
+                      aria-label={`${credential.host}のクローラーアクセスを削除`}
                       disabled={deleteMutation.isPending}
                       onClick={() => deleteMutation.mutate(credential.id)}
                     >

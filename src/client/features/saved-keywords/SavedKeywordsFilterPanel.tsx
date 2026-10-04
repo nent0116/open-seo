@@ -23,30 +23,30 @@ export function SavedKeywordsFilterPanel({
         <TermsTokenInput
           form={form}
           name="include"
-          label="Include"
+          label="含める"
           variant="include"
-          placeholder="Must contain… e.g. audit"
+          placeholder="含める語句… 例：監査"
         />
         <TermsTokenInput
           form={form}
           name="exclude"
-          label="Exclude"
+          label="除外"
           variant="exclude"
-          placeholder="Must not contain… e.g. jobs"
+          placeholder="除外する語句… 例：求人"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
         <FilterRangeInputs
           form={form}
-          title="Search Volume"
+          title="検索ボリューム"
           minName="minVol"
           maxName="maxVol"
           min={0}
         />
         <FilterRangeInputs
           form={form}
-          title="CPC (USD)"
+          title="クリック単価（USD）"
           minName="minCpc"
           maxName="maxCpc"
           step="0.01"
@@ -54,7 +54,7 @@ export function SavedKeywordsFilterPanel({
         />
         <FilterRangeInputs
           form={form}
-          title="Difficulty"
+          title="難易度"
           minName="minKd"
           maxName="maxKd"
           min={0}
@@ -158,7 +158,7 @@ function TermsTokenInput({
                   <button
                     type="button"
                     className="opacity-70 hover:opacity-100"
-                    aria-label={`Remove ${term}`}
+                    aria-label={`${term}を削除`}
                     onClick={() =>
                       commit(terms.filter((existing) => existing !== term))
                     }

@@ -20,7 +20,7 @@ export function Spinner({
     >
       {/* The icon is the status element, so it carries the label for screen readers. */}
       <SpinnerIcon
-        aria-label={label ?? "Loading"}
+        aria-label={label ?? "読み込み中"}
         className={size === "sm" ? "size-4" : "size-6"}
       />
       {label ? <span aria-hidden>{label}</span> : null}

@@ -23,8 +23,8 @@ const columns = [
     meta: { cellClassName: "min-w-80" },
     header: () => (
       <HelpLabel
-        label="Page"
-        helpText="Page on the target site receiving backlinks."
+        label="ページ"
+        helpText="被リンクを受けている対象サイト内のページです。"
       />
     ),
     cell: ({ getValue }) => {
@@ -45,8 +45,8 @@ const columns = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Backlinks"
-        helpText="Total backlinks pointing to this page."
+        label="被リンク"
+        helpText="このページへの被リンクの合計です。"
       />
     ),
     cell: ({ getValue }) => formatNumber(getValue()),
@@ -57,8 +57,8 @@ const columns = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Referring Domains"
-        helpText="Unique domains linking to this page."
+        label="参照ドメイン"
+        helpText="このページへリンクしている固有ドメインです。"
       />
     ),
     cell: ({ getValue }) => formatNumber(getValue()),
@@ -69,8 +69,8 @@ const columns = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Rank"
-        helpText="Authority score for this target page."
+        label="ランク"
+        helpText="対象ページの評価スコアです。"
       />
     ),
     cell: ({ getValue }) => formatNumber(getValue()),
@@ -81,8 +81,8 @@ const columns = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Broken Backlinks"
-        helpText="Backlinks pointing here that are currently broken."
+        label="リンク切れの被リンク"
+        helpText="現在リンク切れになっている、このページへの被リンクです。"
       />
     ),
     cell: ({ getValue }) => formatNumber(getValue()),
@@ -111,7 +111,7 @@ export function TopPagesTable({
   return (
     <DataTable
       table={table}
-      empty={{ title: "No top pages found for this target." }}
+      empty={{ title: "この対象の上位ページは見つかりませんでした。" }}
       {...frame}
     />
   );

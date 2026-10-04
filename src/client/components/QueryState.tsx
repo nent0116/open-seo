@@ -50,7 +50,7 @@ export function QueryError({
             nativeButton={false}
             render={<Link to={BILLING_ROUTE} />}
           >
-            Go to Billing
+            請求・利用状況へ
           </Button>
         ) : undefined
       }

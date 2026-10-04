@@ -19,7 +19,7 @@ type Props = {
 };
 
 const chartConfig = {
-  volume: { label: "Mentions", color: "hsl(220 70% 50%)" },
+  volume: { label: "言及数", color: "hsl(220 70% 50%)" },
 } satisfies ChartConfig;
 
 export function BrandLookupMentionTrendCard({ result }: Props) {

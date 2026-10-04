@@ -25,22 +25,22 @@ function SeoApiStatusBanners({
       {...dataforseoHelpLinkOptions}
       className="font-medium text-primary underline-offset-4 hover:underline"
     >
-      help page
+      ヘルプページ
     </Link>
   );
   return (
     <>
       {shouldShowSeoApiWarning ? (
         <AppBanner variant="warning" icon={icon}>
-          Setup needed: add your DataForSEO API key to use OpenSEO features. See
-          the quick steps on the {helpLink}.
+          設定が必要です。OpenSEOの機能を利用するにはDataForSEO
+          APIキーを追加してください。簡単な手順は{helpLink}で確認できます。
         </AppBanner>
       ) : null}
 
       {seoApiKeyStatusError ? (
         <AppBanner variant="info" icon={icon}>
-          We could not verify your DataForSEO setup. If features are not
-          working, check the setup steps on the {helpLink}.
+          DataForSEOの設定を確認できませんでした。機能が動作しない場合は、
+          {helpLink}で設定手順を確認してください。
         </AppBanner>
       ) : null}
     </>
@@ -56,21 +56,21 @@ function MissingSeoSetupModal({ onClose }: { onClose: () => void }) {
             <AlertTriangle className="size-5" />
           </div>
           <div className="space-y-2">
-            <DialogTitle>One quick setup step</DialogTitle>
+            <DialogTitle>簡単な初期設定</DialogTitle>
             <DialogDescription>
-              Add your DataForSEO API key to start using OpenSEO.
+              DataForSEO APIキーを追加してOpenSEOの利用を開始します。
             </DialogDescription>
           </div>
         </DialogHeader>
         <DialogFooter>
           <Button variant="ghost" onClick={onClose}>
-            Dismiss
+            閉じる
           </Button>
           <Button
             nativeButton={false}
             render={<Link {...dataforseoHelpLinkOptions} onClick={onClose} />}
           >
-            Open setup guide
+            セットアップガイドを開く
             <ExternalLink className="size-4" />
           </Button>
         </DialogFooter>

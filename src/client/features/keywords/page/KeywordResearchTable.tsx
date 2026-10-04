@@ -73,7 +73,7 @@ export function KeywordResearchTable({
         header: () => (
           <SortableHeader
             column={sortColumn("keyword")}
-            label="Keyword"
+            label="キーワード"
             className="min-w-48 md:min-w-0"
           />
         ),
@@ -85,7 +85,7 @@ export function KeywordResearchTable({
               className={`block whitespace-normal break-words capitalize md:truncate ${row.original.parentKeyword ? "font-normal" : "font-medium"}`}
               title={
                 row.original.parentKeyword
-                  ? `${row.original.keyword}: matching reported volume with ${row.original.parentKeyword}. Shared volumes may overlap.`
+                  ? `${row.original.keyword}：${row.original.parentKeyword}と同じ検索ボリュームが報告されています。共有ボリュームは重複する場合があります。`
                   : row.original.keyword
               }
             >
@@ -104,7 +104,7 @@ export function KeywordResearchTable({
         header: () => (
           <SortableHeader
             column={sortColumn("searchVolume")}
-            label="Volume"
+            label="検索ボリューム"
             align="right"
           />
         ),
@@ -121,7 +121,7 @@ export function KeywordResearchTable({
           <SortableHeader
             column={sortColumn("cpc")}
             label="CPC"
-            helpText="Cost per click in USD."
+            helpText="米ドル建てのクリック単価です。"
             align="right"
           />
         ),
@@ -140,8 +140,8 @@ export function KeywordResearchTable({
         header: () => (
           <SortableHeader
             column={sortColumn("competition")}
-            label="Comp."
-            helpText="Paid-search competition from Google Ads (0-1): higher means more advertisers bidding."
+            label="競合度"
+            helpText="Google広告における有料検索の競合度（0～1）です。数値が高いほど入札する広告主が多いことを示します。"
             align="right"
           />
         ),
@@ -160,8 +160,8 @@ export function KeywordResearchTable({
         header: () => (
           <SortableHeader
             column={sortColumn("keywordDifficulty")}
-            label="Score"
-            helpText="Organic ranking difficulty (0-100): higher means harder to reach Google's top 10."
+            label="スコア"
+            helpText="自然検索の上位表示難易度（0～100）です。数値が高いほどGoogleの上位10件に入るのが難しくなります。"
             align="right"
           />
         ),
@@ -169,7 +169,7 @@ export function KeywordResearchTable({
         meta: { headerClassName: "text-right", cellClassName: "text-right" },
       }),
       keywordColumnHelper.accessor("intent", {
-        header: "Intent",
+        header: "検索意図",
         cell: ({ getValue }) => <IntentBadge intent={getValue()} />,
         meta: {
           headerClassName: "text-center",
@@ -202,7 +202,7 @@ export function KeywordResearchTable({
       table={table}
       toolbar={toolbar}
       footer={footer}
-      empty={{ title: "No keywords" }}
+      empty={{ title: "キーワードがありません" }}
       isFiltered={isFiltered}
       onClearFilters={resetFilters}
       onRowClick={(row) => handleRowClick(row.original)}

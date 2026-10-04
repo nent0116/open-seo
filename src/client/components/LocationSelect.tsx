@@ -6,15 +6,21 @@ import {
   ComboboxItem,
   ComboboxList,
 } from "@/client/components/ui/combobox";
-import { LOCATION_OPTIONS } from "@/shared/keyword-locations";
+import { useMemo } from "react";
+import { formatJapaneseCountryName } from "@/shared/country-labels-ja";
+import {
+  getIsoCountryCode,
+  LOCATION_OPTIONS,
+} from "@/shared/keyword-locations";
 
-type LocationOption = (typeof LOCATION_OPTIONS)[number];
+type SourceLocationOption = (typeof LOCATION_OPTIONS)[number];
+type LocationOption = SourceLocationOption & { originalLabel: string };
 
 type Props = {
   value: number;
   onChange: (locationCode: number) => void;
   /** Defaults to the full country list. Pass a subset (e.g. Labs-only). */
-  options?: readonly LocationOption[];
+  options?: readonly SourceLocationOption[];
   /** Width utilities for the field. Defaults to full width. */
   className?: string;
 };
@@ -24,6 +30,7 @@ function matches(option: LocationOption, query: string): boolean {
   if (!needle) return true;
   return (
     option.label.toLowerCase().includes(needle) ||
+    option.originalLabel.toLowerCase().includes(needle) ||
     option.shortLabel.toLowerCase().includes(needle)
   );
 }
@@ -35,11 +42,21 @@ export function LocationSelect({
   options = LOCATION_OPTIONS,
   className = "w-full",
 }: Props) {
-  const selected = options.find((option) => option.code === value) ?? null;
+  const localizedOptions = useMemo<LocationOption[]>(
+    () =>
+      options.map((option) => ({
+        ...option,
+        originalLabel: option.label,
+        label: formatJapaneseCountryName(getIsoCountryCode(option.code)),
+      })),
+    [options],
+  );
+  const selected =
+    localizedOptions.find((option) => option.code === value) ?? null;
 
   return (
     <Combobox
-      items={options}
+      items={localizedOptions}
       value={selected}
       itemToStringLabel={(option) => option.label}
       autoHighlight
@@ -50,11 +67,11 @@ export function LocationSelect({
     >
       <ComboboxInput
         className={className}
-        placeholder="Select country"
-        aria-label="Country"
+        placeholder="国を選択"
+        aria-label="国"
       />
       <ComboboxContent>
-        <ComboboxEmpty>No countries match.</ComboboxEmpty>
+        <ComboboxEmpty>一致する国がありません。</ComboboxEmpty>
         <ComboboxList>
           {(option: LocationOption) => (
             <ComboboxItem key={option.code} value={option}>

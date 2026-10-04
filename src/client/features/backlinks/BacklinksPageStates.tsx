@@ -51,8 +51,8 @@ export function BacklinksErrorState({
 }) {
   return (
     <ErrorState
-      title="Could not load backlinks"
-      message={errorMessage ?? "Please try again in a moment."}
+      title="被リンクを読み込めませんでした"
+      message={errorMessage ?? "時間をおいて、もう一度お試しください。"}
       onRetry={onRetry}
       isRetrying={isRetrying}
     />

@@ -18,20 +18,20 @@ const VARIANTS: Record<
 };
 
 const SHORT_LABELS: Record<KeywordIntent, string> = {
-  informational: "Info",
-  commercial: "Comm",
-  transactional: "Trans",
-  navigational: "Nav",
+  informational: "情報",
+  commercial: "比較",
+  transactional: "購入",
+  navigational: "案内",
   unknown: "?",
 };
 
 /** Full intent labels, shared with the keyword filters so both stay in sync. */
 export const INTENT_LABELS: Record<KeywordIntent, string> = {
-  informational: "Informational",
-  commercial: "Commercial",
-  transactional: "Transactional",
-  navigational: "Navigational",
-  unknown: "Unknown",
+  informational: "情報収集型",
+  commercial: "比較検討型",
+  transactional: "取引型",
+  navigational: "案内型",
+  unknown: "不明",
 };
 
 const DESCRIPTIONS: Record<
@@ -41,27 +41,27 @@ const DESCRIPTIONS: Record<
   informational: {
     label: INTENT_LABELS.informational,
     description:
-      "The searcher wants information or answers. Use this for educational content, guides, and comparison-light explainers.",
+      "検索者は情報や回答を求めています。解説記事、ガイド、比較を補助するコンテンツに適しています。",
   },
   commercial: {
     label: INTENT_LABELS.commercial,
     description:
-      "The searcher is researching options before a purchase. Treat this as buying intent for comparisons, alternatives, and product-led pages.",
+      "検索者は購入前に選択肢を調べています。比較、代替案、製品紹介ページにつながる購入意図として扱います。",
   },
   transactional: {
     label: INTENT_LABELS.transactional,
     description:
-      "The searcher is ready to complete an action, often a purchase. Prioritize clear offers, pricing, trials, or conversion paths.",
+      "検索者は購入などの行動を起こす準備ができています。明確な提案、料金、無料体験、申込み導線を優先します。",
   },
   navigational: {
     label: INTENT_LABELS.navigational,
     description:
-      "The searcher is looking for a specific site, brand, or page. These queries usually reward matching the expected destination.",
+      "検索者は特定のサイト、ブランド、ページを探しています。期待される遷移先と一致するページが評価されやすい検索です。",
   },
   unknown: {
     label: INTENT_LABELS.unknown,
     description:
-      "Intent was not available for this keyword, so avoid making content strategy decisions from this badge alone.",
+      "このキーワードの検索意図は取得できませんでした。この表示だけでコンテンツ戦略を判断しないでください。",
   },
 };
 
@@ -79,7 +79,7 @@ export function IntentBadge({ intent }: { intent: KeywordIntent }) {
             className="h-6 min-w-11 cursor-help font-semibold"
           />
         }
-        aria-label={`${details.label} search intent`}
+        aria-label={`検索意図：${details.label}`}
       >
         {SHORT_LABELS[intent]}
       </TooltipTrigger>

@@ -10,11 +10,11 @@ export async function handleReportSocialImage(
   token: string,
 ): Promise<Response> {
   if (!(await sharesEnabled()) || !SHARE_TOKEN_PATTERN.test(token)) {
-    return textResponse("This report isn't shared.", 404);
+    return textResponse("このレポートは共有されていません。", 404);
   }
   const report = await ReportRepository.getSharedReportByToken(token);
   if (!report || report.archived) {
-    return textResponse("This report isn't shared.", 404);
+    return textResponse("このレポートは共有されていません。", 404);
   }
 
   // Keep the renderer and WASM out of the app's eager startup graph, and do

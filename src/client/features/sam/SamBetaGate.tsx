@@ -13,25 +13,24 @@ export function SamBetaGate({ onContinue }: { onContinue: () => void }) {
   return (
     <GateCard
       icon={Sparkles}
-      title="Sam is in beta"
+      title="Samはベータ版です"
       description={
         <>
           <p>
-            Sam is the OpenSEO MCP and skills wrapped in a chat window. The
-            agent you already use, like Claude Code, ChatGPT, Grok Bot, or
-            Hermes, runs that same toolset on a much more capable harness. We
-            recommend using OpenSEO there.
+            SamはOpenSEO MCPとスキルをチャット画面から利用できる機能です。Claude
+            Code、ChatGPT、Grok
+            Bot、Hermesなど普段お使いのAIエージェントでも、同じツールをより高性能な実行環境で利用できます。OpenSEOはそちらでの利用をおすすめします。
           </p>
-          <p>You can still use Sam, but it is early and has rough edges.</p>
+          <p>Samも利用できますが、開発初期のため未完成な部分があります。</p>
         </>
       }
       actions={
         <>
           <Button size="lg" nativeButton={false} render={<Link to="/ai" />}>
-            Set up your agent
+            AIエージェントを設定
           </Button>
           <Button size="lg" variant="ghost" onClick={onContinue}>
-            Use Sam anyway
+            Samを使用する
           </Button>
         </>
       }

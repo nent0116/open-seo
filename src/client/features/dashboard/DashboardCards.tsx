@@ -60,28 +60,29 @@ export function GscCard({
 
   return (
     <CardShell
-      title="Search performance"
-      stamp="Google Search Console · last 28 days"
+      title="検索パフォーマンス"
+      stamp="Google Search Console・過去28日間"
       action={
         <Link
           to="/p/$projectId/search-performance"
           params={{ projectId }}
           className={moreDetailsClass}
         >
-          More details
+          詳細を見る
         </Link>
       }
     >
       {reportQuery.isError ? (
         <p className="text-sm text-muted-foreground">
-          Couldn&rsquo;t load Search Console data. Try again shortly.
+          Search
+          Consoleのデータを読み込めませんでした。時間をおいて再試行してください。
         </p>
       ) : !report ? (
         <StatGridSkeleton />
       ) : (
         <div className="grid grid-cols-2 gap-3">
           <StatTile
-            label="Clicks"
+            label="クリック数"
             value={formatCount(report.totals.clicks)}
             delta={{
               current: report.totals.clicks,
@@ -89,7 +90,7 @@ export function GscCard({
             }}
           />
           <StatTile
-            label="Impressions"
+            label="表示回数"
             value={formatCount(report.totals.impressions)}
             delta={{
               current: report.totals.impressions,
@@ -98,7 +99,7 @@ export function GscCard({
           />
           <StatTile label="CTR" value={formatCtr(report.totals.ctr)} />
           <StatTile
-            label="Avg position"
+            label="平均掲載順位"
             value={formatPosition(report.totals.position)}
           />
         </div>
@@ -116,16 +117,16 @@ export function AuditHealthCard({
 }) {
   if (!audit) {
     return (
-      <CardShell title="Site audit">
+      <CardShell title="サイト監査">
         <EmptyCardBody
-          message="Crawl your site for broken links, missing tags and indexability problems."
+          message="サイトをクロールし、リンク切れ、タグの不足、インデックス登録の問題を検出します。"
           cta={
             <Button
               size="lg"
               nativeButton={false}
               render={<Link to="/p/$projectId/audit" params={{ projectId }} />}
             >
-              Run an audit
+              監査を実行
             </Button>
           }
         />
@@ -135,13 +136,13 @@ export function AuditHealthCard({
 
   return (
     <CardShell
-      title="Site audit"
-      stamp={`Site audit · ${
+      title="サイト監査"
+      stamp={`サイト監査・${
         audit.status === "completed"
-          ? `crawled ${audit.pagesCrawled} pages · ${formatDay(audit.startedAt)}`
+          ? `${audit.pagesCrawled.toLocaleString("ja-JP")}ページをクロール・${formatDay(audit.startedAt)}`
           : audit.status === "running"
-            ? "crawl in progress"
-            : "last crawl failed"
+            ? "クロール中"
+            : "前回のクロールに失敗"
       }`}
       action={
         <Link
@@ -149,7 +150,7 @@ export function AuditHealthCard({
           params={{ projectId }}
           className={moreDetailsClass}
         >
-          More details
+          詳細を見る
         </Link>
       }
     >
@@ -157,17 +158,17 @@ export function AuditHealthCard({
         // A running crawl has at most a partial issue list, and an empty one
         // is not the same as a healthy site.
         <p className="text-sm text-muted-foreground">
-          Issues appear here when the crawl finishes.
+          クロールが完了すると、ここに問題が表示されます。
         </p>
       ) : audit.topIssues.length === 0 ? (
         audit.status === "completed" ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Check className="size-4 text-success" />
-            No issues found — your site looks healthy.
+            問題は見つかりませんでした。サイトは良好な状態です。
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">
-            Run the audit again to see issues.
+            問題を確認するには、もう一度監査を実行してください。
           </p>
         )
       ) : (
@@ -192,20 +193,19 @@ export function AuditHealthCard({
                 </span>
               </span>
               <span className="shrink-0 tabular-nums text-muted-foreground">
-                {issue.count} {issue.count === 1 ? "page" : "pages"}
+                {issue.count.toLocaleString("ja-JP")}ページ
               </span>
             </li>
           ))}
           {audit.totalIssueTypes > audit.topIssues.length ? (
             <li className="text-xs text-muted-foreground">
-              + {audit.totalIssueTypes - audit.topIssues.length} more issue
-              {audit.totalIssueTypes - audit.topIssues.length === 1 ? "" : "s"}
+              +{audit.totalIssueTypes - audit.topIssues.length}件の問題
             </li>
           ) : null}
           {/* A failed crawl keeps what it found, as the audit page does. */}
           {audit.status !== "completed" ? (
             <li className="text-xs text-muted-foreground">
-              From the pages crawled before the audit stopped.
+              監査が停止するまでにクロールできたページの結果です。
             </li>
           ) : null}
         </ul>
@@ -225,7 +225,10 @@ export function BacklinkPulseCard({
 }) {
   if (!backlinks && refreshing) {
     return (
-      <CardShell title="Backlink pulse" stamp="Taking your first snapshot…">
+      <CardShell
+        title="被リンクの動向"
+        stamp="最初のスナップショットを取得しています…"
+      >
         <StatGridSkeleton />
       </CardShell>
     );
@@ -233,9 +236,9 @@ export function BacklinkPulseCard({
 
   if (!backlinks) {
     return (
-      <CardShell title="Backlink pulse">
+      <CardShell title="被リンクの動向">
         <p className="text-sm text-muted-foreground">
-          We&rsquo;ll snapshot who links to your domain — nothing to set up.
+          ドメインへのリンク状況を自動で記録します。追加設定は不要です。
         </p>
       </CardShell>
     );
@@ -243,9 +246,9 @@ export function BacklinkPulseCard({
 
   return (
     <CardShell
-      title="Backlink pulse"
-      stamp={`Backlinks · snapshot ${formatDay(backlinks.capturedAt)}${
-        refreshing ? " · refreshing…" : ""
+      title="被リンクの動向"
+      stamp={`被リンク・スナップショット ${formatDay(backlinks.capturedAt)}${
+        refreshing ? "・更新中…" : ""
       }`}
       action={
         <Link
@@ -254,29 +257,29 @@ export function BacklinkPulseCard({
           search={{ target: backlinks.domain, scope: "domain" }}
           className={moreDetailsClass}
         >
-          More details
+          詳細を見る
         </Link>
       }
     >
       <div className="grid grid-cols-2 gap-3">
         <StatTile
-          label="Ref. domains"
+          label="参照ドメイン"
           value={
             backlinks.referringDomains === null
               ? "—"
-              : backlinks.referringDomains.toLocaleString()
+              : backlinks.referringDomains.toLocaleString("ja-JP")
           }
         />
         <StatTile
-          label="Backlinks"
+          label="被リンク"
           value={
             backlinks.backlinks === null
               ? "—"
-              : backlinks.backlinks.toLocaleString()
+              : backlinks.backlinks.toLocaleString("ja-JP")
           }
         />
         <StatTile
-          label="New links"
+          label="新規リンク"
           value={`▲ ${newLost(backlinks.newBacklinks)}`}
           tone={
             backlinks.newBacklinks && backlinks.newBacklinks > 0
@@ -285,7 +288,7 @@ export function BacklinkPulseCard({
           }
         />
         <StatTile
-          label="Lost links"
+          label="消失リンク"
           value={`▼ ${newLost(backlinks.lostBacklinks)}`}
           tone={
             backlinks.lostBacklinks && backlinks.lostBacklinks > 0

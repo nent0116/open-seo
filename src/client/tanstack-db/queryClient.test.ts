@@ -21,7 +21,7 @@ describe("default mutation error toast", () => {
   it("shows the standard message for a mutation without its own handling", async () => {
     await runFailingMutation();
     expect(toast.error).toHaveBeenCalledWith(
-      "Too many requests. Please wait and try again.",
+      "リクエストが多すぎます。時間をおいて、もう一度お試しください。",
     );
   });
 

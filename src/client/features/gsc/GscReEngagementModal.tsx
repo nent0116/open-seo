@@ -113,20 +113,19 @@ export function GscReEngagementModal({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-lg">
-            New: Connect Google Search Console
+            新機能：Google Search Consoleを連携
           </DialogTitle>
           <DialogDescription>
-            Bring your real clicks, impressions, and rankings into OpenSEO and
-            query them from Claude or Codex over MCP. It never uses credits.
+            実際のクリック数、表示回数、掲載順位をOpenSEOに取り込み、MCP経由でClaudeやCodexから確認できます。クレジットは使用しません。
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="ghost" onClick={handleDismiss}>
-            Maybe later
+            後で設定
           </Button>
           <Button variant="outline" onClick={handleConnect}>
             <GoogleGlyph className="size-[18px]" />
-            Connect with Google
+            Googleと連携
           </Button>
         </DialogFooter>
       </DialogContent>

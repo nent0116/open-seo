@@ -26,7 +26,7 @@ export type SortField =
 export type SortDir = "asc" | "desc";
 
 const trendChartConfig = {
-  searchVolume: { label: "Search volume", color: "var(--color-primary)" },
+  searchVolume: { label: "検索ボリューム", color: "var(--color-primary)" },
 } satisfies ChartConfig;
 
 export function AreaTrendChart({ trend }: { trend: MonthlySearch[] }) {
@@ -42,7 +42,7 @@ export function AreaTrendChart({ trend }: { trend: MonthlySearch[] }) {
     <ChartContainer
       config={trendChartConfig}
       className="h-[210px]"
-      aria-label="Search trend chart"
+      aria-label="検索トレンドグラフ"
     >
       <AreaChart
         data={data}

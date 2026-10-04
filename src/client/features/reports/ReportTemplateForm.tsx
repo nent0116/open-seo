@@ -18,22 +18,22 @@ import type { ReportTemplate } from "@/types/schemas/report-templates";
 // One form for create and edit. Shape only, as at every other boundary: the
 // caps come back from the service with their copy and show in a toast.
 const formSchema = z.object({
-  name: z.string().trim().min(1, "Give the template a name."),
+  name: z.string().trim().min(1, "テンプレート名を入力してください。"),
   description: z
     .string()
     .trim()
-    .min(1, "Say in one line when to use this template."),
+    .min(1, "このテンプレートを使用する場面を1行で入力してください。"),
   instructions: z
     .string()
     .trim()
-    .min(1, "Say who the report is for and which sections it has."),
+    .min(1, "レポートの対象読者と構成を入力してください。"),
 });
 
-const INSTRUCTIONS_PLACEHOLDER = `Audience: the client's marketing lead, not technical.
-Sections, in order: Where we are / What we did this month / What moved / What to expect next.
-Tone: plain and confident. Gloss every SEO term. No exclamation points.
-Sign off as: Acme SEO
-Accent: #1C4ED8`;
+const INSTRUCTIONS_PLACEHOLDER = `対象読者：クライアントのマーケティング責任者（技術者向けではない）
+構成：現状 / 今月行ったこと / 変化 / 次に期待できること
+文体：平易で自信のある表現。SEO用語には説明を添える。感嘆符は使わない。
+署名：Acme SEO
+アクセントカラー：#1C4ED8`;
 
 export function ReportTemplateForm({
   projectId,
@@ -64,7 +64,11 @@ export function ReportTemplateForm({
         is_update: !result.created,
         source: "app",
       });
-      toast.success(result.created ? "Template created" : "Template saved");
+      toast.success(
+        result.created
+          ? "テンプレートを作成しました"
+          : "テンプレートを保存しました",
+      );
       onSaved();
     },
   });
@@ -92,15 +96,15 @@ export function ReportTemplateForm({
           <form.Form className="flex flex-col gap-4">
             <DialogHeader>
               <DialogTitle>
-                {template ? "Edit template" : "New template"}
+                {template ? "テンプレートを編集" : "新しいテンプレート"}
               </DialogTitle>
             </DialogHeader>
 
             <form.AppField name="name">
               {(field) => (
                 <field.TextField
-                  label="Name"
-                  placeholder="Monthly client check-in"
+                  label="名前"
+                  placeholder="月次クライアント報告"
                   required
                 />
               )}
@@ -109,9 +113,9 @@ export function ReportTemplateForm({
             <form.AppField name="description">
               {(field) => (
                 <field.TextField
-                  label="Description"
-                  description="One line saying when to use it. This is what an agent reads to decide."
-                  placeholder="The monthly update we send retainer clients."
+                  label="説明"
+                  description="使用する場面を1行で説明します。AIエージェントが選択時に参照します。"
+                  placeholder="継続契約のクライアントへ送る月次報告。"
                   required
                 />
               )}
@@ -120,8 +124,8 @@ export function ReportTemplateForm({
             <form.AppField name="instructions">
               {(field) => (
                 <field.TextareaField
-                  label="Instructions"
-                  description="Brand voice for the whole project lives in Context › Writing preferences."
+                  label="作成指示"
+                  description="プロジェクト全体の文章トーンは「プロジェクト情報」›「文章の設定」で管理します。"
                   className="h-56 font-mono leading-relaxed md:text-xs"
                   placeholder={INSTRUCTIONS_PLACEHOLDER}
                   required
@@ -136,10 +140,10 @@ export function ReportTemplateForm({
                 onClick={onClose}
                 disabled={saveMutation.isPending}
               >
-                Cancel
+                キャンセル
               </Button>
               <form.SubmitButton>
-                {template ? "Save changes" : "Create template"}
+                {template ? "変更を保存" : "テンプレートを作成"}
               </form.SubmitButton>
             </DialogFooter>
           </form.Form>

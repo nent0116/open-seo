@@ -35,11 +35,11 @@ export function RankTrackingHistoryMatrix({
     return (
       <EmptyState
         kind="filtered"
-        title="No keywords match these filters"
-        description="Change or clear the filters to see more keywords."
+        title="絞り込み条件に一致するキーワードがありません"
+        description="条件を変更または解除してください。"
         action={
           <Button variant="outline" size="sm" onClick={onClearFilters}>
-            Clear filters
+            絞り込みを解除
           </Button>
         }
       />
@@ -54,7 +54,7 @@ export function RankTrackingHistoryMatrix({
             {/* Unconstrained keyword column absorbs the slack when only a few
                 check columns exist, so sparse history doesn't stretch oddly. */}
             <TableHead className="sticky left-0 z-10 w-full bg-card">
-              Keyword
+              キーワード
             </TableHead>
             {runs.map((r) => (
               <TableHead key={r.runId} className="w-24 text-right">
@@ -150,7 +150,7 @@ function buildMatrix(cells: RankPositionMatrixCell[]): {
 }
 
 function formatDate(value: string): string {
-  return new Date(value).toLocaleDateString("en-US", {
+  return new Date(value).toLocaleDateString("ja-JP", {
     month: "short",
     day: "numeric",
   });

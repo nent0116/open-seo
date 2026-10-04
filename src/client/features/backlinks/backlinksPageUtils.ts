@@ -3,11 +3,11 @@ import type { BacklinksOverviewData } from "./backlinksPageTypes";
 
 export const TAB_DESCRIPTIONS: Record<BacklinksTab, string> = {
   backlinks:
-    "See the individual links pointing to your target, including source page, anchor text, and link quality signals.",
+    "対象への個別リンクを、リンク元ページ、アンカーテキスト、リンク品質の指標とともに確認します。",
   domains:
-    "View the unique domains linking to your target, grouped at the site level instead of by individual link.",
+    "対象へリンクしている固有ドメインを、個別リンクではなくサイト単位で確認します。",
   pages:
-    "See which pages on the target site attract the most backlinks and referring domains.",
+    "対象サイトで被リンクと参照ドメインを多く獲得しているページを確認します。",
 };
 
 export function buildSummaryStats(data: BacklinksOverviewData | undefined) {
@@ -15,51 +15,51 @@ export function buildSummaryStats(data: BacklinksOverviewData | undefined) {
 
   return [
     {
-      label: "Backlinks",
+      label: "被リンク",
       value: formatNumber(data.summary.backlinks),
-      description: "Total links pointing to this site or page.",
+      description: "このサイトまたはページへのリンク総数です。",
     },
     {
-      label: "Referring Domains",
+      label: "参照ドメイン",
       value: formatNumber(data.summary.referringDomains),
-      description: "Unique domains linking to this site or page.",
+      description: "このサイトまたはページへリンクしている固有ドメインです。",
     },
     {
-      label: "Referring Pages",
+      label: "参照ページ",
       value: formatNumber(data.summary.referringPages),
-      description: "Unique pages linking to this site or page.",
+      description: "このサイトまたはページへリンクしている固有ページです。",
     },
     {
-      label: "Rank",
+      label: "ランク",
       value: formatNumber(data.summary.rank),
-      description: "DataForSEO's 0-100 authority score.",
+      description: "DataForSEOによる0～100の評価スコアです。",
     },
     {
-      label: "Backlink Spam Score",
+      label: "被リンクスパムスコア",
       value: formatDecimal(data.summary.backlinksSpamScore),
-      description: "Estimated spam risk of links pointing here.",
+      description: "ここへ向けられたリンクの推定スパムリスクです。",
     },
     {
-      label: "Broken Backlinks",
+      label: "リンク切れの被リンク",
       value: formatNumber(data.summary.brokenBacklinks),
-      description: "Links pointing to broken pages here.",
+      description: "ここにあるエラーページへのリンクです。",
     },
     {
-      label: "Broken Pages",
+      label: "エラーページ",
       value: formatNumber(data.summary.brokenPages),
-      description: "Broken pages here that still have backlinks.",
+      description: "被リンクが残っているエラーページです。",
     },
     {
-      label: "Target Spam Score",
+      label: "対象のスパムスコア",
       value: formatDecimal(data.summary.targetSpamScore),
-      description: "Estimated spam risk of this site or page.",
+      description: "このサイトまたはページの推定スパムリスクです。",
     },
   ];
 }
 
 export function formatNumber(value: number | null | undefined) {
   if (value == null) return "-";
-  return new Intl.NumberFormat().format(Math.round(value));
+  return new Intl.NumberFormat("ja-JP").format(Math.round(value));
 }
 
 export function formatDecimal(value: number | null | undefined) {
@@ -78,7 +78,7 @@ export function formatCompactDate(value: string | null | undefined) {
   if (!value) return "-";
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return value;
-  return parsed.toLocaleDateString(undefined, {
+  return parsed.toLocaleDateString("ja-JP", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -88,7 +88,7 @@ export function formatCompactDate(value: string | null | undefined) {
 export function formatMonthLabel(value: string) {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return value;
-  return parsed.toLocaleDateString(undefined, {
+  return parsed.toLocaleDateString("ja-JP", {
     month: "short",
     year: "2-digit",
   });
@@ -96,8 +96,8 @@ export function formatMonthLabel(value: string) {
 
 export function formatRelativeTimestamp(value: string) {
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return "recently";
-  return parsed.toLocaleString(undefined, {
+  if (Number.isNaN(parsed.getTime())) return "最近";
+  return parsed.toLocaleString("ja-JP", {
     month: "short",
     day: "numeric",
     hour: "numeric",

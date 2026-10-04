@@ -57,7 +57,7 @@ function ReportTemplatesPage() {
         project_id: projectId,
         template_id: templateId,
       });
-      toast.success("Template deleted");
+      toast.success("テンプレートを削除しました");
       setPendingDelete(null);
       invalidate();
     },
@@ -69,22 +69,22 @@ function ReportTemplatesPage() {
         <PageHeader
           backLink={
             <BackLink to="/p/$projectId/reports" params={{ projectId }}>
-              Reports
+              レポート
             </BackLink>
           }
-          title="Report templates"
-          description="Reusable briefs your agents follow when they write a report: who it is for, which sections it has, and how it should sound."
+          title="レポートテンプレート"
+          description="AIエージェントがレポート作成時に参照する再利用可能な指示です。対象読者、構成、文章トーンなどを定めます。"
           actions={
             <Button onClick={() => setForm({})}>
               <Plus data-icon="inline-start" />
-              New template
+              新しいテンプレート
             </Button>
           }
         />
 
         <QueryState
           query={templatesQuery}
-          errorFallback="Failed to load templates"
+          errorFallback="テンプレートを読み込めませんでした"
         >
           {(data) => (
             <ReportTemplatesList
@@ -110,14 +110,14 @@ function ReportTemplatesPage() {
 
       {pendingDelete ? (
         <ConfirmDialog
-          title={`Delete \u201c${pendingDelete.name}\u201d?`}
-          confirmLabel="Delete template"
+          title={`「${pendingDelete.name}」を削除しますか？`}
+          confirmLabel="テンプレートを削除"
           destructive
           pending={deleteMutation.isPending}
           onClose={() => setPendingDelete(null)}
           onConfirm={() => deleteMutation.mutate(pendingDelete.id)}
         >
-          Reports already written from it are not affected.
+          このテンプレートから作成済みのレポートには影響しません。
         </ConfirmDialog>
       ) : null}
     </div>

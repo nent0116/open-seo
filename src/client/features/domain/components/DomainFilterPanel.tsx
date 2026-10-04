@@ -162,8 +162,9 @@ export function DomainFilterPanel<TValues extends FilterValues>({
           <Alert variant="warning">
             <AlertTriangle />
             <AlertDescription className="text-foreground">
-              Too many filter conditions ({meta.conditionCount} of{" "}
-              {maxConditions} max). Remove some terms or ranges before applying.
+              絞り込み条件が多すぎます（{meta.conditionCount}件、上限
+              {maxConditions}
+              件）。適用する前に語句または範囲を減らしてください。
             </AlertDescription>
           </Alert>
         ) : null}
@@ -185,7 +186,7 @@ export function DomainFilterPanel<TValues extends FilterValues>({
               onClick={cancelFilterEdits}
               disabled={!meta.isDirty}
             >
-              Cancel
+              キャンセル
             </Button>
             <Button
               size="sm"
@@ -193,11 +194,11 @@ export function DomainFilterPanel<TValues extends FilterValues>({
               disabled={!meta.isDirty || meta.overLimit}
               title={
                 meta.overLimit
-                  ? `This scope leaves room for at most ${maxConditions} filter conditions per request`
+                  ? `この範囲では1回のリクエストにつき最大${maxConditions}件の絞り込み条件を指定できます`
                   : undefined
               }
             >
-              Apply filters
+              絞り込みを適用
               {meta.isDirty ? (
                 <Badge size="sm" variant="secondary">
                   {meta.dirtyCount}

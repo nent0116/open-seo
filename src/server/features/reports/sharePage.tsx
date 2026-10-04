@@ -75,9 +75,9 @@ document.getElementById("share").addEventListener("click",async function(){
     try{await navigator.share({title:document.title,url:url})}catch(e){}
     return;
   }
-  try{await navigator.clipboard.writeText(url);label.textContent="Link copied"}
-  catch(e){label.textContent="Copy failed"}
-  setTimeout(function(){label.textContent="Share"},2000);
+  try{await navigator.clipboard.writeText(url);label.textContent="リンクをコピーしました"}
+  catch(e){label.textContent="コピーできませんでした"}
+  setTimeout(function(){label.textContent="共有"},2000);
 });`;
 
 function TryButton() {
@@ -88,7 +88,7 @@ function TryButton() {
       target="_blank"
       rel="noreferrer"
     >
-      Try OpenSEO
+      OpenSEOを試す
     </a>
   );
 }
@@ -103,7 +103,7 @@ function Document({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="ja">
       <head>
         <meta charSet="utf-8" />
         <meta
@@ -140,7 +140,7 @@ function unavailable(heading: string, detail: string): Response {
   // generic title keeps the report's own title out of it: that is content the
   // link no longer grants access to.
   return htmlResponse(
-    <Document title="Report unavailable">
+    <Document title="レポートを利用できません">
       <main>
         <h1>{heading}</h1>
         <p>{detail}</p>
@@ -153,8 +153,8 @@ function unavailable(heading: string, detail: string): Response {
 
 const missing = () =>
   unavailable(
-    "This report isn't shared.",
-    "The link may have been turned off, or the report may have been deleted.",
+    "このレポートは共有されていません。",
+    "共有リンクが無効になっているか、レポートが削除された可能性があります。",
   );
 
 /**
@@ -173,8 +173,8 @@ export async function renderSharePage(
   if (!report) return missing();
   if (report.archived) {
     return unavailable(
-      "This project has been archived.",
-      "Its reports are hidden until the owner restores it.",
+      "このプロジェクトはアーカイブされています。",
+      "所有者がプロジェクトを復元するまで、レポートは表示されません。",
     );
   }
 
@@ -222,7 +222,7 @@ export async function renderSharePage(
         <div className="title">
           <h1>{report.title}</h1>
           <p className="meta">
-            Made with OpenSEO · Updated {formatRelativeTime(report.updatedAt)}
+            OpenSEOで作成・{formatRelativeTime(report.updatedAt)}に更新
           </p>
         </div>
         <div className="actions">
@@ -242,7 +242,7 @@ export async function renderSharePage(
               <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
               <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
             </svg>
-            <span>Share</span>
+            <span>共有</span>
           </button>
           <TryButton />
         </div>
