@@ -21,8 +21,8 @@ export function CommandBlock({ command }: { command: string }) {
       </pre>
       <CopyButton
         value={command}
-        successMessage="Command copied"
-        label="Copy command"
+        successMessage="コマンドをコピーしました"
+        label="コマンドをコピー"
         variant="ghost"
         size="icon-xs"
       />
@@ -55,7 +55,7 @@ export function SecretHelpPage({
         <Card>
           <CardHeader>
             <CardTitle>
-              <h2>Steps</h2>
+              <h2>手順</h2>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -66,21 +66,23 @@ export function SecretHelpPage({
         <Card>
           <CardHeader>
             <CardTitle>
-              <h2>Cloudflare Workers (Dashboard UI)</h2>
+              <h2>Cloudflare Workers（ダッシュボード）</h2>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <ol className="list-decimal space-y-2 pl-5">
               <li>
-                In Cloudflare, go to <code>Compute</code> -&gt;{" "}
-                <code>Workers &amp; Pages</code> and open your OpenSEO Worker.
+                Cloudflareで <code>Compute</code> -&gt;{" "}
+                <code>Workers &amp; Pages</code> へ移動し、OpenSEO
+                Workerを開きます。
               </li>
               <li>
-                Open <code>Settings</code>.
+                開く <code>設定</code>.
               </li>
               <li>
-                Go to <code>Variables &amp; Secrets</code> and add a new secret
-                named <code>{secretName}</code>.
+                次へ移動します： <code>Variables &amp; Secrets</code>{" "}
+                を開き、次の名前で新しいシークレットを追加します：{" "}
+                <code>{secretName}</code>.
               </li>
               <li>{dashboardPasteStep}</li>
             </ol>
@@ -88,7 +90,9 @@ export function SecretHelpPage({
             <Separator />
 
             <div>
-              <p>Or set the same secret from your terminal with:</p>
+              <p>
+                または、ターミナルから次のコマンドで同じシークレットを設定します：
+              </p>
               <CommandBlock command={`npx wrangler secret put ${secretName}`} />
             </div>
             <p className="text-muted-foreground">{terminalPromptHint}</p>

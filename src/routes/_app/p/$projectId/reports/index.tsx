@@ -40,8 +40,8 @@ function ReportsPage() {
     <div className="overflow-auto px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
       <div className="mx-auto max-w-7xl space-y-4">
         <PageHeader
-          title="Reports"
-          description="HTML reports your agents saved to this project."
+          title="レポート"
+          description="AIエージェントがこのプロジェクトへ保存したHTMLレポートです。"
           actions={
             <Button
               variant="ghost"
@@ -53,12 +53,15 @@ function ReportsPage() {
                 />
               }
             >
-              Templates
+              テンプレート
             </Button>
           }
         />
 
-        <QueryState query={reportsQuery} errorFallback="Failed to load reports">
+        <QueryState
+          query={reportsQuery}
+          errorFallback="レポートを読み込めませんでした"
+        >
           {(data) => (
             <ReportsList
               projectId={projectId}

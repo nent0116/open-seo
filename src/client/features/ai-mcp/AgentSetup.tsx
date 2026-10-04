@@ -21,7 +21,7 @@ export function AgentSetup({
     <fieldset disabled={disabled}>
       <div className="mb-8">
         <h1 className="text-2xl font-semibold tracking-tight">
-          Set up your agent
+          AIエージェントを設定
         </h1>
         <p className="mt-3 text-pretty text-sm leading-relaxed text-muted-foreground">
           {AGENT_SETUP_DESCRIPTION}
@@ -43,7 +43,7 @@ export function AgentSetup({
               className="h-8 gap-2 px-3 text-xs font-semibold"
               onClick={onComplete}
             >
-              Finish <ArrowRight className="size-4" />
+              完了 <ArrowRight className="size-4" />
             </Button>
           }
         />

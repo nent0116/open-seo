@@ -35,23 +35,23 @@ type Props = {
   ) => void;
 };
 
-const KEYWORD_SCOPE_REASON = "Scopes apply to domain lookups";
+const KEYWORD_SCOPE_REASON = "対象範囲はドメイン検索で指定できます";
 
 const BRAND_LOOKUP_BULLETS = [
   {
     icon: TrendingUp,
-    title: "Track AI visibility",
-    body: "See estimated counts for ChatGPT and Google AI Overview answers that cite your brand, and watch the trend month over month.",
+    title: "AI検索での露出を追跡",
+    body: "ブランドを引用したChatGPTとGoogle AI Overviewの回答推定数を確認し、月ごとの推移を追跡します。",
   },
   {
     icon: Quote,
-    title: "See the prompts",
-    body: "View sample user questions where LLMs reference your brand or domain.",
+    title: "プロンプトを確認",
+    body: "LLMがブランドやドメインに言及したユーザー質問の例を確認します。",
   },
   {
     icon: BarChart3,
-    title: "Map the competition",
-    body: "Spot the pages LLMs cite alongside you so you know who's competing for attention in AI answers.",
+    title: "競合状況を把握",
+    body: "自社と一緒に引用されるページを把握し、AI回答内で注目を競う相手を確認します。",
   },
 ];
 
@@ -140,14 +140,14 @@ export function BrandLookupPage({
     if (trimmed.length === 0) {
       setValidationError({
         field: "query",
-        message: "Enter a brand name or domain",
+        message: "ブランド名またはドメインを入力してください",
       });
       return;
     }
     if (trimmed.length > BRAND_LOOKUP_MAX_INPUT_LENGTH) {
       setValidationError({
         field: "query",
-        message: `Keep it under ${BRAND_LOOKUP_MAX_INPUT_LENGTH} characters`,
+        message: `${BRAND_LOOKUP_MAX_INPUT_LENGTH}文字以内で入力してください`,
       });
       return;
     }
@@ -162,7 +162,7 @@ export function BrandLookupPage({
     if (tooLong) {
       setValidationError({
         field: "competitors",
-        message: `Keep each competitor under ${BRAND_LOOKUP_MAX_INPUT_LENGTH} characters`,
+        message: `競合はそれぞれ${BRAND_LOOKUP_MAX_INPUT_LENGTH}文字以内で入力してください`,
       });
       return;
     }
@@ -174,7 +174,7 @@ export function BrandLookupPage({
     if (matchesTarget) {
       setValidationError({
         field: "competitors",
-        message: `"${matchesTarget}" matches the brand you're looking up — remove it from competitors`,
+        message: `「${matchesTarget}」は調査対象のブランドと同じです。競合から削除してください`,
       });
       return;
     }
@@ -185,7 +185,8 @@ export function BrandLookupPage({
     ) {
       setValidationError({
         field: "query",
-        message: "Add a path to use Subfolder (e.g. example.com/blog)",
+        message:
+          "サブフォルダを使用するにはパスを追加してください（例：example.com/blog）",
       });
       return;
     }
@@ -204,13 +205,13 @@ export function BrandLookupPage({
 
   return (
     <ResearchPageShell
-      title="Brand Lookup"
-      description="See how AI search cites any brand name or domain."
+      title="ブランド調査"
+      description="AI検索がブランド名やドメインをどのように引用しているか確認します。"
       planStatus={planStatus}
       gate={{
-        feature: "Brand Lookup",
+        feature: "ブランド検索",
         description:
-          "See how ChatGPT and Google AI Overview cite any brand or domain — total mentions, sample prompts where it appears, and the pages cited alongside it.",
+          "ChatGPTやGoogle AI Overviewにおけるブランドやドメインの引用状況を、言及総数、表示されたプロンプト例、一緒に引用されたページから確認します。",
         bullets: BRAND_LOOKUP_BULLETS,
       }}
       form={
@@ -235,7 +236,7 @@ export function BrandLookupPage({
       }
       query={lookupQuery}
       hasActiveQuery={hasActiveQuery}
-      errorFallback="Failed to load brand lookup"
+      errorFallback="ブランド調査を読み込めませんでした"
       // The form resets whenever the URL `q`/`c`/`scope` changes, including
       // browser back and history links. `competitorKey` is a stable string,
       // unlike the fresh-each-render `initialCompetitors` array.
@@ -262,7 +263,7 @@ export function BrandLookupPage({
           search={{ q: undefined, c: undefined, scope: undefined }}
           replace
         >
-          Recent searches
+          最近の検索
         </BackLink>
       }
       renderResults={(result) => (
@@ -274,7 +275,7 @@ export function BrandLookupPage({
           loaded={historyLoaded}
           onRemove={removeHistoryItem}
           emptyIcon={Sparkles}
-          emptyTitle="Search a brand name or domain to see how AI cites it"
+          emptyTitle="ブランド名またはドメインを検索してAIでの引用状況を確認"
           getTitle={(item) => (
             <>
               {item.query}
@@ -289,7 +290,7 @@ export function BrandLookupPage({
           )}
           getSubtitle={(item) =>
             item.competitors.length > 0
-              ? `vs ${item.competitors.join(", ")}`
+              ? `比較：${item.competitors.join("、")}`
               : null
           }
           renderLink={(item, props) => (

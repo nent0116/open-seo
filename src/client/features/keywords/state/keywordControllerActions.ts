@@ -18,12 +18,12 @@ import { formatLocationLabel } from "@/shared/keyword-locations";
 function keywordResearchHeaders(locationName?: string) {
   const scope = locationName ? ` (${formatLocationLabel(locationName)})` : "";
   return [
-    "Keyword",
-    `Volume${scope}`,
+    "キーワード",
+    `検索ボリューム${scope}`,
     `CPC${scope}`,
-    `Competition${scope}`,
-    "Score",
-    "Intent",
+    `競合性${scope}`,
+    "スコア",
+    "検索意図",
   ];
 }
 
@@ -147,7 +147,7 @@ export function useSaveAndExportActions(params: SaveExportActionParams) {
             source_feature: "keyword_research",
             keyword_count: count,
           });
-          toast.success(`Saved ${count} keywords`);
+          toast.success(`${count}件のキーワードを保存しました`);
           setShowSaveDialog(false);
         },
       },

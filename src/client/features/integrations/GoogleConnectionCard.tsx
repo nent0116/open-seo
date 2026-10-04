@@ -110,7 +110,7 @@ export function GoogleConnectionCard({
           current ? { ...current, ...saved } : current,
       );
       captureClientEvent(`${provider}:property_select`);
-      toast.success(`${config.name} connected`);
+      toast.success(`${config.name}を連携しました`);
       afterChange();
     },
   });
@@ -118,7 +118,7 @@ export function GoogleConnectionCard({
     meta: { errorToast: false },
     mutationFn: () => config.disconnect(projectId),
     onSuccess: () => {
-      toast.success(`${config.name} disconnected from this project`);
+      toast.success(`${config.name}とこのプロジェクトの連携を解除しました`);
       queryClient.setQueryData(
         connectionKey,
         (current: GoogleConnection | undefined) =>
@@ -140,7 +140,7 @@ export function GoogleConnectionCard({
       onClick={onDismiss}
       disabled={dismissing || changingConnection}
     >
-      Dismiss
+      閉じる
     </Button>
   ) : null;
   const handleConnect = () => void linkAccount(window.location.href);
@@ -168,7 +168,7 @@ export function GoogleConnectionCard({
       {connectionQuery.isPending ? (
         <div
           role="status"
-          aria-label="Loading connection"
+          aria-label="連携情報を読み込んでいます"
           className="space-y-3"
         >
           <Skeleton className="h-4 w-2/3" />
@@ -177,7 +177,7 @@ export function GoogleConnectionCard({
       ) : connectionUnavailable ? (
         <QueryError
           error={connectionQuery.error}
-          fallback="Couldn't check this project's connection."
+          fallback="このプロジェクトの連携状況を確認できませんでした。"
           onRetry={() => void connectionQuery.refetch()}
           isRetrying={connectionQuery.isFetching}
         />
@@ -218,7 +218,7 @@ export function GoogleConnectionCard({
             onSave={() => selection && setPropertyMutation.mutate(selection)}
             saving={setPropertyMutation.isPending}
             secondaryAction={{
-              label: "Cancel",
+              label: "キャンセル",
               disabled: setPropertyMutation.isPending,
               onClick: () => {
                 setPicking(false);
@@ -252,10 +252,7 @@ export function GoogleConnectionCard({
         </p>
       ) : null}
       {connectionQuery.isSuccess && !needsGoogleOAuthSetup && !canManage ? (
-        <PermissionHint
-          action="change this project's connection"
-          className="mt-3"
-        />
+        <PermissionHint action="このプロジェクトの接続変更" className="mt-3" />
       ) : null}
     </CardShell>
   );
@@ -273,11 +270,7 @@ function ConnectionStatusPill({
       variant={connected ? "success" : setupRequired ? "warning" : "outline"}
     >
       <span className="size-1.5 rounded-full bg-current" />
-      {connected
-        ? "Connected"
-        : setupRequired
-          ? "Setup required"
-          : "Not connected"}
+      {connected ? "連携済み" : setupRequired ? "設定が必要" : "未連携"}
     </Badge>
   );
 }

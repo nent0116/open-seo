@@ -40,7 +40,7 @@ function getKeywordSearchValidationErrors(
     if (!validateEmptyKeyword) return null;
     return createFormValidationErrors({
       fields: {
-        keyword: "Please enter at least one keyword.",
+        keyword: "キーワードを1つ以上入力してください。",
       },
     });
   }
@@ -50,7 +50,7 @@ function getKeywordSearchValidationErrors(
   if (keywords.length > MAX_KEYWORDS_PER_SUBMIT) {
     return createFormValidationErrors({
       fields: {
-        keyword: `Please enter no more than ${MAX_KEYWORDS_PER_SUBMIT} keywords (one per line).`,
+        keyword: `キーワードは${MAX_KEYWORDS_PER_SUBMIT}件以内で、1行に1つ入力してください。`,
       },
     });
   }

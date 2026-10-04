@@ -109,7 +109,7 @@ export function KeywordResearchPage(input: Props) {
     getLabel: useCallback((tabInput) => {
       if (tabInput.type !== "keyword") return "";
       return tabInput.locationName
-        ? `${tabInput.keyword} · ${formatLocationLabel(tabInput.locationName, 1)}`
+        ? `${tabInput.keyword}・${formatLocationLabel(tabInput.locationName, 1)}`
         : tabInput.keyword;
     }, []),
     navigateToInput: useCallback(
@@ -200,15 +200,15 @@ export function KeywordResearchPage(input: Props) {
     <div className="px-4 py-4 md:px-6 md:py-6 pb-24 md:pb-8 overflow-auto">
       <div className="mx-auto flex max-w-7xl flex-col gap-4">
         <PageHeader
-          title="Keyword Research"
-          description="Discover keyword ideas, search demand, and ranking opportunities."
+          title="キーワード調査"
+          description="キーワード候補、検索需要、上位表示の機会を見つけます。"
           backLink={
             controller.hasSearched ? (
               <BackButton
                 data-testid="keyword-research-recent-searches"
                 onClick={showRecentSearches}
               >
-                Recent searches
+                最近の検索
               </BackButton>
             ) : undefined
           }
@@ -298,7 +298,7 @@ function ResearchErrorCard({
               nativeButton={false}
               render={<Link to={BILLING_ROUTE} />}
             >
-              Go to Billing
+              請求・利用状況へ
             </Button>
           ) : undefined
         }
@@ -316,7 +316,7 @@ function KeywordSaveDialog({
 
   return (
     <FormDialog
-      title={`Save ${controller.selectedKeywordRows.length} Keywords`}
+      title={`${controller.selectedKeywordRows.length}件のキーワードを保存`}
       onClose={() => controller.setShowSaveDialog(false)}
       actions={
         <>
@@ -324,23 +324,24 @@ function KeywordSaveDialog({
             variant="outline"
             onClick={() => controller.setShowSaveDialog(false)}
           >
-            Cancel
+            キャンセル
           </Button>
           <Button
             pending={controller.savePending}
             onClick={controller.confirmSave}
           >
-            Save
+            保存
           </Button>
         </>
       }
     >
       <div className="space-y-2 text-sm text-muted-foreground">
-        <p>These keywords will be saved to your current project.</p>
+        <p>選択したキーワードを現在のプロジェクトに保存します。</p>
         {controller.locationName ? (
           <p>
-            Saved keywords show national metrics. The local volume for{" "}
-            {formatLocationLabel(controller.locationName)} is not saved.
+            保存したキーワードには国全体の指標が表示されます。{" "}
+            {formatLocationLabel(controller.locationName)}{" "}
+            の地域別ボリュームは保存されません。
           </p>
         ) : null}
       </div>

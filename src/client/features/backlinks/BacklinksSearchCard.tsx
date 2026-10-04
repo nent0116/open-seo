@@ -27,7 +27,7 @@ function getBacklinksValidationErrors(
 
     return createFormValidationErrors({
       fields: {
-        target: "Enter a domain or URL to analyze.",
+        target: "分析するドメインまたはURLを入力してください。",
       },
     });
   }
@@ -88,8 +88,8 @@ export function BacklinksSearchCard({
       <form.Field name="target">
         {(field) => (
           <SearchInput
-            placeholder="Enter a domain or URL"
-            aria-label="Domain or URL"
+            placeholder="ドメインまたはURLを入力"
+            aria-label="ドメインまたはURL"
             value={field.state.value}
             onChange={(event) => {
               const nextTarget = event.target.value;

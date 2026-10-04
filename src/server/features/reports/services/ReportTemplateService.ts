@@ -55,6 +55,8 @@ type SaveParams = {
   createdBy: string;
   /** From the authenticated context, and nowhere else. */
   createdByUserId: string;
+  /** App copy is Japanese; agent-facing callers keep the English default. */
+  locale?: "en" | "ja";
 };
 
 /**
@@ -69,38 +71,61 @@ async function saveReportTemplate(params: SaveParams): Promise<{
   const name = params.name.trim();
   const description = params.description.trim();
   const instructions = params.instructions.trim();
+  const validationCopy = (english: string, japanese: string) =>
+    params.locale === "ja" ? japanese : english;
 
   if (name.length === 0) {
-    throw new AppError("VALIDATION_ERROR", "Give the template a name.");
+    throw new AppError(
+      "VALIDATION_ERROR",
+      validationCopy(
+        "Give the template a name.",
+        "テンプレート名を入力してください。",
+      ),
+    );
   }
   if (name.length > REPORT_TEMPLATE_MAX_NAME_CHARS) {
     throw new AppError(
       "VALIDATION_ERROR",
-      `Name is ${formatCount(name.length)} characters; the limit is ${formatCount(REPORT_TEMPLATE_MAX_NAME_CHARS)}. Shorten it and save again.`,
+      validationCopy(
+        `Name is ${formatCount(name.length)} characters; the limit is ${formatCount(REPORT_TEMPLATE_MAX_NAME_CHARS)}. Shorten it and save again.`,
+        `テンプレート名は${formatCount(name.length)}文字です。${formatCount(REPORT_TEMPLATE_MAX_NAME_CHARS)}文字以内に短くして、もう一度保存してください。`,
+      ),
     );
   }
   if (description.length === 0) {
     throw new AppError(
       "VALIDATION_ERROR",
-      "Add a one-line description saying when to use this template. It is what an agent reads to decide.",
+      validationCopy(
+        "Add a one-line description saying when to use this template. It is what an agent reads to decide.",
+        "このテンプレートを使用する場面を1行で入力してください。AIエージェントが選択時に参照します。",
+      ),
     );
   }
   if (description.length > REPORT_TEMPLATE_MAX_DESCRIPTION_CHARS) {
     throw new AppError(
       "VALIDATION_ERROR",
-      `Description is ${formatCount(description.length)} characters; the limit is ${formatCount(REPORT_TEMPLATE_MAX_DESCRIPTION_CHARS)}. It is one line saying when to use the template — move the detail into the instructions.`,
+      validationCopy(
+        `Description is ${formatCount(description.length)} characters; the limit is ${formatCount(REPORT_TEMPLATE_MAX_DESCRIPTION_CHARS)}. It is one line saying when to use the template — move the detail into the instructions.`,
+        `説明は${formatCount(description.length)}文字です。${formatCount(REPORT_TEMPLATE_MAX_DESCRIPTION_CHARS)}文字以内で使用場面を1行にまとめ、詳細は作成指示へ移してください。`,
+      ),
     );
   }
   if (instructions.length === 0) {
     throw new AppError(
       "VALIDATION_ERROR",
-      "Add instructions: the audience, the sections in order, the tone, and the sign-off.",
+      validationCopy(
+        "Add instructions: the audience, the sections in order, the tone, and the sign-off.",
+        "対象読者、セクションの順序、文章トーン、署名を作成指示に入力してください。",
+      ),
     );
   }
   if (instructions.length > REPORT_TEMPLATE_MAX_INSTRUCTIONS_CHARS) {
     throw new AppError(
       "VALIDATION_ERROR",
-      `Instructions are ${formatCount(instructions.length)} characters; the limit is ${formatCount(REPORT_TEMPLATE_MAX_INSTRUCTIONS_CHARS)}. A template is a brief, not the report — say the audience, the sections in order, the tone and the sign-off, and cut the rest.`,
+      validationCopy(
+        `Instructions are ${formatCount(instructions.length)} characters; the limit is ${formatCount(REPORT_TEMPLATE_MAX_INSTRUCTIONS_CHARS)}. A template is a brief, not the report — say the audience, the sections in order, the tone and the sign-off, and cut the rest.`,
+        `作成指示は${formatCount(instructions.length)}文字です。${formatCount(REPORT_TEMPLATE_MAX_INSTRUCTIONS_CHARS)}文字以内で、対象読者、セクションの順序、文章トーン、署名に絞ってください。`,
+      ),
     );
   }
 
@@ -128,7 +153,10 @@ async function saveReportTemplate(params: SaveParams): Promise<{
   if (clash) {
     throw new AppError(
       "VALIDATION_ERROR",
-      `A template named "${clash.name}" exists in this project (id ${clash.id}). Pass its templateId to update it, or choose another name.`,
+      validationCopy(
+        `A template named "${clash.name}" exists in this project (id ${clash.id}). Pass its templateId to update it, or choose another name.`,
+        `このプロジェクトには「${clash.name}」という名前のテンプレートがすでにあります。別の名前を選んでください。`,
+      ),
     );
   }
 
@@ -148,7 +176,10 @@ async function saveReportTemplate(params: SaveParams): Promise<{
   if (templates.length >= REPORT_TEMPLATE_MAX_PER_PROJECT) {
     throw new AppError(
       "VALIDATION_ERROR",
-      `This project has ${formatCount(REPORT_TEMPLATE_MAX_PER_PROJECT)} report templates, the limit. Delete one from the Templates page.`,
+      validationCopy(
+        `This project has ${formatCount(REPORT_TEMPLATE_MAX_PER_PROJECT)} report templates, the limit. Delete one from the Templates page.`,
+        `このプロジェクトのレポートテンプレートは上限の${formatCount(REPORT_TEMPLATE_MAX_PER_PROJECT)}件に達しています。テンプレートページから不要なものを削除してください。`,
+      ),
     );
   }
 

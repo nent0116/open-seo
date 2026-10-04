@@ -25,7 +25,7 @@ export async function exportRows(args: {
 }): Promise<void> {
   const { format, feature, headers, rows, filename, scope } = args;
   if (rows.length === 0) {
-    toast.error("No data to export");
+    toast.error("出力するデータがありません");
     return;
   }
 
@@ -44,9 +44,9 @@ export async function exportRows(args: {
   if (format === "copy-json") {
     try {
       await navigator.clipboard.writeText(JSON.stringify(records, null, 2));
-      toast.success("Copied data");
+      toast.success("データをコピーしました");
     } catch {
-      toast.error("Could not copy to clipboard");
+      toast.error("クリップボードにコピーできませんでした");
       return;
     }
   } else if (format === "json") {

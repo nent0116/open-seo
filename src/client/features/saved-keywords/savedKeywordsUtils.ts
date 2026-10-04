@@ -6,8 +6,8 @@ import type { GetSavedKeywordsInput } from "@/types/schemas/keywords";
 export const SAVED_KEYWORD_PAGE_SIZES = [50, 100, 250] as const;
 export const SAVED_KEYWORD_EXPORT_HEADERS = [
   ...KEYWORD_RESEARCH_HEADERS,
-  "Tags",
-  "Fetched At",
+  "タグ",
+  "取得日時",
 ];
 
 export function savedKeywordExportRow(row: SavedKeywordRow): CsvValue[] {
@@ -41,10 +41,10 @@ export function toSavedKeywordSort(
 
 export function formatSavedKeywordNumber(value: number | null | undefined) {
   if (value == null) return "-";
-  return new Intl.NumberFormat().format(value);
+  return new Intl.NumberFormat("ja-JP").format(value);
 }
 
 export function formatSavedKeywordDate(value: string | null | undefined) {
   if (!value) return "-";
-  return new Date(value).toLocaleDateString();
+  return new Date(value).toLocaleDateString("ja-JP");
 }

@@ -84,9 +84,9 @@ export function AuditDetail({
     return (
       <div className="px-4 py-4 md:px-6 md:py-6">
         <div className="mx-auto max-w-7xl space-y-4">
-          <BackButton onClick={onBack}>All audits</BackButton>
+          <BackButton onClick={onBack}>すべての監査</BackButton>
           <QueryError
-            fallback="We could not load this audit. It may have been deleted."
+            fallback="この監査を読み込めませんでした。削除されている可能性があります。"
             onRetry={() => void statusQuery.refetch()}
             isRetrying={statusQuery.isFetching}
           />
@@ -120,7 +120,7 @@ export function AuditDetail({
     <div className="px-4 py-4 md:px-6 md:py-6 pb-24 md:pb-8 overflow-auto">
       <div className="mx-auto max-w-7xl space-y-4">
         <div className="space-y-3">
-          <BackButton onClick={onBack}>All audits</BackButton>
+          <BackButton onClick={onBack}>すべての監査</BackButton>
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <h1 className="text-2xl font-semibold tracking-tight">
@@ -129,7 +129,7 @@ export function AuditDetail({
               {!isRunning && <StatusBadge status={status.status} />}
             </div>
             <p className="text-sm text-muted-foreground">
-              Site audit &middot; Started {formatStartedAt(status.startedAt)}
+              サイト監査・開始日時 {formatStartedAt(status.startedAt)}
             </p>
           </div>
         </div>
@@ -146,16 +146,16 @@ export function AuditDetail({
           <Alert variant="destructive">
             <AlertCircle />
             <AlertTitle>
-              This audit stopped before it crawled any pages.
+              ページをクロールする前に監査が停止しました。
             </AlertTitle>
             <AlertDescription>
               <p>
-                Run a new audit to try again, or email{" "}
-                <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> if this
-                keeps happening.
+                新しい監査を実行して再試行してください。解決しない場合は{" "}
+                <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>{" "}
+                までメールでお問い合わせください。
               </p>
               {status.errorCode ? (
-                <p className="font-mono text-xs">Code: {status.errorCode}</p>
+                <p className="font-mono text-xs">コード： {status.errorCode}</p>
               ) : null}
             </AlertDescription>
           </Alert>
@@ -165,7 +165,7 @@ export function AuditDetail({
           <Alert variant="warning">
             <AlertCircle />
             <AlertTitle>
-              This site's bot protection blocked our crawler.
+              このサイトのBot対策によってクローラーがブロックされました。
             </AlertTitle>
             <AlertDescription>
               <BotProtectionAdvice
@@ -180,14 +180,12 @@ export function AuditDetail({
           <Alert variant="warning">
             <AlertCircle />
             <AlertTitle>
-              This audit stopped early after {partialPageCount} page
-              {partialPageCount === 1 ? "" : "s"}.
+              この監査は{partialPageCount}ページを処理した時点で停止しました。
             </AlertTitle>
             <AlertDescription>
-              The results below cover everything crawled before it stopped. Run
-              a new audit to try again, or email{" "}
-              <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> if this
-              keeps happening.
+              以下は停止前にクロールできた範囲の結果です。新しい監査を実行して再試行してください。解決しない場合は{" "}
+              <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>{" "}
+              までメールでお問い合わせください。
             </AlertDescription>
           </Alert>
         )}
@@ -195,7 +193,7 @@ export function AuditDetail({
         {(isComplete || isFailed) && (
           <QueryState
             query={resultsQuery}
-            errorFallback="Failed to load the audit results"
+            errorFallback="監査結果を読み込めませんでした"
           >
             {(data) =>
               (isComplete || failedWithResults) && (
@@ -243,14 +241,14 @@ function ProgressCard({
   const isLighthousePhase = status.currentPhase === "lighthouse";
   const phaseLabel =
     status.currentPhase === "discovery"
-      ? "Discovery"
+      ? "検出中"
       : status.currentPhase === "crawling"
-        ? "Crawling"
+        ? "クロール中"
         : status.currentPhase === "lighthouse"
-          ? "Lighthouse"
+          ? "Lighthouse計測中"
           : status.currentPhase === "finalizing"
-            ? "Finalizing"
-            : "Running";
+            ? "完了処理中"
+            : "実行中";
   const progress = isLighthousePhase ? lighthouseProgress : crawlProgress;
 
   const crawlProgressQuery = useQuery({
@@ -267,7 +265,9 @@ function ProgressCard({
         <CardHeader>
           <CardTitle className="flex items-center gap-2 font-medium">
             <Spinner className="text-primary" aria-hidden />
-            {isLighthousePhase ? "Running Lighthouse checks" : "Crawling pages"}
+            {isLighthousePhase
+              ? "Lighthouseチェックを実行中"
+              : "ページをクロール中"}
           </CardTitle>
           <CardAction>
             <Badge variant="secondary">{phaseLabel}</Badge>
@@ -277,12 +277,12 @@ function ProgressCard({
           <Progress value={progress}>
             <ProgressLabel className="font-normal">
               {isLighthousePhase
-                ? `${lighthouseDone} / ${status.lighthouseTotal} checks${
+                ? `${lighthouseDone} / ${status.lighthouseTotal}件をチェック${
                     status.lighthouseFailed > 0
-                      ? ` (${status.lighthouseFailed} failed)`
+                      ? `（${status.lighthouseFailed}件失敗）`
                       : ""
                   }`
-                : `${status.pagesCrawled} / ${status.pagesTotal} pages`}
+                : `${status.pagesCrawled} / ${status.pagesTotal}ページ`}
             </ProgressLabel>
             <ProgressValue />
           </Progress>
@@ -293,10 +293,11 @@ function ProgressCard({
         <Card size="sm">
           <CardHeader>
             <CardTitle className="font-medium text-muted-foreground">
-              Crawled Pages ({crawledUrls.length})
+              クロール済みページ（{crawledUrls.length}）
             </CardTitle>
             <CardDescription className="text-xs">
-              Updated {new Date(crawledUrls[0].crawledAt).toLocaleTimeString()}
+              更新日時：
+              {new Date(crawledUrls[0].crawledAt).toLocaleTimeString("ja-JP")}
             </CardDescription>
           </CardHeader>
           <CardContent className="max-h-[400px] overflow-y-auto">

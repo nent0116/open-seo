@@ -73,7 +73,7 @@ describe("buildBacklinksTabExport", () => {
       },
     });
 
-    expect(content).toContain('"Domain","Source URL","Target URL"');
+    expect(content).toContain('"ドメイン","リンク元URL","リンク先URL"');
     expect(content).not.toContain('"Ahrefs DR"');
     expect(content).toContain('"example.org"');
     expect(content).toContain('"noopener, noreferrer"');
@@ -90,7 +90,7 @@ describe("buildBacklinksTabExport", () => {
       },
     });
 
-    expect(content).toContain('"Rank","Ahrefs DR","Spam Score"');
+    expect(content).toContain('"ランク","Ahrefs DR","スパムスコア"');
     expect(content).toContain('"71.5"');
   });
 
@@ -105,7 +105,9 @@ describe("buildBacklinksTabExport", () => {
       },
     });
 
-    expect(content).toContain('"Domain Rank","Ahrefs DR","Source Page Rank"');
+    expect(content).toContain(
+      '"ドメインランク","Ahrefs DR","リンク元ページランク"',
+    );
     expect(content).toContain('"33"');
   });
 
@@ -119,7 +121,7 @@ describe("buildBacklinksTabExport", () => {
       },
     });
 
-    expect(content).toContain('"Domain","Backlinks","Referring Pages"');
+    expect(content).toContain('"ドメイン","被リンク","参照元ページ"');
     expect(content).toContain('"source.com"');
   });
 
@@ -142,7 +144,7 @@ describe("buildBacklinksTabExport", () => {
     });
 
     expect(content).toContain(
-      '"Page","Backlinks","Referring Domains","Rank","Broken Backlinks"',
+      '"ページ","被リンク","参照元ドメイン","ランク","リンク切れの被リンク"',
     );
     expect(content).toContain('"https://docs.example.com/start"');
   });

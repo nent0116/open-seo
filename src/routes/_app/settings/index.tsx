@@ -27,12 +27,16 @@ function PersonalSettings() {
         analyticsOptedOut: !enabled,
       });
       if (result.error) {
-        toast.error("We couldn't update your analytics setting.");
+        toast.error("分析データの設定を更新できませんでした。");
       } else {
-        toast.success(enabled ? "Analytics enabled" : "Analytics disabled");
+        toast.success(
+          enabled
+            ? "利用状況データの共有を有効にしました"
+            : "利用状況データの共有を無効にしました",
+        );
       }
     } catch {
-      toast.error("We couldn't update your analytics setting.");
+      toast.error("分析データの設定を更新できませんでした。");
     } finally {
       setIsSaving(false);
     }
@@ -41,9 +45,9 @@ function PersonalSettings() {
   return (
     <div className="space-y-10">
       <section className="space-y-3">
-        <SectionHeader title="Appearance" />
+        <SectionHeader title="外観" />
         <div className="flex items-center justify-between gap-6">
-          <span className="text-sm">Theme</span>
+          <span className="text-sm">テーマ</span>
           <ThemePreferenceRadio />
         </div>
       </section>
@@ -53,12 +57,12 @@ function PersonalSettings() {
           <ApiKeySettings />
 
           <section className="space-y-3">
-            <SectionHeader title="Analytics" />
+            <SectionHeader title="利用状況データ" />
             <div className="flex items-start justify-between gap-6">
               <div>
-                <p className="text-sm">Help improve OpenSEO</p>
+                <p className="text-sm">OpenSEOの改善に協力する</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Share analytics and usage data.
+                  分析データと利用状況データを共有します。
                 </p>
               </div>
               <Switch
@@ -67,16 +71,16 @@ function PersonalSettings() {
                 onCheckedChange={(checked) => {
                   void updateAnalyticsPreference(checked);
                 }}
-                aria-label="Enable product analytics"
+                aria-label="製品利用状況の分析を有効化"
               />
             </div>
           </section>
         </>
       ) : (
         <section className="space-y-3">
-          <SectionHeader title="About" />
+          <SectionHeader title="情報" />
           <div className="flex items-center justify-between gap-6">
-            <span className="text-sm">Version</span>
+            <span className="text-sm">バージョン</span>
             <span className="font-mono text-sm text-muted-foreground">
               v{version}
             </span>

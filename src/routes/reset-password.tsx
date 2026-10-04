@@ -20,7 +20,7 @@ const resetPasswordSchema = z
     confirmPassword: z.string(),
   })
   .refine((value) => value.password === value.confirmPassword, {
-    message: "Passwords do not match.",
+    message: "パスワードが一致しません。",
     path: ["confirmPassword"],
   });
 
@@ -37,12 +37,12 @@ export const Route = createFileRoute("/reset-password")({
 function getResetPasswordErrorMessage(error: string | undefined) {
   switch ((error ?? "").toLowerCase()) {
     case "invalid_token":
-      return "This reset link is no longer valid. Request a new one to keep going.";
+      return "この再設定リンクは無効です。新しいリンクをリクエストしてください。";
     case "token_expired":
-      return "This reset link has expired. Request a new one to keep going.";
+      return "この再設定リンクは期限切れです。新しいリンクをリクエストしてください。";
     default:
       return error
-        ? "This reset link can't be used anymore. Request a new one and try again."
+        ? "この再設定リンクは使用できません。新しいリンクをリクエストして、もう一度お試しください。"
         : null;
   }
 }
@@ -60,31 +60,31 @@ function getResetPasswordPageCopy({
 }) {
   if (!isHostedMode) {
     return {
-      title: "Reset password",
-      helperText: "Password reset isn't available right now.",
+      title: "パスワードを再設定",
+      helperText: "現在、パスワードの再設定を利用できません。",
     };
   }
 
   if (isComplete) {
     return {
-      title: "Password updated",
+      title: "パスワードを更新しました",
       helperText:
-        "Your password has been updated. Sign in with your new password.",
+        "パスワードを更新しました。新しいパスワードでログインしてください。",
     };
   }
 
   if (routeError || !hasToken) {
     return {
-      title: "Reset link expired",
+      title: "再設定リンクの有効期限が切れています",
       helperText:
         routeError ||
-        "This reset link is no longer valid. Request a new one to keep going.",
+        "この再設定リンクは無効です。新しいリンクをリクエストしてください。",
     };
   }
 
   return {
-    title: "Reset password",
-    helperText: "Choose a new password for your account.",
+    title: "パスワードを再設定",
+    helperText: "アカウントの新しいパスワードを入力してください。",
   };
 }
 
@@ -114,9 +114,9 @@ function ResetPasswordPage() {
           formApi.setErrorMap({
             onSubmit: {
               form:
-                result.error.code === "INVALID_TOKEN" || !result.error.message
-                  ? "This reset link is no longer valid. Request a new one and try again."
-                  : result.error.message,
+                result.error.code === "INVALID_TOKEN"
+                  ? "この再設定リンクは無効です。新しいリンクをリクエストして、もう一度お試しください。"
+                  : "パスワードを更新できませんでした。もう一度お試しください。",
               fields: {},
             },
           });
@@ -125,7 +125,7 @@ function ResetPasswordPage() {
       } catch {
         formApi.setErrorMap({
           onSubmit: {
-            form: "We couldn't update your password right now. Please try again.",
+            form: "現在パスワードを更新できません。もう一度お試しください。",
             fields: {},
           },
         });
@@ -163,7 +163,7 @@ function ResetPasswordPage() {
                       search={getSignInSearch(redirectTo)}
                       className="text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      Sign in
+                      ログイン
                     </Link>
                   </p>
                 )
@@ -178,7 +178,7 @@ function ResetPasswordPage() {
                     <Link to="/sign-in" search={getSignInSearch(redirectTo)} />
                   }
                 >
-                  Continue to sign in
+                  ログインへ進む
                 </Button>
               ) : routeError || !token ? (
                 <Button
@@ -192,7 +192,7 @@ function ResetPasswordPage() {
                     />
                   }
                 >
-                  Request a new reset link
+                  新しい再設定リンクを送信
                 </Button>
               ) : (
                 <form.AppForm>
@@ -200,9 +200,9 @@ function ResetPasswordPage() {
                     <form.AppField name="password">
                       {(field) => (
                         <field.TextField
-                          label="New password"
+                          label="新しいパスワード"
                           type="password"
-                          placeholder="New password..."
+                          placeholder="新しいパスワードを入力"
                           autoComplete="new-password"
                           required
                         />
@@ -211,9 +211,9 @@ function ResetPasswordPage() {
                     <form.AppField name="confirmPassword">
                       {(field) => (
                         <field.TextField
-                          label="Confirm new password"
+                          label="新しいパスワード（確認）"
                           type="password"
-                          placeholder="Confirm new password..."
+                          placeholder="新しいパスワードを再入力"
                           autoComplete="new-password"
                           required
                         />
@@ -231,9 +231,7 @@ function ResetPasswordPage() {
                       className="w-full"
                       pending={isSubmitting}
                     >
-                      {isSubmitting
-                        ? "Updating password..."
-                        : "Update password"}
+                      {isSubmitting ? "更新しています…" : "パスワードを更新"}
                     </Button>
                   </form.Form>
                 </form.AppForm>

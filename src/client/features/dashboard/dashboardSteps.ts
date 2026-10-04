@@ -17,39 +17,40 @@ export const setupSteps: {
 }[] = [
   {
     id: "competitor",
-    label: "Explore a competitor",
-    detail: "Find topics and links worth learning from.",
+    label: "競合を調査",
+    detail: "参考にすべきトピックやリンクを見つけます。",
     icon: Globe,
   },
   {
     id: "keywords",
-    label: "Get keyword ideas",
-    detail: "Start from one keyword and see what people search for.",
+    label: "キーワード候補を探す",
+    detail: "1つのキーワードから、実際に検索されている語句を調べます。",
     icon: Lightbulb,
   },
   {
     id: "audit",
-    label: "Audit your site",
-    detail: "Crawl for broken links, missing tags, and indexability problems.",
+    label: "サイトを監査",
+    detail:
+      "リンク切れ、タグ不足、インデックス登録の問題をクロールで検出します。",
     icon: ClipboardCheck,
   },
   {
     id: "mcp",
-    label: "Connect your AI agent",
-    detail: "Use OpenSEO inside Claude or your favorite agent.",
+    label: "AIエージェントを連携",
+    detail: "Claudeなど、普段お使いのAIエージェントからOpenSEOを利用します。",
     icon: Bot,
   },
   {
     id: "team",
-    label: "Invite a teammate",
-    detail: "Share the work, or keep things solo for now.",
+    label: "メンバーを招待",
+    detail: "共同作業するメンバーを招待します。ひとりのままでも利用できます。",
     icon: Users,
   },
   {
     id: "project",
-    label: "Working on multiple websites?",
+    label: "複数のサイトを運用していますか？",
     detail:
-      "Create another project, or let your AI agent set up a list of sites.",
+      "別のプロジェクトを作成するか、AIエージェントにサイト一覧を設定してもらいます。",
     icon: FolderPlus,
   },
 ];

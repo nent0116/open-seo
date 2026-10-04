@@ -16,7 +16,7 @@ type FiltersForm = KeywordResearchControllerState["filtersForm"];
 
 export function FilterIntentSelect({ form }: { form: FiltersForm }) {
   return (
-    <DataTableFilterGroup label="Intent">
+    <DataTableFilterGroup label="検索意図">
       <form.Field name="intents">
         {(field) => {
           const selected = parseIntentFilter(field.state.value);

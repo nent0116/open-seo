@@ -28,21 +28,21 @@ import { Input } from "@/client/components/ui/input";
 import { Textarea } from "@/client/components/ui/textarea";
 
 const SECTION_HINTS: Record<ProjectContextSectionKey, string> = {
-  business_overview: "What you sell, who buys it, and where.",
-  current_goal: "What you're pushing for right now, and by when.",
-  positioning: "Why someone picks you over the alternatives.",
-  writing_preferences: "Voice, words to avoid, topics that are off-limits.",
+  business_overview: "提供する商品・サービス、顧客、対象地域。",
+  current_goal: "現在の目標と達成期限。",
+  positioning: "競合ではなく自社が選ばれる理由。",
+  writing_preferences: "文章のトーン、避ける表現、扱わない話題。",
 };
 
 const SECTION_PLACEHOLDERS: Record<ProjectContextSectionKey, string> = {
   business_overview:
-    "e.g. Booking software for independent restaurants in the US and Canada. Buyers are owner-operators, not marketers.",
+    "例：日本の個人経営レストラン向け予約管理ソフト。主な利用者は店舗オーナー。",
   current_goal:
-    "e.g. Double organic signups by Q4. Comparison pages are the current bet.",
+    "例：第4四半期までに自然検索からの登録数を2倍にする。現在は比較ページを強化中。",
   positioning:
-    "e.g. The only booking tool that sets up in an afternoon. Cheaper than the incumbents, simpler than the DIY stack.",
+    "例：半日で導入できる予約管理ツール。既存製品より低価格で、自作より簡単。",
   writing_preferences:
-    "e.g. Plain and direct, no hype. Never say 'seamless' or 'game-changing'. Don't write about competitor pricing.",
+    "例：簡潔で率直に書き、誇張を避ける。「シームレス」「画期的」は使わず、競合価格には触れない。",
 };
 
 export function ProjectContextPage({ projectId }: { projectId: string }) {
@@ -57,16 +57,15 @@ export function ProjectContextPage({ projectId }: { projectId: string }) {
   return (
     <QueryState
       query={contextQuery}
-      errorFallback="Failed to load project context"
+      errorFallback="プロジェクト情報を読み込めませんでした"
     >
       {(context) => (
         // key remounts the whole page when the project switches under it, so no
         // draft, open form, or edit state can carry over to another project.
         <div key={projectId} className="space-y-8">
           <p className="text-sm text-muted-foreground">
-            What Claude Code and any other connected MCP client know about this
-            project. They read it before they work and write back what they
-            learn, so correct anything that looks wrong.
+            Claude
+            Codeなど、接続したMCPクライアントが参照するプロジェクト情報です。作業前に読み込み、得た情報を書き戻します。誤りがあれば修正してください。
           </p>
 
           <ProseSections
@@ -154,8 +153,8 @@ function ProseSections({
         <EmptyState
           size="sm"
           icon={null}
-          title="Nothing written down yet"
-          description="Fill in what you can — or ask your agent to draft it from your site and confirm what it got right."
+          title="情報はまだ登録されていません"
+          description="分かる範囲で入力するか、サイトをもとにAIエージェントへ下書きを依頼し、内容を確認してください。"
         />
       ) : null}
 
@@ -173,7 +172,7 @@ function ProseSections({
               {section ? (
                 <Provenance by={section.updatedBy} at={section.updatedAt} />
               ) : (
-                <span className="text-xs text-muted-foreground">Empty</span>
+                <span className="text-xs text-muted-foreground">未入力</span>
               )}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -209,7 +208,7 @@ function ProseSections({
           size="sm"
           disabled={update.isPending || changed.length === 0}
         >
-          Save changes
+          変更を保存
         </Button>
       </div>
     </form>
@@ -229,16 +228,16 @@ function CustomSections({
   return (
     <section className="space-y-3">
       <SectionHeader
-        title="Custom sections"
-        hint="Anything an agent wrote down that didn't fit the sections above."
+        title="カスタム項目"
+        hint="上の項目に当てはまらない情報をAIエージェントが記録します。"
       />
 
       {customSections.length === 0 ? (
         <EmptyState
           size="sm"
           icon={null}
-          title="Nothing here yet"
-          description="Agents add a section when they learn something important that has nowhere else to live."
+          title="まだ何もありません"
+          description="AIエージェントは、ほかに保存先のない重要な情報を得たときに項目を追加します。"
         />
       ) : (
         <div className="space-y-3">
@@ -272,13 +271,13 @@ function CustomSections({
                     <Button
                       variant="ghost"
                       size="icon-xs"
-                      aria-label={`Edit ${custom.title ?? custom.slug}`}
+                      aria-label={`${custom.title ?? custom.slug}を編集`}
                       onClick={() => setEditingSlug(custom.slug)}
                     >
                       <Pencil className="size-3.5" />
                     </Button>
                     <InlineConfirm
-                      label={`Delete ${custom.title ?? custom.slug}`}
+                      label={`${custom.title ?? custom.slug}を削除`}
                       pending={update.isPending}
                       onConfirm={() =>
                         update.mutate([{ deleteCustomSection: custom.slug }])
@@ -326,14 +325,14 @@ function CustomSectionForm({
         onChange={(event) => setTitle(event.target.value)}
         placeholder={custom.slug}
         maxLength={120}
-        aria-label="Section title"
+        aria-label="項目のタイトル"
       />
       <Textarea
         value={content}
         onChange={(event) => setContent(event.target.value)}
         rows={5}
         maxLength={PROSE_MAX_CHARS}
-        aria-label="Section content"
+        aria-label="項目の内容"
       />
       <FormActions
         pending={pending}
@@ -357,16 +356,16 @@ function ResearchLog({
   return (
     <section className="space-y-3">
       <SectionHeader
-        title="Research log"
-        hint="What's already been looked up, so nobody buys the same data twice."
+        title="調査履歴"
+        hint="調査済みの内容を記録し、同じデータを重複して購入するのを防ぎます。"
       />
 
       {researchLog.length === 0 ? (
         <EmptyState
           size="sm"
           icon={null}
-          title="Nothing logged yet"
-          description="Agents record paid research here as they run it."
+          title="調査履歴はまだありません"
+          description="AIエージェントが実行した有料調査をここに記録します。"
         />
       ) : (
         <ul className={listClass}>
@@ -384,7 +383,7 @@ function ResearchLog({
               </div>
               <RowActions>
                 <InlineConfirm
-                  label={`Delete log entry from ${entry.entryDate}`}
+                  label={`${entry.entryDate}の履歴を削除`}
                   pending={update.isPending}
                   onConfirm={() =>
                     update.mutate([{ removeResearchLog: [entry.id] }])

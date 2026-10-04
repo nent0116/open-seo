@@ -11,15 +11,15 @@ export function FreePlanAlert({ visible }: { visible: boolean }) {
       <AlertTriangle />
       <AlertDescription className="text-foreground">
         <p>
-          We only start to track keyword positions once you{" "}
+          キーワード順位の計測を開始するには、{" "}
           <Link
             to={SUBSCRIBE_ROUTE}
             search={{ upgrade: true }}
             className="font-medium underline underline-offset-3"
           >
-            upgrade to the paid plan
+            有料プランへアップグレードしてください
           </Link>
-          .
+          。
         </p>
       </AlertDescription>
     </Alert>

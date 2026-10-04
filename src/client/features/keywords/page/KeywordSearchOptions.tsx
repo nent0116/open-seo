@@ -22,18 +22,18 @@ type Props = {
 
 const RESULT_ITEMS = RESULT_LIMITS.map((limit) => ({
   value: limit,
-  label: `${limit} results`,
+  label: `${limit}件`,
 }));
 
 const MODE_ITEMS: { value: KeywordMode; label: string }[] = [
-  { value: "auto", label: "Auto" },
-  { value: "suggestions", label: "Phrase match" },
-  { value: "ideas", label: "Category ideas" },
-  { value: "related", label: "People also search for" },
+  { value: "auto", label: "自動" },
+  { value: "suggestions", label: "フレーズ一致" },
+  { value: "ideas", label: "カテゴリ候補" },
+  { value: "related", label: "関連する検索" },
 ];
 
 const GOOGLE_ADS_ONLY_NOTE =
-  "Not available for countries served from Google Ads data.";
+  "Google広告のデータを使用する国では利用できません。";
 
 /** The search settings most people leave at their defaults. */
 export function KeywordSearchOptions({ controller }: Props) {
@@ -60,25 +60,25 @@ export function KeywordSearchOptions({ controller }: Props) {
               onClick={() => setOpen(true)}
             >
               <SlidersHorizontal data-icon="inline-start" />
-              Options
+              オプション
             </Button>
 
             {open ? (
               <FormDialog
-                title="Search options"
+                title="検索オプション"
                 onClose={() => setOpen(false)}
-                actions={<Button onClick={() => setOpen(false)}>Done</Button>}
+                actions={<Button onClick={() => setOpen(false)}>完了</Button>}
               >
                 <controlsForm.AppField name="resultLimit">
                   {(field) => (
-                    <field.SelectField label="Results" items={RESULT_ITEMS} />
+                    <field.SelectField label="結果件数" items={RESULT_ITEMS} />
                   )}
                 </controlsForm.AppField>
 
                 <controlsForm.AppField name="mode">
                   {(field) => (
                     <field.SelectField
-                      label="Keyword source"
+                      label="キーワードの取得元"
                       description={labs ? undefined : GOOGLE_ADS_ONLY_NOTE}
                       items={MODE_ITEMS}
                       disabled={!labs}
@@ -89,13 +89,13 @@ export function KeywordSearchOptions({ controller }: Props) {
                 <controlsForm.Field name="clickstream">
                   {(field) => (
                     <ToggleRow
-                      label="Clickstream-refined volumes"
+                      label="クリックストリーム補正ボリューム"
                       help={
                         !labs
                           ? GOOGLE_ADS_ONLY_NOTE
                           : local
-                            ? "Not available for local results. Clickstream data covers whole countries only."
-                            : "Google reports one combined volume for similar keywords. This estimates each keyword's own volume. Costs 2x the credits."
+                            ? "地域別の結果では利用できません。クリックストリームデータは国全体のみを対象とします。"
+                            : "Googleが類似キーワードをまとめて報告する検索ボリュームから、キーワードごとの値を推定します。クレジット消費は2倍です。"
                       }
                       // The saved choice returns when the option applies again.
                       checked={labs && !local && field.state.value}
@@ -106,7 +106,7 @@ export function KeywordSearchOptions({ controller }: Props) {
                 </controlsForm.Field>
 
                 <ToggleRow
-                  label="Group keywords"
+                  label="キーワードをグループ化"
                   help={labs ? undefined : GOOGLE_ADS_ONLY_NOTE}
                   checked={labs && groupKeywords}
                   disabled={!labs}

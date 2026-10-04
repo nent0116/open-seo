@@ -58,27 +58,28 @@ const LANGUAGE_ITEMS = SERP_LANGUAGE_OPTIONS.map((language) => ({
 }));
 
 const DEVICE_ITEMS: { value: SaveConfigInput["devices"]; label: string }[] = [
-  { value: "both", label: "Desktop + Mobile" },
-  { value: "desktop", label: "Desktop only" },
-  { value: "mobile", label: "Mobile only" },
+  { value: "both", label: "パソコン＋モバイル" },
+  { value: "desktop", label: "パソコンのみ" },
+  { value: "mobile", label: "モバイルのみ" },
 ];
 
 const DEPTH_ITEMS = Array.from({ length: 10 }, (_, i) => i + 1).map(
   (pages) => ({
     value: pagesToDepth(pages),
-    label: `${pages} ${pages === 1 ? "page" : "pages"} (top ${pages * 10} results)`,
+    label: `${pages}ページ（上位${pages * 10}件）`,
   }),
 );
 
 function validateConfig(values: ConfigFormValues) {
   const fields: Partial<Record<keyof ConfigFormValues, string>> = {};
   if (!values.domain.trim()) {
-    fields.domain = "Enter a domain";
+    fields.domain = "ドメインを入力してください";
   } else if (!domainField.safeParse(values.domain).success) {
-    fields.domain = "Enter a valid domain, like example.com";
+    fields.domain = "example.comのような有効なドメインを入力してください";
   }
   if (values.targetingMode === "local" && !values.locationName) {
-    fields.locationName = "Select a city or region for local targeting";
+    fields.locationName =
+      "地域指定で計測する市区町村または地域を選択してください";
   }
   return Object.keys(fields).length > 0 ? { fields } : undefined;
 }
@@ -109,7 +110,7 @@ export function RankTrackingConfigModal({
       >
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="sr-only">Add Domain</DialogTitle>
+            <DialogTitle className="sr-only">ドメインを追加</DialogTitle>
           </DialogHeader>
           <div className="flex min-h-40 items-center justify-center">
             {projectsQuery.isPending ? (
@@ -117,7 +118,7 @@ export function RankTrackingConfigModal({
             ) : (
               <QueryError
                 error={projectsQuery.error}
-                fallback="Failed to load the project."
+                fallback="プロジェクトを読み込めませんでした。"
                 onRetry={() => void projectsQuery.refetch()}
                 isRetrying={projectsQuery.isFetching}
               />
@@ -240,7 +241,7 @@ function RankTrackingConfigModalContent({
             <form.Form className="flex flex-col gap-4">
               <DialogHeader>
                 <DialogTitle>
-                  {isEdit ? "Edit Domain Config" : "Add Domain"}
+                  {isEdit ? "ドメイン設定を編集" : "ドメインを追加"}
                 </DialogTitle>
               </DialogHeader>
 
@@ -260,14 +261,14 @@ function RankTrackingConfigModalContent({
               >
                 {(field) => (
                   <field.TextField
-                    label="Target Domain"
+                    label="対象ドメイン"
                     placeholder="example.com"
                   />
                 )}
               </form.AppField>
 
               <Field>
-                <FieldLabel htmlFor={countryId}>Country</FieldLabel>
+                <FieldLabel htmlFor={countryId}>国</FieldLabel>
                 <CountryCombobox
                   id={countryId}
                   value={values.locationCode}
@@ -301,9 +302,9 @@ function RankTrackingConfigModalContent({
               <form.AppField name="languageCode">
                 {(field) => (
                   <field.SelectField
-                    label="Language"
+                    label="言語"
                     items={LANGUAGE_ITEMS}
-                    description="Defaults to the country's language. Any language can be tracked in any country — pick the one your customers search in."
+                    description="初期値は対象国の言語です。どの国でも任意の言語を計測できるため、顧客が検索に使う言語を選んでください。"
                   />
                 )}
               </form.AppField>
@@ -312,16 +313,16 @@ function RankTrackingConfigModalContent({
                 <form.AppField name="devices">
                   {(field) => (
                     <field.SelectField
-                      label="Devices"
+                      label="デバイス"
                       items={DEVICE_ITEMS}
-                      description="Most Google searches come from mobile, but select this based on your customer."
+                      description="Google検索の多くはモバイルからですが、顧客に合わせて選択してください。"
                     />
                   )}
                 </form.AppField>
                 {values.devices === "both" && (
                   <p className="flex items-start gap-1.5 text-xs text-info">
                     <Info className="mt-0.5 size-3.5 shrink-0" />
-                    Tracking both devices uses 2x credits per keyword check
+                    両方のデバイスを計測すると、キーワードチェックごとに2倍のクレジットを使用します
                   </p>
                 )}
               </div>
@@ -341,9 +342,9 @@ function RankTrackingConfigModalContent({
               <form.AppField name="serpDepth">
                 {(field) => (
                   <field.SelectField
-                    label="Search Depth"
+                    label="検索範囲"
                     items={DEPTH_ITEMS}
-                    description="10 pages is ~8x more expensive than 1 page"
+                    description="10ページの検索は1ページの約8倍の費用がかかります"
                   />
                 )}
               </form.AppField>
@@ -361,10 +362,10 @@ function RankTrackingConfigModalContent({
                   onClick={onClose}
                   disabled={isSubmitting}
                 >
-                  Cancel
+                  キャンセル
                 </Button>
                 <form.SubmitButton>
-                  {isEdit ? "Save Changes" : "Add Domain"}
+                  {isEdit ? "変更を保存" : "ドメインを追加"}
                 </form.SubmitButton>
               </DialogFooter>
             </form.Form>
@@ -396,11 +397,11 @@ function CostEstimate({
         <span className="font-mono font-semibold text-foreground">
           ~${costPerKeyword.toFixed(4)}
         </span>{" "}
-        per keyword per check
+        ／キーワード／チェック
       </div>
       {schedule !== "manual" && (
         <div>
-          50 keywords would cost{" "}
+          50キーワードの費用：{" "}
           <span className="font-mono font-semibold text-foreground">
             ~${(costPerKeyword * 50 * checksPerMonth).toFixed(2)}
           </span>

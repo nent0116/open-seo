@@ -63,14 +63,13 @@ export function DashboardOnboarding({
 
   return (
     <section
-      aria-label="Onboarding checklist"
+      aria-label="初期設定チェックリスト"
       className="overflow-hidden rounded-xl border border-border bg-card"
     >
       <header className="border-b border-border px-5 py-5 sm:px-6">
-        <h2 className="text-lg font-semibold">Get started</h2>
+        <h2 className="text-lg font-semibold">はじめに</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Research competitors and keywords, audit your site, and connect your
-          tools.
+          競合・キーワードの調査、サイト監査、外部ツールの連携を進めましょう。
         </p>
       </header>
       <Accordion
@@ -114,8 +113,8 @@ export function DashboardOnboarding({
                     }
                   >
                     {item.id === "project"
-                      ? "I only need one project"
-                      : "Skip for now"}
+                      ? "プロジェクトは1つだけでよい"
+                      : "今はスキップ"}
                   </Button>
                 </div>
               </AccordionContent>
@@ -127,7 +126,7 @@ export function DashboardOnboarding({
         <Collapsible className="border-t border-border">
           <CollapsibleTrigger className="group flex w-full items-center gap-2 px-5 py-4 text-left text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset sm:px-6">
             <ChevronRight className="size-4 transition-transform group-data-panel-open:rotate-90" />
-            {deferred.length} saved for later
+            {deferred.length} 後で対応
           </CollapsibleTrigger>
           <CollapsibleContent>
             <ul className="space-y-1 px-5 pb-4 sm:px-6">
@@ -139,13 +138,13 @@ export function DashboardOnboarding({
                   <span className="text-sm">{item.label}</span>
                   <Button
                     variant="ghost"
-                    aria-label={`Restore ${item.label}`}
+                    aria-label={`${item.label}を元に戻す`}
                     disabled={dismiss.isPending}
                     onClick={() =>
                       dismiss.mutate({ step: item.id, dismissed: false })
                     }
                   >
-                    <RotateCcw data-icon="inline-start" /> Restore
+                    <RotateCcw data-icon="inline-start" /> 元に戻す
                   </Button>
                 </li>
               ))}
@@ -157,7 +156,7 @@ export function DashboardOnboarding({
         <Collapsible className="border-t border-border">
           <CollapsibleTrigger className="group flex w-full items-center gap-2 px-5 py-4 text-left text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset sm:px-6">
             <Check className="size-4 text-success" />
-            {completed.length} completed
+            完了 {completed.length.toLocaleString("ja-JP")}件
             <ChevronRight className="ml-auto size-4 text-muted-foreground transition-transform group-data-panel-open:rotate-90" />
           </CollapsibleTrigger>
           <CollapsibleContent>

@@ -85,6 +85,9 @@ describe("saveReportTemplate", () => {
     await expect(save()).rejects.toThrow(
       /exists in this project \(id template_other\)/,
     );
+    await expect(save({ locale: "ja" })).rejects.toThrow(
+      /「client-ready AUDIT summary」という名前のテンプレートがすでにあります/,
+    );
     expect(mocks.insertTemplate).not.toHaveBeenCalled();
   });
 

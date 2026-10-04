@@ -48,15 +48,15 @@ export function ExportToSheetsModal() {
             <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-success/15 text-success">
               <Check className="size-4" />
             </span>
-            Copied {rowCount} row{rowCount === 1 ? "" : "s"} to your clipboard
+            {rowCount}行をクリップボードにコピーしました
           </DialogTitle>
           <DialogDescription>
-            Open a new Google Sheet and paste to fill it.
+            新しいGoogleスプレッドシートを開き、貼り付けてください。
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button onClick={handleOpenSheet}>
-            Open new Google Sheet
+            新しいGoogleスプレッドシートを開く
             <ExternalLink data-icon="inline-end" />
           </Button>
         </DialogFooter>

@@ -27,7 +27,7 @@ export function PlanOfferCard({
         <div className="flex items-baseline justify-between gap-4">
           <span className="font-semibold">{offer.name}</span>
           <span className="text-lg font-semibold tabular-nums">
-            ${offer.priceUsd}/month
+            ${offer.priceUsd}/月
           </span>
         </div>
 
@@ -51,14 +51,14 @@ export function PlanOfferCard({
         <p className="text-center text-xs text-muted-foreground">
           <Tooltip>
             <TooltipTrigger className="cursor-help underline decoration-dotted">
-              30-day money-back guarantee
+              30日間返金保証
             </TooltipTrigger>
             <TooltipContent>
-              Not for you yet? Email {SUPPORT_EMAIL} within 30 days of your
-              charge and we'll refund your subscription.
+              ご満足いただけない場合は、請求から30日以内に {SUPPORT_EMAIL}{" "}
+              までメールでご連絡いただければ、サブスクリプション料金を返金します。
             </TooltipContent>
           </Tooltip>
-          . Cancel anytime. Powered by Stripe.
+          。いつでも解約できます。決済はStripeを利用しています。
         </p>
       </CardContent>
     </Card>

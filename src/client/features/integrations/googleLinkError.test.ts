@@ -32,7 +32,7 @@ describe("Google link callback errors", () => {
     const error = errors.getGoogleLinkError("gsc");
     expect(error).toEqual({ code: "access_denied" });
     const copy = googleAuthErrorCopy(error!.code, "Search Console");
-    expect(copy.title).toBe("Search Console connection was canceled");
+    expect(copy.title).toBe("Search Consoleとの連携がキャンセルされました");
     expect(location.href).toBe(
       "https://app.example.com/p/project-a#connect-gsc",
     );

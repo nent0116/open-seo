@@ -64,7 +64,7 @@ async function handleAutumnRequest(request: Request) {
     context = await resolveHostedContext(request.headers);
   } catch {
     return Response.json(
-      { message: "Authentication required.", code: "unauthenticated" },
+      { message: "認証が必要です。", code: "unauthenticated" },
       { status: 401 },
     );
   }
@@ -77,7 +77,7 @@ async function handleAutumnRequest(request: Request) {
   ) {
     return Response.json(
       {
-        message: "Only the organization owner can manage billing.",
+        message: "請求を管理できるのは組織の所有者だけです。",
         code: "billing_owner_required",
       },
       { status: 403 },

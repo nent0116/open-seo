@@ -22,17 +22,17 @@ import {
 } from "@/client/features/billing/useBillingUsageEvents";
 
 const chartConfig = {
-  credits: { label: "Usage", color: "#7c3aed" },
+  credits: { label: "使用量", color: "#7c3aed" },
 } satisfies ChartConfig;
 
 export function BillingUsageChart() {
   const eventsQuery = useBillingUsageEvents();
 
   return (
-    <BillingUsageCard title="Usage">
+    <BillingUsageCard title="使用量">
       <QueryState
         query={eventsQuery}
-        errorFallback="Failed to load usage"
+        errorFallback="使用量を読み込めませんでした"
         loading={<Skeleton className="h-40 w-full" />}
       >
         {(events) => <UsageChart events={events} />}
@@ -55,7 +55,7 @@ function UsageChart({ events }: { events: BillingUsageEvent[] }) {
         {totalSpend === 0 ? (
           <div className="flex h-full items-center justify-center">
             <span className="text-sm text-muted-foreground">
-              No usage recorded yet
+              使用履歴はまだありません
             </span>
           </div>
         ) : (
@@ -124,7 +124,7 @@ function binEventsByDay(events: BillingUsageEvent[]) {
 }
 
 function formatShortDate(timestamp: number) {
-  return new Date(timestamp).toLocaleDateString("en-US", {
+  return new Date(timestamp).toLocaleDateString("ja-JP", {
     month: "short",
     day: "numeric",
   });

@@ -2,6 +2,7 @@ import type {
   PromptExplorerModel,
   WebSearchCountryCode,
 } from "@/types/schemas/ai-search";
+import { formatJapaneseCountryName } from "@/shared/country-labels-ja";
 
 const MODEL_LABELS: Record<PromptExplorerModel, string> = {
   chat_gpt: "ChatGPT",
@@ -14,8 +15,6 @@ export function formatModelLabel(model: PromptExplorerModel): string {
   return MODEL_LABELS[model];
 }
 
-const COUNTRY_NAMES = new Intl.DisplayNames(["en"], { type: "region" });
-
 export function formatCountryLabel(code: WebSearchCountryCode): string {
-  return COUNTRY_NAMES.of(code) ?? code;
+  return formatJapaneseCountryName(code);
 }

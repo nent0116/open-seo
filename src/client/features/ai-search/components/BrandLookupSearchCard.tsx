@@ -72,33 +72,32 @@ export function BrandLookupSearchCard({
         <>
           <Field>
             <Input
-              placeholder="Add competitors (comma-separated)"
+              placeholder="競合を追加（カンマ区切り）"
               value={competitors}
               onChange={(event) => onCompetitorsChange(event.target.value)}
               autoComplete="off"
               spellCheck={false}
-              aria-label="Competitors"
+              aria-label="競合サイト"
               aria-invalid={competitorsError || undefined}
               aria-describedby={
                 competitorsError ? "brand-lookup-input-error" : undefined
               }
             />
             <FieldDescription>
-              Add up to 5 competitor brands or domains to see your Share of
-              Voice.
+              競合ブランドまたはドメインを最大5件追加し、シェア・オブ・ボイスを確認できます。
             </FieldDescription>
           </Field>
           <p className="text-xs text-muted-foreground tabular-nums">
-            Est.{" "}
+            推定{" "}
             <span className="font-medium text-foreground">
               ${BRAND_LOOKUP_DISPLAYED_COST_USD.toFixed(2)}
             </span>
             {hasCompetitors ? (
               <span>
                 {" "}
-                plus ~$
-                {BRAND_LOOKUP_COMPETITOR_DISPLAYED_COST_USD.toFixed(2)} to
-                compare competitors
+                競合比較には追加で約$
+                {BRAND_LOOKUP_COMPETITOR_DISPLAYED_COST_USD.toFixed(2)}{" "}
+                かかります
               </span>
             ) : null}
           </p>
@@ -106,8 +105,8 @@ export function BrandLookupSearchCard({
       }
     >
       <SearchInput
-        placeholder="Enter a brand name or domain"
-        aria-label="Brand name or domain"
+        placeholder="ブランド名またはドメインを入力してください"
+        aria-label="ブランド名またはドメイン"
         value={query}
         maxLength={BRAND_LOOKUP_MAX_INPUT_LENGTH}
         onChange={(event) => onQueryChange(event.target.value)}

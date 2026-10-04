@@ -20,7 +20,7 @@ export function BillingUsageCard({
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardAction className="self-center text-xs text-muted-foreground">
-          Last 30 days
+          過去30日間
         </CardAction>
       </CardHeader>
       <CardContent>{children}</CardContent>

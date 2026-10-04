@@ -180,7 +180,7 @@ export function useKeywordResearchData(
       displayedLocationCode,
       request.locationName
         ? formatLocationLabel(request.locationName)
-        : LOCATIONS[displayedLocationCode] || "Unknown",
+        : LOCATIONS[displayedLocationCode] || "不明",
       request.locationName,
     );
   }, [
@@ -196,7 +196,10 @@ export function useKeywordResearchData(
   const rows = hasSearched ? (researchQuery.data?.rows ?? []) : [];
   const researchError =
     hasSearched && researchQuery.isError
-      ? getStandardErrorMessage(researchQuery.error, "Research failed.")
+      ? getStandardErrorMessage(
+          researchQuery.error,
+          "キーワード調査に失敗しました。",
+        )
       : null;
 
   return {

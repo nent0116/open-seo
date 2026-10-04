@@ -54,8 +54,8 @@ export function KeywordResearchSearchBar({ controller }: Props) {
                   <InputGroupTextarea
                     className="min-h-0 py-[7px] leading-6 field-sizing-fixed"
                     rows={rows}
-                    placeholder="Enter a keyword"
-                    aria-label="Keywords"
+                    placeholder="キーワードを入力"
+                    aria-label="キーワード"
                     aria-invalid={keywordError ? true : undefined}
                     value={field.state.value}
                     onChange={(event) => field.handleChange(event.target.value)}
@@ -108,7 +108,7 @@ export function KeywordResearchSearchBar({ controller }: Props) {
             <KeywordSearchOptions controller={controller} />
 
             <Button type="submit" className="w-full px-6 lg:w-auto lg:shrink-0">
-              Search
+              検索
             </Button>
           </div>
         </form>
@@ -134,9 +134,7 @@ export function KeywordResearchSearchBar({ controller }: Props) {
                 <Alert variant="info" role="status">
                   <Info />
                   <AlertDescription>
-                    Keyword data for this country comes from Google Ads — search
-                    volume, CPC, and trends are available, but difficulty and
-                    intent are not.
+                    この国のキーワードデータはGoogle広告から取得します。検索ボリューム、クリック単価、トレンドは利用できますが、難易度と検索意図は含まれません。
                   </AlertDescription>
                 </Alert>
               )}

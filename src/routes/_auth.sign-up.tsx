@@ -26,12 +26,12 @@ import { z } from "zod";
 const signUpSchema = z
   .object({
     name: z.string().trim(),
-    email: z.string().trim().email("Enter a valid email address."),
+    email: z.string().trim().email("有効なメールアドレスを入力してください。"),
     password: passwordSchema,
     confirmPassword: z.string(),
   })
   .refine((value) => value.password === value.confirmPassword, {
-    message: "Passwords do not match.",
+    message: "パスワードが一致しません。",
     path: ["confirmPassword"],
   });
 
@@ -70,7 +70,7 @@ function SignUpPage() {
           redirect_to: redirectTo,
         });
         const resolvedName =
-          value.name.trim() || email.split("@")[0] || "OpenSEO User";
+          value.name.trim() || email.split("@")[0] || "OpenSEOユーザー";
         const verificationCallbackURL = new URL(
           "/verify-email",
           window.location.origin,
@@ -104,7 +104,7 @@ function SignUpPage() {
           if (isTurnstileEnabled) captcha.reset();
           formApi.setErrorMap({
             onSubmit: {
-              form: result.error.message || "Unable to create account.",
+              form: "アカウントを作成できませんでした。もう一度お試しください。",
               fields: {},
             },
           });
@@ -123,7 +123,7 @@ function SignUpPage() {
         if (isTurnstileEnabled) captcha.reset();
         formApi.setErrorMap({
           onSubmit: {
-            form: "Unable to create account right now. Please try again.",
+            form: "現在アカウントを作成できません。もう一度お試しください。",
             fields: {},
           },
         });
@@ -133,7 +133,7 @@ function SignUpPage() {
 
   return (
     <AuthPageCard
-      title="Create your account"
+      title="アカウントを作成"
       footer={
         isHostedMode ? (
           showEmailForm ? (
@@ -145,40 +145,40 @@ function SignUpPage() {
                 google.clearError();
               }}
             >
-              Back to signup
+              アカウント作成へ戻る
             </button>
           ) : (
             <div className="space-y-4">
               <p className="text-sm leading-relaxed text-muted-foreground">
-                By signing up, you agree to our{" "}
+                アカウントを作成すると、
                 <a
                   href="https://openseo.so/terms-and-conditions"
                   target="_blank"
                   rel="noreferrer"
                   className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
                 >
-                  Terms
-                </a>{" "}
-                and{" "}
+                  利用規約
+                </a>
+                および
                 <a
                   href="https://openseo.so/privacy"
                   target="_blank"
                   rel="noreferrer"
                   className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
                 >
-                  Privacy Policy
+                  プライバシーポリシー
                 </a>
-                .
+                に同意したものとみなされます。
               </p>
 
               <p className="text-sm text-foreground/50">
-                Already have an account?{" "}
+                すでにアカウントをお持ちですか？{" "}
                 <Link
                   to="/sign-in"
                   search={getSignInSearch(redirectTo)}
                   className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
                 >
-                  Sign in
+                  ログイン
                 </Link>
               </p>
             </div>
@@ -189,7 +189,7 @@ function SignUpPage() {
       {!showEmailForm ? (
         <>
           <AuthMethodChooser
-            googleLabel="Continue with Google"
+            googleLabel="Googleで続行"
             disabled={!isHostedMode}
             isBusy={google.isStarting}
             onContinueWithGoogle={() => {
@@ -210,10 +210,10 @@ function SignUpPage() {
             <form.AppField name="name">
               {(field) => (
                 <field.TextField
-                  label="Name (optional)"
+                  label="名前（任意）"
                   hideLabel
                   className={authInputClassName}
-                  placeholder="Name (optional)..."
+                  placeholder="名前（任意）"
                   autoComplete="name"
                 />
               )}
@@ -221,11 +221,11 @@ function SignUpPage() {
             <form.AppField name="email">
               {(field) => (
                 <field.TextField
-                  label="Email address"
+                  label="メールアドレス"
                   hideLabel
                   className={authInputClassName}
                   type="email"
-                  placeholder="Email address..."
+                  placeholder="メールアドレスを入力"
                   autoComplete="email"
                   required
                 />
@@ -234,11 +234,11 @@ function SignUpPage() {
             <form.AppField name="password">
               {(field) => (
                 <field.TextField
-                  label="Password"
+                  label="パスワード"
                   hideLabel
                   className={authInputClassName}
                   type="password"
-                  placeholder="Password..."
+                  placeholder="パスワードを入力"
                   autoComplete="new-password"
                   required
                 />
@@ -247,11 +247,11 @@ function SignUpPage() {
             <form.AppField name="confirmPassword">
               {(field) => (
                 <field.TextField
-                  label="Confirm password"
+                  label="パスワード（確認）"
                   hideLabel
                   className={authInputClassName}
                   type="password"
-                  placeholder="Confirm password..."
+                  placeholder="パスワードを再入力"
                   autoComplete="new-password"
                   required
                 />
@@ -285,7 +285,9 @@ function SignUpPage() {
                       pending={isSubmitting}
                       disabled={isTurnstileEnabled && !captcha.hasToken}
                     >
-                      {isSubmitting ? "Creating account..." : "Create account"}
+                      {isSubmitting
+                        ? "アカウントを作成しています…"
+                        : "アカウントを作成"}
                     </Button>
                   </>
                 );

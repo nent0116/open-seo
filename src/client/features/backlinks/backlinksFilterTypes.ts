@@ -132,7 +132,7 @@ export function backlinksFilterBudgetError(
 ): string | null {
   const limit = backlinksFilterConditionLimit(scope, hideSpam);
   if (countFilterConditions(values) <= limit) return null;
-  return `These filters exceed the ${limit}-condition limit for this view. Remove conditions in Filters${hideSpam ? " or choose All links (spammy included) from Best links" : ""}. Your filters have been kept.`;
+  return `この表示で指定できる絞り込み条件は${limit}件までです。絞り込みから条件を減らしてください${hideSpam ? "。または「高品質リンク」で「すべてのリンク（スパムを含む）」を選択してください" : ""}。入力した条件は保持されています。`;
 }
 
 /**

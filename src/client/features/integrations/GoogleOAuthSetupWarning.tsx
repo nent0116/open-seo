@@ -16,15 +16,15 @@ export function GoogleOAuthSetupWarning({
   return (
     <Alert variant="warning">
       <AlertTriangle className="size-4" />
-      <AlertTitle>Google OAuth client not configured</AlertTitle>
+      <AlertTitle>Google OAuthクライアントが設定されていません</AlertTitle>
       <AlertDescription>
         <p>
-          Add your Google client ID and secret to this OpenSEO deployment before
-          connecting {integrationName}.
+          {integrationName}
+          と連携する前に、このOpenSEO環境へGoogleクライアントIDとシークレットを設定してください。
         </p>
         <SafeExternalLink
           url={docsUrl}
-          label="Open setup guide"
+          label="セットアップガイドを開く"
           className="inline-flex items-center gap-1 font-medium underline underline-offset-2"
         />
       </AlertDescription>

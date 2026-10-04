@@ -155,7 +155,7 @@ export function Sidebar({
           )
         ) : (
           <nav
-            aria-label="Main navigation"
+            aria-label="メインナビゲーション"
             aria-busy={navPlaceholder || undefined}
           >
             {navGroups.map((group) => (
@@ -218,7 +218,7 @@ function AccountFooter({ ready }: { ready: boolean }) {
       <SidebarMenu>
         <SidebarNavLink
           icon={CircleHelp}
-          label="Help & Community"
+          label="ヘルプ・コミュニティ"
           linkProps={{ to: "/support" }}
         />
         {email ? (
@@ -228,7 +228,7 @@ function AccountFooter({ ready }: { ready: boolean }) {
                 render={
                   <SidebarMenuButton
                     className={navButtonClass}
-                    aria-label="Open account menu"
+                    aria-label="アカウントメニューを開く"
                   />
                 }
               >
@@ -243,7 +243,7 @@ function AccountFooter({ ready }: { ready: boolean }) {
                     <DropdownMenuGroup>
                       <DropdownMenuLabel className="flex items-center gap-1.5">
                         <ArrowLeftRight className="size-3" />
-                        Organization
+                        組織
                       </DropdownMenuLabel>
                       {organizations.map((organization) => (
                         <DropdownMenuItem
@@ -274,7 +274,7 @@ function AccountFooter({ ready }: { ready: boolean }) {
                   }
                 >
                   <Settings className="size-4" />
-                  Settings
+                  設定
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   render={
@@ -285,10 +285,10 @@ function AccountFooter({ ready }: { ready: boolean }) {
                   }
                 >
                   <CreditCard className="size-4" />
-                  Billing
+                  請求・利用状況
                 </DropdownMenuItem>
                 <DropdownMenuGroup>
-                  <DropdownMenuLabel>Theme</DropdownMenuLabel>
+                  <DropdownMenuLabel>テーマ</DropdownMenuLabel>
                   <div className="px-1 pb-1">
                     <ThemePreferenceRadio />
                   </div>
@@ -299,7 +299,7 @@ function AccountFooter({ ready }: { ready: boolean }) {
                   onClick={() => signOutAndRedirect()}
                 >
                   <LogOut className="size-4" />
-                  Sign out
+                  ログアウト
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -307,7 +307,7 @@ function AccountFooter({ ready }: { ready: boolean }) {
         ) : ready ? (
           <SidebarNavLink
             icon={Settings}
-            label="Settings"
+            label="設定"
             linkProps={{ to: "/settings" }}
           />
         ) : (

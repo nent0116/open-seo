@@ -180,8 +180,20 @@ describe("Prompt Explorer countries", () => {
     );
     expect(result.results).toMatchObject([
       { model: "chat_gpt", status: "success", webSearchCountryCode: "BG" },
-      { model: "claude", status: "error", errorCode: "UNSUPPORTED_COUNTRY" },
-      { model: "gemini", status: "error", errorCode: "UNSUPPORTED_COUNTRY" },
+      {
+        model: "claude",
+        status: "error",
+        errorCode: "UNSUPPORTED_COUNTRY",
+        message:
+          "Claudeはブルガリアを検索対象国としてサポートしていません。上の「国を指定しない」を選択し、もう一度実行するとClaudeも含められます。",
+      },
+      {
+        model: "gemini",
+        status: "error",
+        errorCode: "UNSUPPORTED_COUNTRY",
+        message:
+          "Geminiは国の指定をサポートしていません。上の「国を指定しない」を選択し、もう一度実行するとGeminiも含められます。",
+      },
       { model: "perplexity", status: "success", webSearchCountryCode: "BG" },
     ]);
     expect(llmResponse).toHaveBeenCalledTimes(2);

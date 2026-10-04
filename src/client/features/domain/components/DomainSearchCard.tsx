@@ -18,11 +18,11 @@ import {
 import type { ResearchScope } from "@/shared/researchScope";
 
 const SORT_ITEMS: { value: DomainSortMode; label: string }[] = [
-  { value: "rank", label: "By Rank" },
-  { value: "traffic", label: "By Traffic" },
-  { value: "volume", label: "By Volume" },
-  { value: "score", label: "By Score" },
-  { value: "cpc", label: "By CPC" },
+  { value: "rank", label: "順位順" },
+  { value: "traffic", label: "トラフィック順" },
+  { value: "volume", label: "検索ボリューム順" },
+  { value: "score", label: "スコア順" },
+  { value: "cpc", label: "クリック単価順" },
 ];
 
 type Props = {
@@ -58,8 +58,8 @@ export function DomainSearchCard({
       <controlsForm.Field name="domain">
         {(field) => (
           <SearchInput
-            placeholder="Enter a domain or URL"
-            aria-label="Domain or URL"
+            placeholder="ドメインまたはURLを入力"
+            aria-label="ドメインまたはURL"
             value={field.state.value}
             onChange={(event) => {
               field.handleChange(event.target.value);
@@ -110,7 +110,7 @@ export function DomainSearchCard({
             }}
           >
             <SelectTrigger
-              aria-label="Sort keywords"
+              aria-label="キーワードの並び順"
               className="w-full shrink-0 lg:w-36"
             >
               <SelectValue />

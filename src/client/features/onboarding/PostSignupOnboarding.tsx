@@ -60,8 +60,8 @@ export function PostSignupOnboarding({
         <fieldset disabled={isSaving} className="min-w-0">
           {step === 0 ? (
             <OnboardingChoiceGroup
-              title="What brings you here?"
-              description="Pick up to three things you want to work on."
+              title="どのような目的で利用しますか？"
+              description="取り組みたい項目を3つまで選んでください。"
               maxSelections={3}
               options={[...INTEREST_OPTIONS]}
               selectedValues={answers.selectedInterests}
@@ -80,7 +80,7 @@ export function PostSignupOnboarding({
             />
           ) : step === 1 ? (
             <OnboardingChoiceGroup
-              title="Who are you doing SEO for?"
+              title="誰のためにSEOへ取り組みますか？"
               options={[...WORK_FOR_OPTIONS]}
               selectedValues={answers.workFor ? [answers.workFor] : []}
               onToggle={(workFor) => updateAnswers({ workFor })}
@@ -97,7 +97,7 @@ export function PostSignupOnboarding({
             />
           ) : step === 2 ? (
             <OnboardingChoiceGroup
-              title="How did you find OpenSEO?"
+              title="OpenSEOをどこで知りましたか？"
               options={[...SOURCE_OPTIONS]}
               selectedValues={answers.source ? [answers.source] : []}
               onToggle={(source) => updateAnswers({ source })}
@@ -205,8 +205,8 @@ function OnboardingChoiceGroup({
         <Input
           type="text"
           className="mt-4 border-foreground/20 bg-card text-base md:text-base"
-          aria-label={multiple ? "Other tasks" : "Other answer"}
-          placeholder={multiple ? "Tell us what else..." : "Tell us more..."}
+          aria-label={multiple ? "その他の用途" : "その他の回答"}
+          placeholder={multiple ? "その他の用途を入力" : "詳しく入力"}
           value={otherValue}
           onChange={(event) => onOtherChange(event.target.value)}
         />
@@ -225,7 +225,7 @@ function ClientWebsiteCountPicker({
   return (
     <div className="w-full rounded-lg border border-border bg-background/40 p-4">
       <p className="text-sm text-foreground/70">
-        About how many client sites do you work on?
+        担当しているクライアントサイトはおよそ何件ですか？
       </p>
       <div className="mt-2 flex flex-wrap gap-2">
         {CLIENT_WEBSITE_COUNT_OPTIONS.map((option) => {

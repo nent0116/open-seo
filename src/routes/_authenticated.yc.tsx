@@ -26,9 +26,9 @@ import { BILLING_ROUTE } from "@/shared/billing";
 import { SUPPORT_EMAIL } from "@/client/lib/support";
 
 const PLAN_FEATURES = [
-  "Keyword research, backlinks, rank tracking, and site audits",
-  "MCP server and agent skills for Claude, Cursor, and ChatGPT",
-  "Google Search Console Integration",
+  "キーワード調査、被リンク、順位計測、サイト監査",
+  "Claude、Cursor、ChatGPT向けのMCPサーバーとエージェントスキル",
+  "Google Search Console連携",
   monthlyCreditsFeature(YC_PLAN_OFFER),
 ];
 
@@ -75,10 +75,10 @@ function YcPlanPage() {
 
   if (routeState === "error") {
     return (
-      <StatusScreen logo title="Billing unavailable" size="sm">
+      <StatusScreen logo title="請求機能を利用できません" size="sm">
         <QueryError
           error={customerQuery.error}
-          fallback="We couldn't verify your billing status right now. Please try again."
+          fallback="現在、請求状況を確認できません。もう一度お試しください。"
           onRetry={() => void customerQuery.refetch()}
           isRetrying={customerQuery.isFetching}
         />
@@ -106,7 +106,7 @@ function YcPlanPage() {
       setError(
         getStandardErrorMessage(
           err,
-          "We couldn't start the checkout. Please try again.",
+          "決済手続きを開始できませんでした。もう一度お試しください。",
         ),
       );
       setIsAttaching(false);
@@ -123,10 +123,9 @@ function YcPlanPage() {
           alt="OpenSEO"
           className="mx-auto size-10 rounded-lg"
         />
-        <h1 className="text-xl font-semibold">OpenSEO for YC founders</h1>
+        <h1 className="text-xl font-semibold">YC創業者向けOpenSEO</h1>
         <p className="text-sm text-muted-foreground">
-          A bigger monthly credit pool for teams doing serious SEO work, with
-          your first month free through the YC deal.
+          本格的にSEOへ取り組むチーム向けの大容量月間クレジットプランです。YC特典で初月は無料になります。
         </p>
       </div>
 
@@ -135,10 +134,10 @@ function YcPlanPage() {
           <Tag className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
           <p className="text-muted-foreground">
             <span className="font-medium text-foreground">
-              Don&rsquo;t forget your promo code.
+              プロモーションコードをお忘れなく。
             </span>{" "}
-            Enter the code from the YC deal under &ldquo;Add promotion
-            code&rdquo; on the checkout page to get your first month free.
+            決済画面の「Add promotion
+            code」にYC特典のコードを入力すると、初月が無料になります。
           </p>
         </div>
 
@@ -150,14 +149,14 @@ function YcPlanPage() {
 
         {isOnYcPlan ? (
           <p className="text-sm text-muted-foreground">
-            You&rsquo;re already on the {YC_PLAN_OFFER.name}.{" "}
+            現在利用中のプラン：{YC_PLAN_OFFER.name}。{" "}
             <Link
               to={BILLING_ROUTE}
               className="underline underline-offset-2 hover:text-foreground"
             >
-              Manage it on Billing
+              請求画面で管理
             </Link>
-            .
+            。
           </p>
         ) : canManageBilling ? (
           <div className="space-y-2">
@@ -168,42 +167,42 @@ function YcPlanPage() {
               onClick={() => void handleSubscribe()}
             >
               {isAttaching
-                ? "Redirecting..."
+                ? "移動しています…"
                 : isPaid
-                  ? `Switch to the ${YC_PLAN_OFFER.name}`
-                  : `Get the ${YC_PLAN_OFFER.name}`}
+                  ? `${YC_PLAN_OFFER.name}へ切り替える`
+                  : `${YC_PLAN_OFFER.name}を申し込む`}
             </Button>
             {isPaid ? (
               <p className="text-center text-xs text-muted-foreground">
-                Replaces your current subscription.
+                現在のサブスクリプションから切り替わります。
               </p>
             ) : null}
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">
-            Only the organization owner can change the plan. Ask them to switch
-            this organization to the {YC_PLAN_OFFER.name}.
+            プランを変更できるのは組織の所有者だけです。この組織を次のプランへ変更するよう依頼してください：{" "}
+            {YC_PLAN_OFFER.name}。
           </p>
         )}
       </PlanOfferCard>
 
       <div className="text-center space-y-2">
         <p className="text-sm text-muted-foreground">
-          Questions? Email{" "}
+          ご質問はメールでお問い合わせください：{" "}
           <a
             className="underline underline-offset-2 hover:text-foreground"
             href={`mailto:${SUPPORT_EMAIL}`}
           >
             {SUPPORT_EMAIL}
           </a>
-          .
+          。
         </p>
         <Link
           to="/"
           className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowRight className="size-3.5 rotate-180" />
-          Back to app
+          アプリへ戻る
         </Link>
       </div>
     </div>

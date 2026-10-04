@@ -38,9 +38,9 @@ const BACKLINKS_RESULTS_TABS: Array<{
   tab: BacklinksSearchState["tab"];
   label: string;
 }> = [
-  { tab: "backlinks", label: "Backlinks" },
-  { tab: "domains", label: "Referring Domains" },
-  { tab: "pages", label: "Top Pages" },
+  { tab: "backlinks", label: "被リンク" },
+  { tab: "domains", label: "参照ドメイン" },
+  { tab: "pages", label: "上位ページ" },
 ];
 
 export function BacklinksResultsCard({
@@ -168,7 +168,7 @@ export function BacklinksResultsCard({
             <>
               <ExportMenu
                 actions={["sheets", "csv"]}
-                scopes={[{ id: "page", label: "Current page · selected view" }]}
+                scopes={[{ id: "page", label: "現在のページ・選択中の表示" }]}
                 disabled={exportTable.rows.length === 0}
                 onExport={(format) =>
                   void exportRows({
@@ -213,9 +213,9 @@ export function BacklinksResultsCard({
                   {
                     value: "one",
                     icon: <Rows3 />,
-                    label: "One per domain",
+                    label: "ドメインごとに1件",
                   },
-                  { value: "all", icon: <List />, label: "All links" },
+                  { value: "all", icon: <List />, label: "すべてのリンク" },
                 ]}
               />
             </>

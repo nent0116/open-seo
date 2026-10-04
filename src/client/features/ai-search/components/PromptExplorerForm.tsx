@@ -66,7 +66,7 @@ const COUNTRY_ITEMS: Array<{
   value: WebSearchCountrySelection;
   label: string;
 }> = [
-  { value: "default", label: "No country preference" },
+  { value: "default", label: "国を指定しない" },
   ...sortBy(
     WEB_SEARCH_COUNTRY_CODES.map((code) => ({
       value: code,
@@ -120,7 +120,7 @@ export function PromptExplorerForm({
       <CardContent>
         <form onSubmit={onSubmit} noValidate className="space-y-5">
           <Field>
-            <FieldLabel htmlFor="prompt-explorer-prompt">Prompt</FieldLabel>
+            <FieldLabel htmlFor="prompt-explorer-prompt">プロンプト</FieldLabel>
             <Textarea
               id="prompt-explorer-prompt"
               className="resize-none"
@@ -132,7 +132,7 @@ export function PromptExplorerForm({
               autoFocus
             />
             <FieldDescription className="flex items-center justify-between">
-              <span>What your customers might ask AI.</span>
+              <span>顧客がAIに尋ねそうな内容を入力します。</span>
               <span
                 className={cn(
                   "tabular-nums",
@@ -147,7 +147,7 @@ export function PromptExplorerForm({
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <Field>
               <FieldLabel htmlFor="prompt-explorer-brand">
-                Highlight brand (optional)
+                ブランドを強調（任意）
               </FieldLabel>
               <Input
                 id="prompt-explorer-brand"
@@ -157,12 +157,12 @@ export function PromptExplorerForm({
                 spellCheck={false}
               />
               <FieldDescription>
-                We&apos;ll flag whether each model mentions this brand.
+                各モデルがこのブランドに言及したか表示します。
               </FieldDescription>
             </Field>
 
             <Field>
-              <FieldTitle>Models</FieldTitle>
+              <FieldTitle>モデル</FieldTitle>
               <div className="flex flex-wrap items-start gap-x-5 gap-y-2 pt-1.5">
                 {PROMPT_EXPLORER_MODELS.map((model) => (
                   <Label key={model} className="font-normal">
@@ -175,8 +175,8 @@ export function PromptExplorerForm({
                       {unsupportedModels.includes(model) &&
                       form.webSearchCountryCode !== "default" ? (
                         <span className="block text-xs text-muted-foreground">
-                          Skipped for{" "}
                           {formatCountryLabel(form.webSearchCountryCode)}
+                          の指定に対応していないためスキップ
                         </span>
                       ) : null}
                     </span>
@@ -193,7 +193,7 @@ export function PromptExplorerForm({
                   checked={form.webSearch}
                   onCheckedChange={onWebSearchChange}
                 />
-                Allow web search
+                Web検索を許可
               </Label>
               <Combobox
                 items={countryItems}
@@ -210,12 +210,12 @@ export function PromptExplorerForm({
                 disabled={!form.webSearch}
               >
                 <ComboboxInput
-                  aria-label="Web search country"
-                  placeholder="Search countries"
+                  aria-label="Web検索の対象国"
+                  placeholder="国を検索"
                   className="w-full sm:w-80"
                 />
                 <ComboboxContent>
-                  <ComboboxEmpty>No supported countries match.</ComboboxEmpty>
+                  <ComboboxEmpty>一致する対応国がありません。</ComboboxEmpty>
                   <ComboboxList>
                     {(item: (typeof COUNTRY_ITEMS)[number]) => (
                       <ComboboxItem key={item.value} value={item}>
@@ -230,7 +230,7 @@ export function PromptExplorerForm({
                   render={
                     <button
                       type="button"
-                      aria-label="About country targeting"
+                      aria-label="国指定について"
                       className="text-muted-foreground"
                     />
                   }
@@ -238,9 +238,7 @@ export function PromptExplorerForm({
                   <Info className="size-4" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  A country guides web search when a model supports it. Models
-                  may answer without searching. Leave it unset to run all
-                  selected models.
+                  対応しているモデルでは、指定した国をWeb検索の参考にします。検索せずに回答する場合もあります。すべての選択済みモデルを実行するには未設定にしてください。
                 </TooltipContent>
               </Tooltip>
             </div>
@@ -250,8 +248,7 @@ export function PromptExplorerForm({
               pending={isLoading}
               disabled={supportedModels.length === 0}
             >
-              Run {supportedModels.length}{" "}
-              {supportedModels.length === 1 ? "model" : "models"}
+              {supportedModels.length}モデルを実行
             </Button>
           </div>
 

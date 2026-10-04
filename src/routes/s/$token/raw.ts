@@ -19,7 +19,7 @@ import { sharePath } from "@/shared/report-share";
 
 // One body for every dead end — unknown token, revoked link, archived project,
 // kill switch off. A revoked link must not confirm that it once worked.
-const NOT_SHARED_BODY = "This report isn't shared.";
+const NOT_SHARED_BODY = "このレポートは共有されていません。";
 
 /**
  * How long a colo may keep the document. A revoked link keeps loading for up

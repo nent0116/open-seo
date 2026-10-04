@@ -121,7 +121,7 @@ function FixPaymentPage() {
       setError(
         getStandardErrorMessage(
           err,
-          "We couldn't open the billing portal. Please try again.",
+          "請求ポータルを開けませんでした。もう一度お試しください。",
         ),
       );
       setIsOpeningPortal(false);
@@ -134,10 +134,10 @@ function FixPaymentPage() {
 
   if (routeState === "error") {
     return (
-      <Page title="Billing unavailable">
+      <Page title="請求機能を利用できません">
         <QueryError
           error={customerQuery.error}
-          fallback="We couldn't load your billing details right now. Please try again."
+          fallback="現在、請求情報を読み込めません。もう一度お試しください。"
           onRetry={() => void customerQuery.refetch()}
           isRetrying={customerQuery.isFetching}
         />
@@ -147,11 +147,10 @@ function FixPaymentPage() {
 
   if (isChecking) {
     return (
-      <Page title="Checking your payment…">
+      <Page title="お支払い状況を確認しています…">
         <Spinner />
         <p className="text-sm text-muted-foreground">
-          Stripe is retrying the charge with your updated card. This usually
-          takes a few seconds.
+          更新したカードでStripeが決済を再試行しています。通常は数秒で完了します。
         </p>
       </Page>
     );
@@ -159,16 +158,18 @@ function FixPaymentPage() {
 
   if (!isPastDue) {
     return (
-      <Page title={returned ? "You're all set" : "Your billing is up to date"}>
+      <Page
+        title={returned ? "お支払いが完了しました" : "お支払い状況は正常です"}
+      >
         <p className="text-sm text-muted-foreground">
           {returned
-            ? "The payment went through and your subscription is active again."
-            : "There's nothing outstanding on your account."}{" "}
+            ? "お支払いが完了し、サブスクリプションが再開されました。"
+            : "未払いの請求はありません。"}{" "}
           <Link
             to={BILLING_ROUTE}
             className="font-medium text-primary underline-offset-4 hover:underline"
           >
-            Back to billing
+            請求・利用状況へ戻る
           </Link>
         </p>
       </Page>
@@ -177,29 +178,28 @@ function FixPaymentPage() {
 
   if (!canManageBilling) {
     return (
-      <Page title="Fix your payment">
+      <Page title="お支払い方法を修正">
         <p className="text-sm text-muted-foreground">
-          A payment for this organization didn&rsquo;t go through. Only the
-          organization owner can update the card, so please ask them to visit
-          this page.
+          この組織の決済を完了できませんでした。カードを更新できるのは組織の所有者だけです。所有者にこのページを開くよう依頼してください。
         </p>
       </Page>
     );
   }
 
   return (
-    <Page title={returned ? "Still showing as unpaid" : "Fix your payment"}>
+    <Page
+      title={returned ? "未払いの表示が続いています" : "お支払い方法を修正"}
+    >
       <p className="text-sm text-muted-foreground">
         {returned
-          ? "Your subscription is still marked past due. Stripe can take a few minutes to retry the charge. If you added a new card but the invoice is still listed as open in the portal, you can pay it there directly."
-          : "Your last payment didn't go through. This usually means the card expired or the bank declined the charge. Nothing has been turned off yet."}
+          ? "サブスクリプションはまだ支払期限超過と表示されています。Stripeによる再決済には数分かかる場合があります。新しいカードを追加しても請求書がポータルで未払いの場合は、ポータルから直接お支払いください。"
+          : "前回のお支払いを処理できませんでした。カードの有効期限切れや、金融機関による決済拒否が主な原因です。機能はまだ停止されていません。"}
       </p>
 
       <div className="rounded-lg border border-border bg-card p-4">
-        <p className="text-sm font-semibold">Update your payment method</p>
+        <p className="text-sm font-semibold">お支払い方法を更新</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add a working card in the billing portal. It becomes your default for
-          future renewals, and the open invoice can be paid on the same screen.
+          請求ポータルで有効なカードを追加してください。今後の更新時の既定カードとなり、未払い請求も同じ画面で支払えます。
         </p>
         <Button
           size="sm"
@@ -207,7 +207,7 @@ function FixPaymentPage() {
           pending={isOpeningPortal}
           onClick={() => void openPortal()}
         >
-          {isOpeningPortal ? "Opening Stripe..." : "Open billing portal"}
+          {isOpeningPortal ? "Stripeを開いています…" : "請求ポータルを開く"}
         </Button>
       </div>
 
@@ -224,12 +224,14 @@ function Page({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="mx-auto box-content max-w-7xl space-y-5 px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
       <div>
-        <p className="text-sm font-medium text-muted-foreground">Billing</p>
+        <p className="text-sm font-medium text-muted-foreground">
+          請求・利用状況
+        </p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight">{title}</h1>
       </div>
       {children}
       <p className="text-xs text-muted-foreground">
-        Something look wrong? Email {SUPPORT_EMAIL}.
+        問題がある場合はメールでお問い合わせください：{SUPPORT_EMAIL}。
       </p>
     </div>
   );

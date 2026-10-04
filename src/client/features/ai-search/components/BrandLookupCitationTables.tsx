@@ -40,7 +40,7 @@ function HeaderWithHelp({
 }
 
 const PLATFORM_HELP =
-  "Which AI surface produced the answer — ChatGPT or Google AI Overview.";
+  "回答を生成したAI検索サービス（ChatGPTまたはGoogle AI Overview）です。";
 
 /**
  * Platform indicator used only when a table actually spans >1 platform. A dot +
@@ -108,7 +108,7 @@ function PageUrlCell({
         <span className="font-medium text-foreground group-hover:underline">
           {row.domain ?? formatUrlForDisplay(row.url)}
         </span>
-        {isOwn ? <Badge size="sm">You</Badge> : null}
+        {isOwn ? <Badge size="sm">自社</Badge> : null}
         <ExternalLink className="size-3 shrink-0 text-muted-foreground" />
       </span>
       {path ? (
@@ -149,16 +149,16 @@ function KeywordsCell({
             params={{ projectId }}
             search={{ q: keyword.question, hb: brand || undefined }}
             className="group/kw inline-flex items-baseline gap-2 text-xs"
-            title="Run this prompt in Prompt Explorer"
+            title="このプロンプトをプロンプト調査で実行"
           >
             <span className="text-foreground/80 group-hover/kw:underline">
               {keyword.question}
             </span>
             <span
               className="shrink-0 text-muted-foreground tabular-nums"
-              title="Prompt volume in the fetched sample"
+              title="取得したサンプル内のプロンプトボリューム"
             >
-              {formatCount(keyword.aiSearchVolume)} vol.
+              {formatCount(keyword.aiSearchVolume)} ボリューム
             </span>
           </Link>
         </li>
@@ -190,8 +190,8 @@ export function buildTopPagesColumns({
       meta: { cellClassName: TEXT_CELL },
       header: () => (
         <HeaderWithHelp
-          label="Source"
-          helpText="A page cited as a source in AI answers where the searched brand or domain appears."
+          label="リンク元"
+          helpText="検索したブランドまたはドメインが表示されたAI回答で、情報源として引用されたページです。"
         />
       ),
       enableSorting: false,
@@ -205,7 +205,10 @@ export function buildTopPagesColumns({
             id: "platform",
             meta: { cellClassName: "whitespace-nowrap align-top" },
             header: () => (
-              <HeaderWithHelp label="Platform" helpText={PLATFORM_HELP} />
+              <HeaderWithHelp
+                label="プラットフォーム"
+                helpText={PLATFORM_HELP}
+              />
             ),
             enableSorting: false,
             cell: ({ getValue }) => <PlatformCell platform={getValue()} />,
@@ -217,8 +220,8 @@ export function buildTopPagesColumns({
       meta: { cellClassName: "max-w-lg align-top" },
       header: () => (
         <HeaderWithHelp
-          label="Cited for"
-          helpText="Example prompts from the fetched sample where this page was cited."
+          label="引用されたプロンプト"
+          helpText="取得したサンプルのうち、このページが引用されたプロンプト例です。"
         />
       ),
       cell: ({ row }) => (
@@ -235,8 +238,8 @@ export function buildTopPagesColumns({
       header: ({ column }) => (
         <SortableHeader
           column={column}
-          label="Source vol."
-          helpText="Estimated monthly prompt demand DataForSEO reports for this cited source, across prompts where the searched brand or domain appears."
+          label="引用元ボリューム"
+          helpText="検索したブランドまたはドメインが表示されたプロンプトのうち、この引用元についてDataForSEOが推定した月間需要です。"
           align="right"
         />
       ),
@@ -264,8 +267,8 @@ export function buildTopQueriesColumns({
       meta: { cellClassName: TEXT_CELL },
       header: () => (
         <HeaderWithHelp
-          label="Query"
-          helpText="A sampled user prompt whose AI answer cited the searched brand or domain in its text or sources. The prompt itself may not name the brand."
+          label="検索文"
+          helpText="AI回答の本文または引用元に、検索したブランドやドメインが含まれたユーザープロンプトのサンプルです。プロンプト自体にブランド名がない場合もあります。"
         />
       ),
       enableSorting: false,
@@ -274,7 +277,7 @@ export function buildTopQueriesColumns({
           <p className="break-words font-medium">{row.original.question}</p>
           {row.original.brandsMentioned.length > 0 ? (
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Brands: {row.original.brandsMentioned.slice(0, 5).join(", ")}
+              ブランド： {row.original.brandsMentioned.slice(0, 5).join(", ")}
             </p>
           ) : null}
         </>
@@ -286,7 +289,10 @@ export function buildTopQueriesColumns({
             id: "platform",
             meta: { cellClassName: "whitespace-nowrap align-top" },
             header: () => (
-              <HeaderWithHelp label="Platform" helpText={PLATFORM_HELP} />
+              <HeaderWithHelp
+                label="プラットフォーム"
+                helpText={PLATFORM_HELP}
+              />
             ),
             enableSorting: false,
             cell: ({ getValue }) => <PlatformCell platform={getValue()} />,
@@ -299,8 +305,8 @@ export function buildTopQueriesColumns({
       header: ({ column }) => (
         <SortableHeader
           column={column}
-          label="AI search vol."
-          helpText="Estimated monthly search demand for this prompt's topic. This is prompt demand, not the number of brand mentions."
+          label="AI検索ボリューム"
+          helpText="このプロンプトのトピックに対する推定月間検索需要です。ブランド言及数ではありません。"
           align="right"
         />
       ),
@@ -312,7 +318,7 @@ export function buildTopQueriesColumns({
     }),
     queriesHelper.display({
       id: "action",
-      header: () => <span className="sr-only">Actions</span>,
+      header: () => <span className="sr-only">操作</span>,
       meta: { cellClassName: "w-px whitespace-nowrap text-right align-top" },
       cell: ({ row }) => (
         <Tooltip>
@@ -328,14 +334,14 @@ export function buildTopQueriesColumns({
                   size: "icon-xs",
                   className: "text-muted-foreground",
                 })}
-                aria-label="Run this prompt in Prompt Explorer"
+                aria-label="このプロンプトをプロンプト調査で実行"
               />
             }
           >
             <Sparkles />
           </TooltipTrigger>
           <TooltipContent side="left">
-            Run this prompt in Prompt Explorer
+            このプロンプトをプロンプト調査で実行
           </TooltipContent>
         </Tooltip>
       ),

@@ -13,16 +13,16 @@ export const crawlerCredentialsQueryKey = ["crawler-credentials"];
 export const saveCrawlerCredentialMutationKey = ["save-crawler-credential"];
 
 const signatureSchema = z.object({
-  host: z.string().trim().min(1, "Enter a domain."),
+  host: z.string().trim().min(1, "ドメインを入力してください。"),
   signatureInput: z
     .string()
     .trim()
-    .min(1, "Enter Signature-Input.")
+    .min(1, "Signature-Inputを入力してください。")
     .refine(
       (value) => !isCrawlerAccessExpired(parseSignatureExpiry(value)),
-      "This signature has already expired. Create a new one in Shopify admin.",
+      "この署名は期限切れです。Shopify管理画面で新しい署名を作成してください。",
     ),
-  signature: z.string().trim().min(1, "Enter Signature."),
+  signature: z.string().trim().min(1, "Signatureを入力してください。"),
 });
 
 /**
@@ -54,7 +54,9 @@ export function CrawlerAccessForm({
       await queryClient.invalidateQueries({
         queryKey: crawlerCredentialsQueryKey,
       });
-      toast.success(`Crawler access saved for ${result.credential.host}`);
+      toast.success(
+        `${result.credential.host}のクローラーアクセスを保存しました`,
+      );
       onSaved?.();
     },
   });
@@ -72,8 +74,8 @@ export function CrawlerAccessForm({
             fields: {
               signatureInput:
                 problem.reason === "wrong_domain"
-                  ? `This signature was created for ${problem.signedHost}, not ${problem.host}. In Shopify admin, create a signature for ${problem.host}.`
-                  : `Shopify won't accept this signature for ${problem.host}. Check that you created it for ${problem.host} and copied both values in full.`,
+                  ? `この署名は${problem.host}ではなく${problem.signedHost}用に作成されています。Shopify管理画面で${problem.host}用の署名を作成してください。`
+                  : `Shopifyは${problem.host}に対してこの署名を受け付けません。${problem.host}用に作成した署名であることと、両方の値を省略せずコピーしたことを確認してください。`,
             },
           },
         });
@@ -90,7 +92,7 @@ export function CrawlerAccessForm({
           <form.AppField name="host">
             {(field) => (
               <field.TextField
-                label="Domain"
+                label="ドメイン"
                 placeholder="store.example.com"
                 className="font-mono"
                 required
@@ -115,7 +117,7 @@ export function CrawlerAccessForm({
           {(field) => (
             <field.TextField
               label="Signature"
-              description="Shopify also shows a Signature-Agent value. You don't need to paste it: OpenSEO sends it with every request."
+              description="ShopifyにはSignature-Agentの値も表示されますが、貼り付ける必要はありません。OpenSEOが各リクエストと一緒に送信します。"
               type="password"
               autoComplete="off"
               data-ph-mask
@@ -125,9 +127,7 @@ export function CrawlerAccessForm({
             />
           )}
         </form.AppField>
-        <form.SubmitButton disabled={!projectId}>
-          Save signature
-        </form.SubmitButton>
+        <form.SubmitButton disabled={!projectId}>署名を保存</form.SubmitButton>
       </form.Form>
     </form.AppForm>
   );

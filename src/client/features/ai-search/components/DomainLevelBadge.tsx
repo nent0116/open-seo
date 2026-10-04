@@ -22,7 +22,7 @@ export function DomainLevelBadge({ tooltip }: { tooltip: string }) {
           />
         }
       >
-        Domain-level
+        ドメイン単位
       </TooltipTrigger>
       <TooltipContent>{tooltip}</TooltipContent>
     </Tooltip>

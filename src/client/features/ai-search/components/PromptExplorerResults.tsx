@@ -91,8 +91,8 @@ function ModelResultCard({
 
       <p className="px-5 pt-3 text-xs text-muted-foreground">
         {modelResult.webSearchCountryCode
-          ? `Country hint sent: ${formatCountryLabel(modelResult.webSearchCountryCode)}. This is not a verified search location.`
-          : "No country hint sent. Any search uses the provider’s default location."}
+          ? `国の指定：${formatCountryLabel(modelResult.webSearchCountryCode)}。実際にこの地域から検索されたことを保証するものではありません。`
+          : "国は指定されていません。検索時はプロバイダーの既定地域が使用されます。"}
       </p>
       <div className="px-5 py-5">
         <MarkdownAnswer text={modelResult.text} />
@@ -108,7 +108,7 @@ function ModelResultCard({
       {modelResult.fanOutQueries.length > 0 ? (
         <div className="border-t border-border px-5 py-3">
           <p className="mb-2 text-xs font-medium tracking-wider text-muted-foreground uppercase">
-            Related queries the model considered
+            モデルが検討した関連検索
           </p>
           <div className="flex flex-wrap gap-1.5">
             {modelResult.fanOutQueries.map((query, index) => (
@@ -137,7 +137,7 @@ function CitationsList({
   return (
     <div className="border-t border-border bg-muted/30 px-5 py-3">
       <p className="mb-2 text-xs font-medium tracking-wider text-muted-foreground uppercase">
-        Cited sources ({citations.length})
+        引用元（{citations.length}）
       </p>
       <ExpandableList
         items={citations}
@@ -198,9 +198,11 @@ function ModelHeader({
         {modelName ? (
           <code className="text-xs text-muted-foreground">{modelName}</code>
         ) : null}
-        {status === "error" ? <Badge variant="destructive">Error</Badge> : null}
+        {status === "error" ? (
+          <Badge variant="destructive">エラー</Badge>
+        ) : null}
         {status === "skipped" ? (
-          <Badge variant="secondary">Skipped</Badge>
+          <Badge variant="secondary">スキップ</Badge>
         ) : null}
         <BrandMentionBadge
           mentioned={brandMentioned}
@@ -209,20 +211,20 @@ function ModelHeader({
         {webSearch ? (
           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
             <Globe className="size-3" />
-            web search
+            Web検索あり
           </span>
         ) : webSearch === false ? (
           // The model chose not to browse for this answer — that's why there
           // are no cited sources on this card.
           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
             <Globe className="size-3" />
-            no web search
+            Web検索なし
           </span>
         ) : null}
       </div>
       {tokens != null ? (
         <span className="text-xs text-muted-foreground tabular-nums">
-          {tokens.toLocaleString()} tokens
+          {tokens.toLocaleString("ja-JP")}トークン
         </span>
       ) : null}
     </header>

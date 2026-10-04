@@ -43,12 +43,12 @@ import {
 
 function formatTrendRangeLabel(trend: KeywordResearchRow["trend"]): string {
   const last12 = lastTwelveMonths(trend);
-  if (last12.length === 0) return "Last 12 available months";
+  if (last12.length === 0) return "利用可能な直近12か月";
 
   const [startLabel, endLabel] = [last12[0], last12[last12.length - 1]].map(
-    (m) => `${MONTH_SHORT_LABELS[m.month - 1] ?? `M${m.month}`} ${m.year}`,
+    (m) => `${m.year}年${MONTH_SHORT_LABELS[m.month - 1] ?? `${m.month}月`}`,
   );
-  return startLabel === endLabel ? startLabel : `${startLabel} - ${endLabel}`;
+  return startLabel === endLabel ? startLabel : `${startLabel}～${endLabel}`;
 }
 
 type Props = {
@@ -78,9 +78,9 @@ function MobileTabs({ controller }: Props) {
     >
       <TabsList variant="line" className="w-full">
         <TabsTrigger value="keywords">
-          Keywords ({controller.filteredRows.length})
+          キーワード（{controller.filteredRows.length}）
         </TabsTrigger>
-        <TabsTrigger value="serp">SERP Analysis</TabsTrigger>
+        <TabsTrigger value="serp">検索結果分析</TabsTrigger>
       </TabsList>
     </Tabs>
   );
@@ -96,9 +96,9 @@ function KeywordPanel({ controller }: Props) {
       {showApproximateMatchNotice ? (
         <Alert variant="warning" role="status">
           <AlertDescription className="text-foreground">
-            No exact match for{" "}
-            <span className="font-medium">"{searchedKeyword}"</span>. Showing
-            closest related keywords instead.
+            完全に一致する結果がありません：{" "}
+            <span className="font-medium">"{searchedKeyword}"</span>
+            。代わりに関連性の高いキーワードを表示します。
           </AlertDescription>
         </Alert>
       ) : null}
@@ -126,10 +126,10 @@ function TableCard({ controller }: Props) {
 
   const keywordCountLabel =
     selectedKeywordRows.length > 0
-      ? `${selectedKeywordRows.length} selected`
+      ? `${selectedKeywordRows.length}件を選択中`
       : activeFilterCount > 0
-        ? `Showing ${keywordCount} of ${rows.length} keywords`
-        : `Showing ${keywordCount} keywords`;
+        ? `全${rows.length}件中${keywordCount}件を表示`
+        : `${keywordCount}件のキーワードを表示`;
 
   return (
     <>
@@ -142,17 +142,17 @@ function TableCard({ controller }: Props) {
               icon={<Save className="size-3.5" />}
               onClick={controller.handleSaveKeywords}
             >
-              Save<span className="hidden md:inline"> Keywords</span>
+              保存<span className="hidden md:inline"> キーワード</span>
             </TableBulkActionButton>
             <TableBulkExportMenu
               actions={[
                 {
-                  label: "Export to Sheets",
+                  label: "Google スプレッドシートへ出力",
                   icon: <Sheet className="size-4" />,
                   onClick: () => controller.exportSelection("sheets"),
                 },
                 {
-                  label: "Export CSV",
+                  label: "CSVで出力",
                   icon: <FileDown className="size-4" />,
                   onClick: () => controller.exportSelection("csv"),
                 },
@@ -227,34 +227,34 @@ function TableFilters({ controller }: Props) {
         <FilterTextInput
           form={filtersForm}
           name="include"
-          label="Include Terms"
-          placeholder="audit, checker, template"
+          label="含める語句"
+          placeholder="例：監査、チェッカー、テンプレート"
         />
         <FilterTextInput
           form={filtersForm}
           name="exclude"
-          label="Exclude Terms"
-          placeholder="jobs, salary, course"
+          label="除外する語句"
+          placeholder="例：求人、給与、講座"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-3">
         <FilterRangeInputs
           form={filtersForm}
-          title="Search Volume"
+          title="検索ボリューム"
           minName="minVol"
           maxName="maxVol"
         />
         <FilterRangeInputs
           form={filtersForm}
-          title="CPC (USD)"
+          title="クリック単価（USD）"
           minName="minCpc"
           maxName="maxCpc"
           step="0.01"
         />
         <FilterRangeInputs
           form={filtersForm}
-          title="Difficulty"
+          title="難易度"
           minName="minKd"
           maxName="maxKd"
         />
@@ -276,7 +276,7 @@ function SerpPanel({ controller }: Props) {
         <Card size="sm" className="hidden shrink-0 md:flex">
           <CardHeader>
             <CardTitle>
-              Search Trends{" "}
+              検索トレンド{" "}
               <span className="font-normal text-muted-foreground">
                 {formatTrendRangeLabel(overviewKeyword.trend)}
               </span>

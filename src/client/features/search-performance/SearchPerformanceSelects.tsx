@@ -14,9 +14,9 @@ import {
 } from "@/client/components/ui/select";
 
 const RANGE_LABELS: Record<SearchPerformanceDateRange, string> = {
-  last_7_days: "Last 7 days",
-  last_28_days: "Last 28 days",
-  last_3_months: "Last 3 months",
+  last_7_days: "過去7日間",
+  last_28_days: "過去28日間",
+  last_3_months: "過去3か月",
 };
 const RANGE_OPTIONS = SEARCH_PERFORMANCE_RANGES.map((value) => ({
   value,
@@ -24,9 +24,9 @@ const RANGE_OPTIONS = SEARCH_PERFORMANCE_RANGES.map((value) => ({
 }));
 
 const DEVICE_LABELS: Record<SearchPerformanceDevice, string> = {
-  DESKTOP: "Desktop",
-  MOBILE: "Mobile",
-  TABLET: "Tablet",
+  DESKTOP: "パソコン",
+  MOBILE: "モバイル",
+  TABLET: "タブレット",
 };
 const DEVICE_OPTIONS = GSC_DEVICES.map((value) => ({
   value,
@@ -35,7 +35,10 @@ const DEVICE_OPTIONS = GSC_DEVICES.map((value) => ({
 
 // Sentinel for "no filter" in the selects; never written to the URL.
 const ALL = "ALL";
-const DEVICE_ITEMS = [{ value: ALL, label: "All devices" }, ...DEVICE_OPTIONS];
+const DEVICE_ITEMS = [
+  { value: ALL, label: "すべてのデバイス" },
+  ...DEVICE_OPTIONS,
+];
 
 function isDateRange(value: string): value is SearchPerformanceDateRange {
   return SEARCH_PERFORMANCE_RANGES.some((option) => option === value);
@@ -59,7 +62,7 @@ export function SearchPerformanceSelects({
   const country = search.country ?? ALL;
   const range = search.range ?? "last_28_days";
   const countryItems = [
-    { value: ALL, label: "All countries" },
+    { value: ALL, label: "すべての国" },
     ...(country !== ALL && !countries.some((row) => row.key === country)
       ? [{ value: country, label: country.toUpperCase() }]
       : []),
@@ -81,7 +84,11 @@ export function SearchPerformanceSelects({
           });
         }}
       >
-        <SelectTrigger size="sm" className="w-36" aria-label="Device filter">
+        <SelectTrigger
+          size="sm"
+          className="w-36"
+          aria-label="デバイスで絞り込む"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -103,7 +110,7 @@ export function SearchPerformanceSelects({
           });
         }}
       >
-        <SelectTrigger size="sm" className="w-36" aria-label="Country filter">
+        <SelectTrigger size="sm" className="w-36" aria-label="国で絞り込む">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -126,7 +133,7 @@ export function SearchPerformanceSelects({
           }
         }}
       >
-        <SelectTrigger size="sm" className="w-36" aria-label="Date range">
+        <SelectTrigger size="sm" className="w-36" aria-label="期間">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

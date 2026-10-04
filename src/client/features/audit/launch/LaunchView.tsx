@@ -29,7 +29,7 @@ export function LaunchView({
   return (
     <div className="px-4 py-4 md:px-6 md:py-6 pb-24 md:pb-8 overflow-auto">
       <div className="mx-auto max-w-7xl space-y-4">
-        <PageHeader title="Site Audit" />
+        <PageHeader title="サイト監査" />
 
         <LaunchFormCard
           launchForm={controller.launchForm}
@@ -47,13 +47,13 @@ export function LaunchView({
 
         {controller.largeCrawlPages != null ? (
           <ConfirmDialog
-            title="Start a large audit?"
-            confirmLabel="Continue"
+            title="大規模な監査を開始しますか？"
+            confirmLabel="続行"
             onConfirm={controller.confirmLargeCrawl}
             onClose={controller.cancelLargeCrawl}
           >
-            You are about to crawl {controller.largeCrawlPages.toLocaleString()}{" "}
-            pages. This is okay, but it may take a while. Continue?
+            これから{controller.largeCrawlPages.toLocaleString("ja-JP")}
+            ページをクロールします。処理に時間がかかる場合があります。続行しますか？
           </ConfirmDialog>
         ) : null}
       </div>

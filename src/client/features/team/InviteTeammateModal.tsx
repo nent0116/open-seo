@@ -17,18 +17,18 @@ import { captureClientEvent } from "@/client/lib/posthog";
 import { sendTeamInvitation } from "@/serverFunctions/organization";
 
 const inviteSchema = z.object({
-  email: z.string().trim().email("Enter a valid email address."),
+  email: z.string().trim().email("有効なメールアドレスを入力してください。"),
 });
 
 export function inviteErrorMessage(error: Error) {
   const code = getErrorCode(error);
   if (code === "RATE_LIMITED") {
-    return "Invitation limit reached for today. Try again tomorrow.";
+    return "本日の招待上限に達しました。明日もう一度お試しください。";
   }
   if (code === "UPSTREAM_UNAVAILABLE") {
-    return "The invitation was saved but the email couldn't be sent. Use Resend in a moment to retry.";
+    return "招待は保存されましたが、メールを送信できませんでした。時間をおいて「再送信」をお試しください。";
   }
-  return "We couldn't send that invitation.";
+  return "招待を送信できませんでした。";
 }
 
 export function InviteTeammateModal({
@@ -45,14 +45,16 @@ export function InviteTeammateModal({
       sendTeamInvitation({ data: { email: inviteeEmail } }),
     onSuccess: () => {
       captureClientEvent("team:invitation_send");
-      toast.success("Invitation sent");
+      toast.success("招待を送信しました");
       onInvited();
       onClose();
     },
     onError: (error: Error) => {
       if (getErrorCode(error) === "CONFLICT") {
         form.setErrorMap({
-          onSubmit: { fields: { email: "This person is already a member." } },
+          onSubmit: {
+            fields: { email: "このメールアドレスはすでにメンバーです。" },
+          },
         });
       } else {
         toast.error(inviteErrorMessage(error));
@@ -80,16 +82,15 @@ export function InviteTeammateModal({
         <form.AppForm>
           <form.Form className="flex flex-col gap-4">
             <DialogHeader>
-              <DialogTitle>Invite a teammate</DialogTitle>
+              <DialogTitle>メンバーを招待</DialogTitle>
               <DialogDescription>
-                They&rsquo;ll join as an Admin with full access to each project
-                except for billing. The invitation link expires in 7 days.
+                管理者として参加し、請求を除く各プロジェクトのすべての機能を利用できます。招待リンクの有効期限は7日間です。
               </DialogDescription>
             </DialogHeader>
             <form.AppField name="email">
               {(field) => (
                 <field.TextField
-                  label="Email"
+                  label="メールアドレス"
                   type="email"
                   placeholder="teammate@company.com"
                   required
@@ -103,9 +104,9 @@ export function InviteTeammateModal({
                 onClick={onClose}
                 disabled={inviteMutation.isPending}
               >
-                Cancel
+                キャンセル
               </Button>
-              <form.SubmitButton>Send invite</form.SubmitButton>
+              <form.SubmitButton>招待を送信</form.SubmitButton>
             </DialogFooter>
           </form.Form>
         </form.AppForm>

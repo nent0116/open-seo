@@ -14,9 +14,9 @@ type SummaryStat = { label: string; value: string; description: string };
 
 const SCOPE_NOTES: Partial<Record<BacklinksOverviewData["scope"], string>> = {
   exact_url:
-    "Showing backlinks for this exact page. Switch the scope to Domain or Subdomains for site-wide results — trend charts need one of those.",
+    "このページだけを対象に被リンクを表示しています。サイト全体の結果を表示するには、対象範囲を「ドメイン」または「サブドメイン」に切り替えてください。推移グラフにもいずれかの指定が必要です。",
   subfolder:
-    "Showing backlinks pointing into this subfolder. Counts come from filtered backlink totals; rank, trends, and the referring-domains breakdown need Domain or Subdomains scope.",
+    "このサブフォルダ内への被リンクを表示しています。件数は絞り込み後の被リンク合計です。評価、推移、参照ドメインの内訳を表示するには、対象範囲を「ドメイン」または「サブドメイン」にしてください。",
 };
 
 export function BacklinksScopeAlert({
@@ -52,12 +52,12 @@ export function BacklinksOverviewPanels({
           <Badge variant="outline">{RESEARCH_SCOPE_LABELS[data.scope]}</Badge>
         </div>
         <p className="text-xs text-muted-foreground">
-          Updated {formatRelativeTimestamp(data.fetchedAt)} &middot; Overview
-          metrics cover the full target, before table filters
+          更新日時 {formatRelativeTimestamp(data.fetchedAt)}{" "}
+          ・概要の指標は、表の絞り込み前の対象全体を集計しています
           {/* history/live can't exclude subdomains, so say so rather than
               imply the charts match the domain-scoped totals. */}
           {data.scope === "domain" ? (
-            <> &middot; Trends include subdomains</>
+            <> ・トレンドにはサブドメインを含みます</>
           ) : null}
         </p>
       </div>
@@ -101,15 +101,12 @@ function OverviewGrid({
       {domainScope ? (
         <>
           <TrendPanel
-            title="Backlink growth"
-            description="Backlinks and referring domains over the last year"
+            title="被リンクの推移"
+            description="過去1年間の被リンクと参照ドメインの推移"
           >
             <BacklinksTrendChart data={data.trends} />
           </TrendPanel>
-          <TrendPanel
-            title="New vs lost"
-            description="Backlink acquisition and attrition"
-          >
+          <TrendPanel title="新規と消失" description="被リンクの獲得と消失">
             <BacklinksNewLostChart data={data.newLostTrends} />
           </TrendPanel>
         </>

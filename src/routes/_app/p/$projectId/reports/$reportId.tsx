@@ -98,7 +98,7 @@ function ReportDetailPage() {
 
   const loadError = {
     error: reportQuery.error,
-    fallback: "Failed to load the report",
+    fallback: "レポートを読み込めませんでした",
     onRetry: () => void reportQuery.refetch(),
     isRetrying: reportQuery.isFetching,
   };
@@ -112,7 +112,7 @@ function ReportDetailPage() {
       <div className="px-4 py-4 md:px-6 md:py-6">
         <div className="mx-auto max-w-7xl space-y-4">
           <BackLink to="/p/$projectId/reports" params={{ projectId }}>
-            Reports
+            レポート
           </BackLink>
           {/* A deleted report and another project's report are the same
               answer on purpose, so ids cannot be probed. Retrying either
@@ -120,13 +120,13 @@ function ReportDetailPage() {
           {notFound ? (
             <QueryError
               variant="page"
-              title="Report not found"
-              fallback="This report does not exist or you do not have access to it."
+              title="レポートが見つかりません"
+              fallback="このレポートは存在しないか、アクセス権がありません。"
             />
           ) : (
             <QueryError
               variant="page"
-              title="Couldn't load the report"
+              title="レポートを読み込めませんでした"
               {...loadError}
             />
           )}
@@ -164,25 +164,25 @@ function ReportDetailPage() {
       <PageHeader
         backLink={
           <BackLink to="/p/$projectId/reports" params={{ projectId }}>
-            Reports
+            レポート
           </BackLink>
         }
         title={report.title}
         description={
           <dl className="flex flex-wrap items-baseline gap-x-6 gap-y-1 text-foreground">
             <div className="flex items-baseline gap-1.5">
-              <dt className="text-muted-foreground">Created by</dt>
+              <dt className="text-muted-foreground">作成者</dt>
               <dd>{formatCreatedBy(report)}</dd>
             </div>
             <div className="flex items-baseline gap-1.5">
-              <dt className="text-muted-foreground">Type</dt>
+              <dt className="text-muted-foreground">種類</dt>
               {/* As in the list's Type column: the template name when the
                     report followed one, else the skill, else an em dash. */}
               <dd>{report.templateName ?? report.skill ?? "—"}</dd>
             </div>
             <div className="flex items-baseline gap-1.5">
-              <dt className="text-muted-foreground">Updated</dt>
-              <dd title={new Date(report.updatedAt).toLocaleString()}>
+              <dt className="text-muted-foreground">更新日時</dt>
+              <dd title={new Date(report.updatedAt).toLocaleString("ja-JP")}>
                 {formatRelativeTime(report.updatedAt)}
               </dd>
             </div>
@@ -202,12 +202,12 @@ function ReportDetailPage() {
                 ) : (
                   <Lock data-icon="inline-start" />
                 )}
-                Share
+                共有
               </Button>
             ) : (
               <Button onClick={exportPdf}>
                 <FileDown data-icon="inline-start" />
-                Export
+                エクスポート
               </Button>
             )}
             <DropdownMenu>
@@ -216,7 +216,7 @@ function ReportDetailPage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label="Report actions"
+                    aria-label="レポートの操作"
                   />
                 }
               >
@@ -227,7 +227,7 @@ function ReportDetailPage() {
                   <>
                     <DropdownMenuItem onClick={exportPdf}>
                       <FileDown />
-                      Export
+                      エクスポート
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                   </>
@@ -237,7 +237,7 @@ function ReportDetailPage() {
                   onClick={() => setShowDelete(true)}
                 >
                   <Trash2 />
-                  Delete
+                  削除
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -257,8 +257,8 @@ function ReportDetailPage() {
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="Full screen"
-            title="Full screen"
+            aria-label="全画面表示"
+            title="全画面表示"
             onClick={() =>
               void navigate({ search: () => ({ full: true }), replace: true })
             }
@@ -269,8 +269,8 @@ function ReportDetailPage() {
             variant="ghost"
             size="icon-sm"
             nativeButton={false}
-            aria-label="Open in new tab"
-            title="Open in new tab"
+            aria-label="新しいタブで開く"
+            title="新しいタブで開く"
             render={
               <a href={`/r/${report.id}`} target="_blank" rel="noreferrer" />
             }
@@ -331,7 +331,7 @@ function FullScreenReport({
         <span className="truncate text-sm font-medium">{title}</span>
         <Button ref={exitRef} variant="ghost" onClick={onExit}>
           <Minimize2 data-icon="inline-start" />
-          Exit
+          終了
         </Button>
       </div>
       <div className="min-h-0 flex-1 p-2">

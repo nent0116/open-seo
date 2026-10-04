@@ -22,12 +22,12 @@ export function RenderingWarnings({ data }: { data: AuditResultsData }) {
         <Alert variant="warning">
           <ShieldAlert />
           <AlertTitle>
-            Some pages may need JavaScript to show their content.
+            一部のページは、コンテンツ表示にJavaScriptが必要な可能性があります。
           </AlertTitle>
           <AlertDescription>
             {rendered
-              ? "They were still loading after rendering, so we couldn't check them."
-              : "Turn on Render JavaScript and run the audit again to check them."}
+              ? "レンダリング後も読み込みが完了しなかったため、確認できませんでした。"
+              : "「JavaScriptを実行」を有効にして監査を再実行してください。"}
           </AlertDescription>
         </Alert>
       )}
@@ -35,19 +35,16 @@ export function RenderingWarnings({ data }: { data: AuditResultsData }) {
       {rendered && unreadCount > 0 && (
         <Alert variant="warning">
           <ShieldAlert />
-          <AlertTitle>
-            We couldn't read {unreadCount}{" "}
-            {unreadCount === 1 ? "page" : "pages"}.
-          </AlertTitle>
+          <AlertTitle>読み込めなかったページ：{unreadCount}件</AlertTitle>
           <AlertDescription>
-            To see them, open Pages and filter Crawl result by Failed.
+            確認するには「ページ」を開き、クロール結果を「失敗」で絞り込んでください。
           </AlertDescription>
         </Alert>
       )}
 
       {rendered && (
         <p className="text-sm text-muted-foreground">
-          JavaScript rendering was enabled for this audit.
+          この監査ではJavaScriptレンダリングが有効でした。
         </p>
       )}
     </>

@@ -25,13 +25,13 @@ export function KeywordAreaField({ locationCode, value, onChange }: Props) {
     <div
       className="col-span-2 w-full lg:w-44 lg:shrink-0"
       onFocus={() => setFocused(true)}
-      title="Get search volume for one city, county, or region. Leave empty for the whole country."
+      title="市区町村や地域を1つ指定して検索ボリュームを取得します。国全体を対象にする場合は空欄にしてください。"
     >
       <SerpLocationCombobox
         value={value}
         onChange={onChange}
         countryCode={countryCode}
-        placeholder="City (optional)"
+        placeholder="地域（任意）"
       />
     </div>
   );
@@ -47,7 +47,7 @@ export function LocalVolumeCostNote() {
     : LOCAL_VOLUME_COST_USD;
   return (
     <span className="text-xs text-muted-foreground">
-      Local volume adds ~${costUsd.toFixed(2)} per search.
+      地域別ボリュームの取得には約${costUsd.toFixed(2)} の追加料金がかかります。
     </span>
   );
 }

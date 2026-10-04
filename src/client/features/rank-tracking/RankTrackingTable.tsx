@@ -120,9 +120,7 @@ export function RankTrackingTable({
       void queryClient.invalidateQueries({
         queryKey: ["rankTrackingCostEstimate", projectId, configId],
       });
-      toast.success(
-        `${result.removed} keyword${result.removed !== 1 ? "s" : ""} removed`,
-      );
+      toast.success(`${result.removed}件のキーワードを削除しました`);
     },
   });
 
@@ -138,17 +136,17 @@ export function RankTrackingTable({
               onClick={() => setShowConfirm(true)}
               variant="danger"
             >
-              Remove
+              削除
             </TableBulkActionButton>
             <TableBulkExportMenu
               actions={[
                 {
-                  label: "Export to Sheets",
+                  label: "Google スプレッドシートへ出力",
                   icon: <Sheet className="size-4" />,
                   onClick: () => exportSelection("sheets"),
                 },
                 {
-                  label: "Export CSV",
+                  label: "CSVで出力",
                   icon: <FileDown className="size-4" />,
                   onClick: () => exportSelection("csv"),
                 },
@@ -160,16 +158,15 @@ export function RankTrackingTable({
 
       {showConfirm && (
         <ConfirmDialog
-          title="Remove keywords?"
-          confirmLabel={`Remove ${selectedCount} keyword${selectedCount !== 1 ? "s" : ""}`}
+          title="キーワードを削除しますか？"
+          confirmLabel={`${selectedCount}件のキーワードを削除`}
           destructive
           pending={removeMutation.isPending}
           onConfirm={() => removeMutation.mutate(selectedRows.map((r) => r.id))}
           onClose={() => setShowConfirm(false)}
         >
-          This will stop tracking {selectedCount} keyword
-          {selectedCount !== 1 ? "s" : ""}. Historical ranking data is preserved
-          but won't appear in the table.
+          次の{selectedCount}件のキーワードの計測を停止します
+          。過去の順位データは保持されますが、表には表示されません。
         </ConfirmDialog>
       )}
 
@@ -191,19 +188,19 @@ export function RankTrackingTable({
         isFiltered={totalCount > 0}
         onClearFilters={onClearFilters}
         empty={{
-          title: "No keywords yet",
-          description: "Add the keywords you want to track for this domain.",
+          title: "キーワードはまだありません",
+          description: "このドメインで計測したいキーワードを追加してください。",
           action: (
             <Button size="sm" onClick={onAddKeywords}>
               <Plus data-icon="inline-start" />
-              Add Keywords
+              キーワードを追加
             </Button>
           ),
         }}
         footer={
           rows.length > 0 ? (
             <p className="border-t border-border px-4 py-2 text-xs text-muted-foreground">
-              {rows.length} of {totalCount} keywords
+              全{totalCount}件中{rows.length}件のキーワード
             </p>
           ) : null
         }

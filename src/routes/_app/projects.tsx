@@ -34,19 +34,19 @@ function ProjectsPage() {
     <div className="h-full overflow-auto px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
       <div className="mx-auto max-w-7xl space-y-6">
         <PageHeader
-          title="Projects"
-          description="Each project has its own Search Console, rank tracking, and audits."
+          title="プロジェクト"
+          description="Search Console、順位計測、サイト監査はプロジェクトごとに管理されます。"
           actions={
             <Button onClick={() => setCreating(true)}>
               <Plus data-icon="inline-start" />
-              New project
+              新しいプロジェクト
             </Button>
           }
         />
 
         <QueryState
           query={projectsQuery}
-          errorFallback="Failed to load projects"
+          errorFallback="プロジェクトを読み込めませんでした"
         >
           {(data) => (
             <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
@@ -64,12 +64,12 @@ function ProjectsPage() {
                         </span>
                         {project.id === currentProjectId ? (
                           <Badge variant="secondary" size="sm">
-                            Current
+                            現在
                           </Badge>
                         ) : null}
                       </span>
                       <span className="truncate text-xs text-muted-foreground">
-                        {project.domain ?? "No domain set"}
+                        {project.domain ?? "ドメイン未設定"}
                       </span>
                     </span>
                     <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
@@ -106,7 +106,7 @@ function ArchivedProjects() {
       await queryClient.invalidateQueries({
         queryKey: projectsQueryOptions().queryKey,
       });
-      toast.success("Project restored");
+      toast.success("プロジェクトを復元しました");
     },
   });
 
@@ -114,7 +114,7 @@ function ArchivedProjects() {
 
   return (
     <section className="space-y-3">
-      <SectionHeader title="Archived" />
+      <SectionHeader title="アーカイブ済み" />
       <ul className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
         {archived.map((project) => (
           <li
@@ -126,7 +126,7 @@ function ArchivedProjects() {
                 {project.name}
               </span>
               <span className="truncate text-xs text-muted-foreground">
-                {project.domain ?? "No domain set"}
+                {project.domain ?? "ドメイン未設定"}
               </span>
             </span>
             <Button
@@ -135,7 +135,7 @@ function ArchivedProjects() {
               onClick={() => restoreMutation.mutate(project.id)}
               disabled={restoreMutation.isPending}
             >
-              Restore
+              元に戻す
             </Button>
           </li>
         ))}

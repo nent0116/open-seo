@@ -26,14 +26,14 @@ export function SavedKeywordsHeader({
   return (
     <>
       <PageHeader
-        title="Saved Keywords"
-        description="Save keyword ideas from research, organize them with tags, and revisit when you're ready to act."
+        title="保存済みキーワード"
+        description="調査で見つけたキーワード候補を保存し、タグで整理して、施策に取り組むときに見直せます。"
         actions={
           <>
             <Button
               variant="outline"
               size="sm"
-              title="Fetch new volume, difficulty, and CPC"
+              title="最新の検索ボリューム、難易度、クリック単価を取得"
               disabled={disabled || metricsRefreshing}
               onClick={() => setConfirmingRefresh(true)}
             >
@@ -41,7 +41,7 @@ export function SavedKeywordsHeader({
                 data-icon="inline-start"
                 className={metricsRefreshing ? "animate-spin" : ""}
               />
-              {metricsRefreshing ? "Updating..." : "Update keyword stats"}
+              {metricsRefreshing ? "更新しています…" : "キーワード指標を更新"}
             </Button>
 
             <ExportMenu
@@ -58,16 +58,15 @@ export function SavedKeywordsHeader({
 
       {confirmingRefresh ? (
         <ConfirmDialog
-          title="Update keyword stats?"
-          confirmLabel="Update stats"
+          title="キーワード指標を更新しますか？"
+          confirmLabel="指標を更新"
           onConfirm={() => {
             setConfirmingRefresh(false);
             onRefreshMetrics();
           }}
           onClose={() => setConfirmingRefresh(false)}
         >
-          This fetches new volume, difficulty, and CPC for every saved keyword
-          in this project. Each keyword uses credits.
+          このプロジェクトで保存したすべてのキーワードについて、最新の検索ボリューム、難易度、クリック単価を取得します。キーワードごとにクレジットを使用します。
         </ConfirmDialog>
       ) : null}
     </>

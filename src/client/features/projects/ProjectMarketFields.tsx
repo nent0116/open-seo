@@ -41,7 +41,7 @@ export function ProjectMarketFields({
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       <Field>
-        <FieldLabel htmlFor={countryId}>Country</FieldLabel>
+        <FieldLabel htmlFor={countryId}>国</FieldLabel>
         <CountryCombobox
           id={countryId}
           value={value.locationCode}
@@ -57,7 +57,7 @@ export function ProjectMarketFields({
         className={hideLanguageOnMobile ? "hidden sm:flex" : undefined}
         data-disabled={languageDisabled}
       >
-        <FieldLabel htmlFor={languageId}>Language</FieldLabel>
+        <FieldLabel htmlFor={languageId}>言語</FieldLabel>
         <Select
           items={languageItems}
           value={value.languageCode}

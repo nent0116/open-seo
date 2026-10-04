@@ -5,7 +5,7 @@ import { exportRows } from "@/client/lib/exportRows";
 
 type AuditExportFormat = "csv" | "json" | "sheets";
 
-const ISSUES_HEADERS = ["Severity", "Issue", "URL", "Details", "How To Fix"];
+const ISSUES_HEADERS = ["重要度", "問題", "URL", "詳細", "修正方法"];
 
 function issuesRows(issues: AuditResultsData["issues"]): CsvValue[][] {
   return issues.map((issue) => {
@@ -51,13 +51,13 @@ export function exportIssues(
 
 const PAGES_HEADERS = [
   "URL",
-  "Status",
-  "Title",
+  "ステータス",
+  "タイトル",
   "H1",
-  "Words",
-  "Images",
-  "Missing Alt",
-  "Response Time (ms)",
+  "単語数",
+  "画像数",
+  "alt属性なし",
+  "応答時間（ミリ秒）",
 ];
 
 function pagesRows(pages: AuditResultsData["pages"]): CsvValue[][] {
@@ -75,9 +75,9 @@ function pagesRows(pages: AuditResultsData["pages"]): CsvValue[][] {
 
 const PERFORMANCE_HEADERS = [
   "URL",
-  "Device",
-  "Performance",
-  "Accessibility",
+  "デバイス",
+  "パフォーマンス",
+  "アクセシビリティ",
   "SEO",
   "LCP (ms)",
   "CLS",

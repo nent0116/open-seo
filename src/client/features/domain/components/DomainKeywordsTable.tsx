@@ -61,7 +61,7 @@ export function DomainKeywordsTable({
     () => [
       makeSelectionColumn<KeywordRow>(selectAnchorRef),
       keywordColumnHelper.accessor("keyword", {
-        header: () => "Keyword",
+        header: () => "キーワード",
         cell: ({ getValue }) => (
           <span className="font-medium">{getValue()}</span>
         ),
@@ -69,7 +69,7 @@ export function DomainKeywordsTable({
       keywordColumnHelper.accessor("position", {
         header: () => (
           <SortableHeader
-            label="Rank"
+            label="順位"
             column={domainSortColumn(
               sortMode === "rank",
               currentSortOrder,
@@ -82,7 +82,7 @@ export function DomainKeywordsTable({
       keywordColumnHelper.accessor("searchVolume", {
         header: () => (
           <SortableHeader
-            label="Volume"
+            label="検索ボリューム"
             column={domainSortColumn(
               sortMode === "volume",
               currentSortOrder,
@@ -95,7 +95,7 @@ export function DomainKeywordsTable({
       keywordColumnHelper.accessor("traffic", {
         header: () => (
           <SortableHeader
-            label="Traffic"
+            label="トラフィック"
             column={domainSortColumn(
               sortMode === "traffic",
               currentSortOrder,
@@ -109,7 +109,7 @@ export function DomainKeywordsTable({
         header: () => (
           <SortableHeader
             label="CPC"
-            helpText="Cost per click in USD."
+            helpText="米ドル建てのクリック単価です。"
             column={domainSortColumn(sortMode === "cpc", currentSortOrder, () =>
               onSortClick("cpc"),
             )}
@@ -137,8 +137,8 @@ export function DomainKeywordsTable({
       keywordColumnHelper.accessor("keywordDifficulty", {
         header: () => (
           <SortableHeader
-            label="Score"
-            helpText="Organic ranking difficulty (0-100): higher means harder to reach Google's top 10."
+            label="スコア"
+            helpText="自然検索の上位表示難易度（0～100）です。数値が高いほどGoogleの上位10件に入るのが難しくなります。"
             column={domainSortColumn(
               sortMode === "score",
               currentSortOrder,
@@ -174,7 +174,7 @@ export function DomainKeywordsTable({
   return (
     <DataTable
       table={table}
-      empty={{ title: "No keywords match this search." }}
+      empty={{ title: "この検索に一致するキーワードはありません。" }}
       {...frame}
     />
   );

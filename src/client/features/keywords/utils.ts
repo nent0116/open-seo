@@ -4,18 +4,18 @@ import type { MonthlySearch } from "@/types/keywords";
 export { LOCATIONS } from "./locations";
 
 export const MONTH_SHORT_LABELS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
+  "1月",
+  "2月",
+  "3月",
+  "4月",
+  "5月",
+  "6月",
+  "7月",
+  "8月",
+  "9月",
+  "10月",
+  "11月",
+  "12月",
 ] as const;
 
 /** The most recent 12 months of a trend, oldest first. */
@@ -33,12 +33,12 @@ export function parseTerms(value: string): string[] {
 
 export function formatNumber(value: number | null | undefined): string {
   if (value == null) return "-";
-  return new Intl.NumberFormat().format(value);
+  return new Intl.NumberFormat("ja-JP").format(value);
 }
 
 export function formatCompactNumber(value: number | null | undefined): string {
   if (value == null) return "-";
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat("ja-JP", {
     notation: "compact",
     maximumFractionDigits: 1,
   }).format(value);

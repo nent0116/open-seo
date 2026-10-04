@@ -101,7 +101,7 @@ export function BacklinksBody({
         loaded={historyLoaded}
         onRemove={onRemoveHistoryItem}
         emptyIcon={Link2}
-        emptyTitle="Enter a domain or URL to get started"
+        emptyTitle="ドメインまたはURLを入力して始めましょう"
         getTitle={(item) => item.target}
         getSubtitle={(item) => RESEARCH_SCOPE_LABELS[item.scope]}
         renderLink={(item, props) => (

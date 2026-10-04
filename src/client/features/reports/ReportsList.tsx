@@ -30,8 +30,8 @@ export function ReportsList({
     return (
       <EmptyState
         icon={FileText}
-        title="No reports yet"
-        description="Run an OpenSEO skill such as seo-audit from Claude Code or Codex and the report will appear here."
+        title="レポートはまだありません"
+        description="Claude CodeまたはCodexからseo-auditなどのOpenSEOスキルを実行すると、レポートがここに表示されます。"
       />
     );
   }
@@ -42,10 +42,10 @@ export function ReportsList({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Created by</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Updated</TableHead>
+              <TableHead>タイトル</TableHead>
+              <TableHead>作成者</TableHead>
+              <TableHead>種類</TableHead>
+              <TableHead>更新日時</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
@@ -74,13 +74,13 @@ export function ReportsList({
                   {formatRelativeTime(report.updatedAt)}
                 </TableCell>
                 <TableCell className="w-10 text-right">
-                  <RowActionsMenu label={`Actions for ${report.title}`}>
+                  <RowActionsMenu label={`「${report.title}」の操作`}>
                     <DropdownMenuItem
                       variant="destructive"
                       onClick={() => onDelete(report)}
                     >
                       <Trash2 />
-                      Delete
+                      削除
                     </DropdownMenuItem>
                   </RowActionsMenu>
                 </TableCell>
@@ -91,7 +91,7 @@ export function ReportsList({
       </TableCard>
       {reports.length === REPORT_APP_LIST_LIMIT ? (
         <p className="text-xs text-muted-foreground">
-          Showing the {REPORT_APP_LIST_LIMIT} most recent reports.
+          最新の{REPORT_APP_LIST_LIMIT}件のレポートを表示しています。
         </p>
       ) : null}
     </div>

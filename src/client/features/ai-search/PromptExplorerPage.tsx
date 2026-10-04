@@ -36,18 +36,18 @@ type Props = {
 const PROMPT_EXPLORER_BULLETS = [
   {
     icon: Columns3,
-    title: "Four models side-by-side",
-    body: "Run one prompt across ChatGPT, Claude, Gemini, and Perplexity and compare answers in a single view.",
+    title: "4つのモデルを並べて比較",
+    body: "1つのプロンプトをChatGPT、Claude、Gemini、Perplexityで実行し、回答を一覧で比較します。",
   },
   {
     icon: SearchCheck,
-    title: "See what the models cite",
-    body: "Every answer lists the sources it drew from, so you can audit where each model gets its information.",
+    title: "モデルの引用元を確認",
+    body: "各回答に参照元が表示されるため、モデルがどこから情報を取得したか確認できます。",
   },
   {
     icon: Sparkles,
-    title: "Check brand mentions",
-    body: "Highlight a brand to instantly see whether it shows up in the answer text or the cited sources.",
+    title: "ブランドへの言及を確認",
+    body: "ブランド名を指定し、回答本文や引用元に登場したかすぐに確認できます。",
   },
 ];
 
@@ -102,23 +102,23 @@ export function PromptExplorerPage({ projectId, urlState, onSubmit }: Props) {
     event.preventDefault();
     const trimmed = form.prompt.trim();
     if (trimmed.length === 0) {
-      setValidationError("Enter a prompt");
+      setValidationError("プロンプトを入力してください");
       return;
     }
     if (trimmed.length > PROMPT_EXPLORER_MAX_PROMPT_LENGTH) {
       setValidationError(
-        `Keep prompts under ${PROMPT_EXPLORER_MAX_PROMPT_LENGTH} characters`,
+        `プロンプトは${PROMPT_EXPLORER_MAX_PROMPT_LENGTH}文字以内で入力してください`,
       );
       return;
     }
     if (form.highlightBrand.trim().length > BRAND_LOOKUP_MAX_INPUT_LENGTH) {
       setValidationError(
-        `Keep the brand under ${BRAND_LOOKUP_MAX_INPUT_LENGTH} characters`,
+        `ブランド名は${BRAND_LOOKUP_MAX_INPUT_LENGTH}文字以内で入力してください`,
       );
       return;
     }
     if (form.models.length === 0) {
-      setValidationError("Select at least one model");
+      setValidationError("モデルを1つ以上選択してください");
       return;
     }
     setValidationError(null);
@@ -150,13 +150,13 @@ export function PromptExplorerPage({ projectId, urlState, onSubmit }: Props) {
 
   return (
     <ResearchPageShell
-      title="Prompt Explorer"
-      description="Ask any prompt across ChatGPT, Claude, Gemini, and Perplexity side-by-side."
+      title="プロンプト調査"
+      description="同じプロンプトをChatGPT、Claude、Gemini、Perplexityに送信し、回答を比較します。"
       planStatus={planStatus}
       gate={{
-        feature: "Prompt Explorer",
+        feature: "プロンプト調査",
         description:
-          "Ask one prompt across ChatGPT, Claude, Gemini, and Perplexity at the same time and compare their answers — including which sources each model cites.",
+          "1つのプロンプトをChatGPT、Claude、Gemini、Perplexityへ同時に送り、各モデルの回答と引用元を比較します。",
         bullets: PROMPT_EXPLORER_BULLETS,
       }}
       form={
@@ -176,7 +176,7 @@ export function PromptExplorerPage({ projectId, urlState, onSubmit }: Props) {
       }
       query={exploreQuery}
       hasActiveQuery={hasActivePrompt}
-      errorFallback="Failed to load prompt results"
+      errorFallback="プロンプトの結果を読み込めませんでした"
       // Covers browser back/forward and history links. The route builds a
       // fresh `urlState` object on every render, so compare by value.
       urlKey={`${projectId}:${JSON.stringify(urlState)}`}
@@ -202,7 +202,7 @@ export function PromptExplorerPage({ projectId, urlState, onSubmit }: Props) {
           search={{}}
           replace
         >
-          Recent searches
+          最近の検索
         </BackLink>
       }
       renderResults={(result) => <PromptExplorerResults result={result} />}
@@ -212,7 +212,7 @@ export function PromptExplorerPage({ projectId, urlState, onSubmit }: Props) {
           loaded={historyLoaded}
           onRemove={removeHistoryItem}
           emptyIcon={MessageSquare}
-          emptyTitle="Enter a prompt to compare model answers"
+          emptyTitle="プロンプトを入力してモデルの回答を比較"
           getTitle={(item) => item.prompt}
           getSubtitle={(item) => item.models.map(formatModelLabel).join(", ")}
           renderLink={(item, props) => (

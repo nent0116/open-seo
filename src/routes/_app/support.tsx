@@ -23,11 +23,11 @@ function SupportPage() {
       <div className="mx-auto max-w-7xl space-y-8">
         <div className="space-y-1">
           <p className="text-sm font-medium text-muted-foreground">
-            Help & Community
+            ヘルプ・コミュニティ
           </p>
           <PageHeader
-            title="We want to hear from you"
-            description="We want to talk to you! We're super open to feedback and want to learn how you work so we can make OpenSEO better."
+            title="ご意見をお聞かせください"
+            description="皆さまのご意見をお待ちしています。OpenSEOをより良くするため、使い方や改善のご要望をぜひお聞かせください。"
           />
         </div>
 
@@ -35,17 +35,17 @@ function SupportPage() {
           <Card>
             <CardHeader>
               <CardTitle>
-                <h2>Email</h2>
+                <h2>メールアドレス</h2>
               </CardTitle>
               <CardDescription>
-                Send ideas, problems, questions, or feedback directly.
+                アイデア、問題、質問、フィードバックを直接送信できます。
               </CardDescription>
             </CardHeader>
             <CardContent>
               <CopyButton
                 value={SUPPORT_EMAIL}
                 label={SUPPORT_EMAIL}
-                successMessage="Email copied to clipboard"
+                successMessage="メールアドレスをコピーしました"
                 size="sm"
               />
             </CardContent>
@@ -54,15 +54,15 @@ function SupportPage() {
           <SupportLinkCard
             href={DISCORD_URL}
             title="Discord"
-            description="Ask for help, share ideas and learn from the community."
-            cta="Join the Discord"
+            description="コミュニティで質問、アイデアの共有、情報交換ができます。"
+            cta="Discordに参加"
           />
 
           <SupportLinkCard
             href={`${GITHUB_URL}/issues`}
             title="GitHub Issues"
-            description="Report bugs or request features on GitHub."
-            cta="Open an issue"
+            description="GitHubで不具合の報告や機能要望を送信できます。"
+            cta="Issueを作成"
           />
         </div>
       </div>

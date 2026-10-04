@@ -48,7 +48,7 @@ export function ChatComposer({
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={handleKey}
           rows={1}
-          placeholder="Ask SAM to research, analyze, or track anything…"
+          placeholder="SAMに調査、分析、計測を依頼…"
           className="max-h-40 min-h-0 px-3 leading-relaxed"
         />
         <InputGroupAddon align="inline-end">
@@ -57,7 +57,7 @@ export function ChatComposer({
               variant="secondary"
               size="icon-sm"
               className="rounded-full"
-              aria-label="Stop"
+              aria-label="停止"
               onClick={onStop}
             >
               <Square className="size-3.5 fill-current" />
@@ -68,7 +68,7 @@ export function ChatComposer({
               variant="default"
               size="icon-sm"
               className="rounded-full"
-              aria-label="Send message"
+              aria-label="メッセージを送信"
               disabled={!value.trim()}
             >
               <ArrowUp />

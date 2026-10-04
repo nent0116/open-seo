@@ -25,7 +25,7 @@ export function PlanPageAccountMenu({ email }: { email: string | undefined }) {
             <Button
               variant="ghost"
               size="icon"
-              aria-label="Open account menu"
+              aria-label="アカウントメニューを開く"
             />
           }
         >
@@ -38,7 +38,7 @@ export function PlanPageAccountMenu({ email }: { email: string | undefined }) {
             </DropdownMenuLabel>
           </DropdownMenuGroup>
           <DropdownMenuItem render={<Link to="/settings" />}>
-            <Settings className="size-4" /> Settings
+            <Settings className="size-4" /> 設定
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <ThemePreferenceDropdownItems />
@@ -47,7 +47,7 @@ export function PlanPageAccountMenu({ email }: { email: string | undefined }) {
             variant="destructive"
             onClick={() => signOutAndRedirect()}
           >
-            Sign out
+            ログアウト
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -25,10 +25,10 @@ import {
 type Schedule = RankTrackingConfig["scheduleInterval"];
 
 const SCHEDULE_ITEMS: { value: Schedule; label: string }[] = [
-  { value: "daily", label: "Daily" },
-  { value: "weekly", label: "Weekly" },
-  { value: "monthly", label: "Monthly (end of month)" },
-  { value: "manual", label: "Manual only" },
+  { value: "daily", label: "毎日" },
+  { value: "weekly", label: "毎週" },
+  { value: "monthly", label: "毎月（月末）" },
+  { value: "manual", label: "手動のみ" },
 ];
 
 const WEEKDAY_ITEMS = WEEKDAYS.map((day, index) => ({
@@ -54,7 +54,7 @@ export function ScheduleField({
 
   return (
     <Field>
-      <FieldLabel htmlFor={id}>Schedule</FieldLabel>
+      <FieldLabel htmlFor={id}>スケジュール</FieldLabel>
       <Select
         items={SCHEDULE_ITEMS}
         value={schedule}
@@ -86,7 +86,7 @@ export function ScheduleField({
                 className="h-auto p-0 text-xs"
                 onClick={() => setShowScheduleTime(true)}
               >
-                change
+                変更
               </Button>
             </>
           )}
@@ -105,7 +105,7 @@ export function ScheduleField({
                   }
                 }}
               >
-                <SelectTrigger aria-label="Day of week">
+                <SelectTrigger aria-label="曜日">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -120,7 +120,7 @@ export function ScheduleField({
             <Input
               type="time"
               className="w-auto"
-              aria-label="Time of day"
+              aria-label="実行時刻"
               value={`${String(scheduleTime.hour).padStart(2, "0")}:${String(scheduleTime.minute).padStart(2, "0")}`}
               onChange={(e) => {
                 const [hour, minute] = e.target.value.split(":").map(Number);
@@ -131,14 +131,14 @@ export function ScheduleField({
             />
           </div>
           <FieldDescription>
-            In your local timezone: {browserTimeZoneLabel()}
+            現在のタイムゾーン： {browserTimeZoneLabel()}
           </FieldDescription>
         </>
       )}
       {schedule === "daily" && (
         <p className="flex items-start gap-1.5 text-xs text-warning">
           <Info className="mt-0.5 size-3.5 shrink-0" />
-          Daily checks use 7x more credits than weekly
+          毎日のチェックは毎週の7倍のクレジットを使用します
         </p>
       )}
     </Field>

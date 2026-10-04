@@ -83,13 +83,13 @@ export function EditableListSection<T>({
                     variant="ghost"
                     size="icon-xs"
                     disabled={pending}
-                    aria-label={`Edit ${getLabel(item)}`}
+                    aria-label={`${getLabel(item)}を編集`}
                     onClick={() => setEditing(id)}
                   >
                     <Pencil className="size-3.5" />
                   </Button>
                   <InlineConfirm
-                    label={`Remove ${getLabel(item)}`}
+                    label={`${getLabel(item)}を削除`}
                     pending={pending}
                     onConfirm={() => onRemove(item)}
                   />

@@ -96,7 +96,7 @@ export function ShopifyCrawlWarning({
       disabled={isSaving}
       onClick={() => rerunMutation.mutate()}
     >
-      {rerunMutation.isPending ? "Starting…" : "Re-run audit"}
+      {rerunMutation.isPending ? "開始しています…" : "監査を再実行"}
     </Button>
   );
 
@@ -112,23 +112,22 @@ export function ShopifyCrawlWarning({
         <AlertDescription className="text-foreground">
           {signedAndStillLimited ? (
             <>
-              Shopify limited this crawl despite your signature. To check that
-              it was created for <span className="font-mono">{host}</span>,
-              paste it again in{" "}
+              署名を使用しましたが、Shopifyによってクロールが制限されました。署名の対象が{" "}
+              <span className="font-mono">{host}</span>
+              であることを確認するには、次の画面でもう一度貼り付けてください：{" "}
               <Link
                 to="/p/$projectId/settings/integrations"
                 params={{ projectId }}
               >
-                Project settings
+                プロジェクト設定
               </Link>
-              . If it was, Shopify is still throttling this store: re-run the
-              audit later or with fewer pages.
+              。正しい場合もShopifyがこのストアを制限しています。時間をおくか、ページ数を減らして監査を再実行してください。
             </>
           ) : (
             <>
-              Crawler access is saved for{" "}
-              <span className="font-mono">{host}</span>. Re-run the audit to
-              crawl with it.
+              クローラーアクセスを保存しました：{" "}
+              <span className="font-mono">{host}</span>
+              。使用するには監査を再実行してください。
             </>
           )}
         </AlertDescription>
@@ -143,38 +142,33 @@ export function ShopifyCrawlWarning({
       <div className="min-w-0 space-y-3">
         {expiredCredential?.expiresAt ? (
           <>
-            <AlertTitle>
-              Your Shopify signature for this store has expired.
-            </AlertTitle>
+            <AlertTitle>このストアのShopify署名は期限切れです。</AlertTitle>
             <p className="text-muted-foreground">
-              It ran out on{" "}
-              {new Date(expiredCredential.expiresAt).toLocaleDateString()}, so
-              requests after that went out unsigned and Shopify limited them.
-              Signatures can't be renewed: create a fresh one in Shopify admin
-              and paste it below to replace the stored values.
+              有効期限：{" "}
+              {new Date(expiredCredential.expiresAt).toLocaleDateString(
+                "ja-JP",
+              )}
+              。それ以降のリクエストは未署名となり、Shopifyによって制限されました。署名は更新できません。Shopify管理画面で新しい署名を作成し、下に貼り付けて保存済みの値を置き換えてください。
             </p>
           </>
         ) : (
           <>
-            <AlertTitle>Shopify limited this crawl.</AlertTitle>
+            <AlertTitle>Shopifyによってクロールが制限されました。</AlertTitle>
             <p className="text-muted-foreground">
-              Shopify rate-limits crawlers it hasn't authorized, so parts of
-              this report are missing. If you own this store, authorizing
-              OpenSEO takes about a minute.
+              Shopifyは未承認のクローラーを制限するため、このレポートの一部が欠けています。ストア所有者であれば、約1分でOpenSEOを承認できます。
             </p>
           </>
         )}
 
         <ol className="list-decimal space-y-1 pl-5 text-muted-foreground">
           <li>
-            In Shopify admin, go to Online Store &rarr; Preferences &rarr;
-            Crawler access and click Create signature.
+            Shopify管理画面で「オンラインストア」→「各種設定」→「クローラーアクセス」を開き、「署名を作成」をクリックします。
           </li>
           <li>
-            Pick the domain <span className="font-mono">{host}</span> and an
-            expiry (up to 3 months).
+            ドメイン <span className="font-mono">{host}</span>{" "}
+            と有効期限（最長3か月）を選びます。
           </li>
-          <li>Paste the two values below.</li>
+          <li>2つの値を下に貼り付けます。</li>
         </ol>
 
         {/* Keyed by host: the report stays mounted when the audit changes. */}
@@ -193,7 +187,7 @@ export function ShopifyCrawlWarning({
             target="_blank"
             rel="noreferrer"
           >
-            Shopify's crawler access guide
+            Shopifyのクローラーアクセスガイド
           </a>
         </div>
       </div>

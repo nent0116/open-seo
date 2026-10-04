@@ -41,8 +41,8 @@ const DEVICE_STYLE: Record<
   "desktop" | "mobile",
   { label: string; color: string }
 > = {
-  desktop: { label: "Desktop", color: "#2563eb" },
-  mobile: { label: "Mobile", color: "#14b8a6" },
+  desktop: { label: "パソコン", color: "#2563eb" },
+  mobile: { label: "モバイル", color: "#14b8a6" },
 };
 
 export interface KeywordTrendTarget {
@@ -138,7 +138,7 @@ export function KeywordTrendModal({
     void navigator.clipboard.writeText(
       buildCsv(HISTORY_HEADERS, historyRows.map(historyExportRow)),
     );
-    toast.success("Copied to clipboard");
+    toast.success("クリップボードにコピーしました");
     captureClientEvent("rank_tracking:keyword_trend_copy");
   };
 
@@ -169,7 +169,7 @@ export function KeywordTrendModal({
               {locationName
                 ? formatLocationLabel(locationName, 2)
                 : (LOCATIONS[locationCode] ?? "US")}{" "}
-              &middot; Position over time
+              ・順位の推移
             </DialogDescription>
           </div>
           <TrendRangeToggle value={sinceDays} onChange={setSinceDays} />
@@ -177,7 +177,7 @@ export function KeywordTrendModal({
 
         <QueryState
           query={historyQuery}
-          errorFallback="Failed to load keyword history"
+          errorFallback="キーワード履歴を読み込めませんでした"
           loading={<Skeleton className="h-56 w-full" />}
         >
           {() =>
@@ -203,7 +203,7 @@ export function KeywordTrendModal({
                       typeof item.dataKey === "string" &&
                       bottomBandKeys.has(`${checkedAt}:${item.dataKey}`) ? (
                       <span className="font-normal text-muted-foreground">
-                        Not in top {serpDepth}
+                        上位{serpDepth}位圏外
                       </span>
                     ) : (
                       String(value)
@@ -214,11 +214,11 @@ export function KeywordTrendModal({
                 <div className="flex items-center justify-end gap-2">
                   <Button variant="ghost" size="xs" onClick={handleCopy}>
                     <Copy data-icon="inline-start" />
-                    Copy
+                    コピー
                   </Button>
                   <Button variant="ghost" size="xs" onClick={handleExport}>
                     <Download data-icon="inline-start" />
-                    Export CSV
+                    CSVで出力
                   </Button>
                 </div>
 
@@ -226,10 +226,10 @@ export function KeywordTrendModal({
                   <Table containerClassName="max-h-64">
                     <TableHeader className="sticky top-0 z-10 bg-popover">
                       <TableRow>
-                        <TableHead>Date</TableHead>
-                        {devices.length > 1 && <TableHead>Device</TableHead>}
-                        <TableHead>Position</TableHead>
-                        <TableHead>Δ vs previous check</TableHead>
+                        <TableHead>日時</TableHead>
+                        {devices.length > 1 && <TableHead>デバイス</TableHead>}
+                        <TableHead>掲載順位</TableHead>
+                        <TableHead>前回比</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -243,7 +243,9 @@ export function KeywordTrendModal({
                         return (
                           <TableRow key={`${r.device}-${r.checkedAt}-${idx}`}>
                             <TableCell className="text-xs whitespace-nowrap">
-                              {new Date(r.checkedAt).toLocaleDateString()}
+                              {new Date(r.checkedAt).toLocaleDateString(
+                                "ja-JP",
+                              )}
                             </TableCell>
                             {devices.length > 1 && (
                               <TableCell className="text-xs">
@@ -253,7 +255,7 @@ export function KeywordTrendModal({
                             <TableCell>
                               {r.position === null ? (
                                 <span className="text-xs text-muted-foreground">
-                                  Not in top {serpDepth}
+                                  上位{serpDepth}位圏外
                                 </span>
                               ) : (
                                 <span className="font-mono text-sm">
@@ -376,7 +378,7 @@ function slugify(value: string): string {
     .replace(/^-|-$/g, "");
 }
 
-const HISTORY_HEADERS = ["Date", "Device", "Position", "Change vs previous"];
+const HISTORY_HEADERS = ["日時", "デバイス", "順位", "前回比"];
 
 function historyExportRow(row: HistoryRow): CsvValue[] {
   return [

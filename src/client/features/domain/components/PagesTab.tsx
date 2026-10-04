@@ -38,18 +38,18 @@ const EMPTY_PAGES_ROWS: PageRow[] = [];
 const PAGE_TEXT_FILTERS = [
   {
     key: "include",
-    label: "Include Page Terms",
+    label: "ページに含める語句",
     placeholder: "pricing, tools, guides",
   },
   {
     key: "exclude",
-    label: "Exclude Page Terms",
+    label: "ページから除外する語句",
     placeholder: "blog, tag, archive",
   },
 ] as const;
 const PAGE_RANGE_FILTERS = [
-  { title: "Traffic", minKey: "minTraffic", maxKey: "maxTraffic" },
-  { title: "Keywords", minKey: "minVol", maxKey: "maxVol" },
+  { title: "トラフィック", minKey: "minTraffic", maxKey: "maxTraffic" },
+  { title: "キーワード", minKey: "minVol", maxKey: "maxVol" },
 ] as const;
 
 type Props = {
@@ -176,7 +176,7 @@ export function PagesTab({
         query.isError ? (
           <QueryError
             error={query.error}
-            fallback="Failed to load pages."
+            fallback="ページを読み込めませんでした。"
             onRetry={() => void query.refetch()}
             isRetrying={isFetching}
           />
@@ -190,7 +190,7 @@ export function PagesTab({
             showFilters={showFilters}
             onToggleFilters={() => setShowFilters((prev) => !prev)}
             activeFilterCount={activeFilterCount}
-            countLabel="pages"
+            countLabel="ページ"
             totalCount={totalCount}
             fallbackCount={rows.length}
             onExport={exportAll}

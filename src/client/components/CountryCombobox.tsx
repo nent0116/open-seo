@@ -6,16 +6,31 @@ import {
   ComboboxItem,
   ComboboxList,
 } from "@/client/components/ui/combobox";
-import { LOCATION_OPTIONS } from "@/shared/keyword-locations";
+import {
+  getIsoCountryCode,
+  LOCATION_OPTIONS,
+} from "@/shared/keyword-locations";
+import { formatJapaneseCountryName } from "@/shared/country-labels-ja";
 
-type LocationOption = (typeof LOCATION_OPTIONS)[number];
+type SourceLocationOption = (typeof LOCATION_OPTIONS)[number];
+type LocationOption = SourceLocationOption & { originalLabel: string };
+
+const LOCALIZED_LOCATION_OPTIONS: LocationOption[] = LOCATION_OPTIONS.map(
+  (option) => ({
+    ...option,
+    originalLabel: option.label,
+    label: formatJapaneseCountryName(getIsoCountryCode(option.code)),
+  }),
+);
 
 // Matches the start of the name or of any word in it, so "uni" finds United
 // States, not Tunisia, and "united states" still finds United States.
 function matchesCountry(option: LocationOption, query: string) {
   const needle = query.trim().toLowerCase();
-  const label = option.label.toLowerCase();
+  const label = option.originalLabel.toLowerCase();
+  const localizedLabel = option.label.toLowerCase();
   return (
+    localizedLabel.includes(needle) ||
     label.startsWith(needle) ||
     label.split(/[\s-]+/).some((word) => word.startsWith(needle)) ||
     option.shortLabel.toLowerCase().startsWith(needle)
@@ -33,11 +48,11 @@ export function CountryCombobox({
   onChange: (locationCode: number) => void;
 }) {
   const country =
-    LOCATION_OPTIONS.find((option) => option.code === value) ?? null;
+    LOCALIZED_LOCATION_OPTIONS.find((option) => option.code === value) ?? null;
 
   return (
     <Combobox
-      items={LOCATION_OPTIONS}
+      items={LOCALIZED_LOCATION_OPTIONS}
       value={country}
       itemToStringLabel={(option) => option.label}
       autoHighlight
@@ -46,13 +61,9 @@ export function CountryCombobox({
         if (option) onChange(option.code);
       }}
     >
-      <ComboboxInput
-        id={id}
-        className="w-full"
-        placeholder="Search countries"
-      />
+      <ComboboxInput id={id} className="w-full" placeholder="国を検索" />
       <ComboboxContent>
-        <ComboboxEmpty>No countries match.</ComboboxEmpty>
+        <ComboboxEmpty>一致する国がありません。</ComboboxEmpty>
         <ComboboxList>
           {(option: LocationOption) => (
             <ComboboxItem key={option.code} value={option}>

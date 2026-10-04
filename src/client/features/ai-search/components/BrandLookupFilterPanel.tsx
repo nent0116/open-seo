@@ -80,14 +80,14 @@ function FilterRangeInputs({
 }
 
 const PLATFORM_ITEMS = [
-  { value: "all", icon: null, label: "All" },
+  { value: "all", icon: null, label: "すべて" },
   { value: "chat_gpt", icon: null, label: formatPlatformLabel("chat_gpt") },
   { value: "google", icon: null, label: formatPlatformLabel("google") },
 ];
 
 function PlatformToggle({ form }: { form: AnyForm }) {
   return (
-    <DataTableFilterGroup label="Platform">
+    <DataTableFilterGroup label="プラットフォーム">
       <form.Field name="platform">
         {(field: StringField) => (
           <SegmentedToggle
@@ -116,13 +116,13 @@ function TopPagesFilters({
         <FilterTextInput
           form={form}
           name="include"
-          label="Include Terms"
+          label="含める語句"
           placeholder="reddit, forbes"
         />
         <FilterTextInput
           form={form}
           name="exclude"
-          label="Exclude Terms"
+          label="除外する語句"
           placeholder="pinterest, /tag"
         />
       </div>
@@ -132,7 +132,7 @@ function TopPagesFilters({
         <div className="min-w-[220px]">
           <FilterRangeInputs
             form={form}
-            title="Source mentions"
+            title="引用元の言及数"
             minName="minMentions"
             maxName="maxMentions"
           />
@@ -153,14 +153,14 @@ function QueriesFilters({
         <FilterTextInput
           form={form}
           name="include"
-          label="Include Terms"
-          placeholder="pricing, reviews"
+          label="含める語句"
+          placeholder="料金、レビュー"
         />
         <FilterTextInput
           form={form}
           name="exclude"
-          label="Exclude Terms"
-          placeholder="login, download"
+          label="除外する語句"
+          placeholder="ログイン、ダウンロード"
         />
       </div>
 
@@ -169,7 +169,7 @@ function QueriesFilters({
         <div className="min-w-[220px]">
           <FilterRangeInputs
             form={form}
-            title="AI search volume"
+            title="AI検索ボリューム"
             minName="minVolume"
             maxName="maxVolume"
           />

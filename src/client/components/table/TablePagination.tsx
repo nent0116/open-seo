@@ -80,7 +80,7 @@ export function TablePagination<TSize extends number>({
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
         {pageSizes && onPageSizeChange ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span className="whitespace-nowrap">Rows per page</span>
+            <span className="whitespace-nowrap">1ページの表示件数</span>
             <Select
               value={pageSize}
               onValueChange={(value) => {
@@ -91,7 +91,7 @@ export function TablePagination<TSize extends number>({
               <SelectTrigger
                 size="sm"
                 className="w-20"
-                aria-label="Rows per page"
+                aria-label="1ページの表示件数"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -108,14 +108,16 @@ export function TablePagination<TSize extends number>({
 
         <div className="flex items-center gap-2">
           <span className="whitespace-nowrap text-sm tabular-nums text-muted-foreground">
-            Page {currentPage.toLocaleString()}
-            {totalPages != null ? ` of ${totalPages.toLocaleString()}` : ""}
+            {currentPage.toLocaleString("ja-JP")}ページ
+            {totalPages != null
+              ? ` / 全${totalPages.toLocaleString("ja-JP")}ページ`
+              : ""}
           </span>
           <div className="flex items-center gap-1">
             {renderPageButton({
               page: currentPage - 1,
               disabled: !canGoPrev || isLoading,
-              label: "Previous page",
+              label: "前のページ",
               children: <ChevronLeft />,
               onPageChange,
             })}
@@ -133,7 +135,7 @@ export function TablePagination<TSize extends number>({
               renderPageButton({
                 page: currentPage + 1,
                 disabled: !canGoNext || isLoading,
-                label: "Next page",
+                label: "次のページ",
                 children: <ChevronRight />,
                 onPageChange,
               })
@@ -175,8 +177,8 @@ function formatRange(
   const start = pageRange?.start ?? (page - 1) * pageSize + 1;
   const pageEnd = pageRange?.end ?? start + pageSize - 1;
   if (totalCount == null) {
-    return `${start.toLocaleString()}–${pageEnd.toLocaleString()}`;
+    return `${start.toLocaleString("ja-JP")}～${pageEnd.toLocaleString("ja-JP")}件`;
   }
   const end = Math.min(totalCount, pageEnd);
-  return `${start.toLocaleString()}–${end.toLocaleString()} of ${totalCount.toLocaleString()}`;
+  return `${start.toLocaleString("ja-JP")}～${end.toLocaleString("ja-JP")}件 / 全${totalCount.toLocaleString("ja-JP")}件`;
 }

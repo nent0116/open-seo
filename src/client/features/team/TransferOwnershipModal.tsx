@@ -35,7 +35,7 @@ export function TransferOwnershipModal({
     mutationFn: () => transferOwnership({ data: { memberId: member.id } }),
     onSuccess: () => {
       captureClientEvent("team:ownership_transfer");
-      toast.success(`${displayName} is now the owner`);
+      toast.success(`${displayName}が所有者になりました`);
       onTransferred();
       onClose();
     },
@@ -43,8 +43,8 @@ export function TransferOwnershipModal({
       const teamChanged = isTeamChangedError(error);
       toast.error(
         teamChanged
-          ? "Your team changed while this was open. Ownership didn't change."
-          : "We couldn't transfer ownership. Ownership didn't change.",
+          ? "この画面を開いている間にチーム構成が変更されました。所有権は変更されていません。"
+          : "所有権を移譲できませんでした。所有権は変更されていません。",
       );
       // Refresh either way so the list and the caller's role are current.
       onTransferred();
@@ -64,17 +64,15 @@ export function TransferOwnershipModal({
     >
       <DialogContent showCloseButton={false} className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Transfer ownership?</DialogTitle>
+          <DialogTitle>所有権を移譲しますか？</DialogTitle>
           <DialogDescription>
             <span className="font-medium text-foreground" data-ph-mask>
               {displayName}
             </span>{" "}
-            becomes the owner of this organization and manages its billing. You
-            become an Admin and keep full access to each project.
+            がこの組織の所有者となり、請求を管理します。あなたは管理者となり、各プロジェクトへのすべてのアクセス権を保持します。
           </DialogDescription>
           <DialogDescription>
-            Projects, data, and the subscription stay with the organization.
-            Only the new owner can transfer ownership again.
+            プロジェクト、データ、サブスクリプションは組織に残ります。今後、所有権を移譲できるのは新しい所有者だけです。
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -83,13 +81,13 @@ export function TransferOwnershipModal({
             onClick={onClose}
             disabled={transferMutation.isPending}
           >
-            Cancel
+            キャンセル
           </Button>
           <Button
             onClick={() => transferMutation.mutate()}
             pending={transferMutation.isPending}
           >
-            Transfer ownership
+            所有権を移譲
           </Button>
         </DialogFooter>
       </DialogContent>

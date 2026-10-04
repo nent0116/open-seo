@@ -8,9 +8,9 @@ export const passwordSchema = z
   .string()
   .min(
     HOSTED_PASSWORD_MIN_LENGTH,
-    `Password must be at least ${HOSTED_PASSWORD_MIN_LENGTH} characters.`,
+    `パスワードは${HOSTED_PASSWORD_MIN_LENGTH}文字以上で入力してください。`,
   )
   .max(
     HOSTED_PASSWORD_MAX_LENGTH,
-    `Password must be at most ${HOSTED_PASSWORD_MAX_LENGTH} characters.`,
+    `パスワードは${HOSTED_PASSWORD_MAX_LENGTH}文字以内で入力してください。`,
   );

@@ -38,7 +38,7 @@ function getLaunchValidationErrors(
 
   return createFormValidationErrors({
     fields: {
-      url: "Please enter a URL.",
+      url: "URLを入力してください。",
     },
   });
 }
@@ -100,7 +100,7 @@ export function useLaunchController({
           lighthouseStrategy: value.runLighthouse ? "auto" : "none",
           renderJavaScript: value.renderJavaScript,
         });
-        toast.success("Audit started!");
+        toast.success("監査を開始しました");
         onAuditStarted(result.auditId);
       } catch (error) {
         // Starting an audit refuses for credits only when the rendering hold
@@ -109,7 +109,7 @@ export function useLaunchController({
           value.renderJavaScript &&
           getErrorCode(error) === "INSUFFICIENT_CREDITS"
             ? renderingCreditsNeededText(effectiveMaxPages)
-            : getStandardErrorMessage(error, "Failed to start audit");
+            : getStandardErrorMessage(error, "監査を開始できませんでした");
         formApi.setErrorMap({
           onSubmit: createFormValidationErrors({ form: message }),
         });
@@ -170,7 +170,7 @@ function useLaunchMutations({ projectId }: { projectId: string }) {
       deleteAudit({ data: { projectId, auditId } }),
     onSuccess: () => {
       void invalidateHistory();
-      toast.success("Audit deleted");
+      toast.success("監査を削除しました");
     },
   });
 

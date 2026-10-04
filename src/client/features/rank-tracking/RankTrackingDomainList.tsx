@@ -127,7 +127,7 @@ export function RankTrackingDomainList({
       void queryClient.invalidateQueries({
         queryKey: ["rankTrackingConfigs", projectId],
       });
-      toast.success("Domain archived");
+      toast.success("ドメインをアーカイブしました");
     },
   });
 
@@ -135,12 +135,12 @@ export function RankTrackingDomainList({
     <Card className="gap-0 py-0">
       <CardHeader className="px-5 pt-4 pb-3">
         <CardTitle>
-          <h2 className="text-sm font-semibold">Tracked Domains</h2>
+          <h2 className="text-sm font-semibold">計測中のドメイン</h2>
         </CardTitle>
         <CardAction className="self-center">
           <Button size="sm" onClick={onAddDomain}>
             <Plus data-icon="inline-start" />
-            Add Domain
+            ドメインを追加
           </Button>
         </CardAction>
       </CardHeader>
@@ -159,7 +159,7 @@ export function RankTrackingDomainList({
           <div className="px-5 py-4">
             <QueryError
               error={summariesQuery.error}
-              fallback="Failed to load tracked domains"
+              fallback="計測中のドメインを読み込めませんでした"
               onRetry={() => void summariesQuery.refetch()}
               isRetrying={summariesQuery.isFetching}
             />
@@ -178,18 +178,18 @@ export function RankTrackingDomainList({
           <EmptyState
             variant="plain"
             icon={Globe}
-            title="No tracked domains yet"
-            description="Add a domain to start monitoring keyword rankings over time."
+            title="計測中のドメインはまだありません"
+            description="ドメインを追加して、キーワード順位の推移を計測します。"
           />
         ) : filteredSummaries.length === 0 ? (
           <EmptyState
             variant="plain"
             kind="filtered"
-            title="No matching tracked domains"
-            description="Try clearing search or adjusting filters."
+            title="一致する計測ドメインがありません"
+            description="検索を解除するか、絞り込み条件を調整してください。"
             action={
               <Button variant="outline" size="sm" onClick={clearFilters}>
-                Clear filters
+                絞り込みを解除
               </Button>
             }
           />
@@ -207,15 +207,14 @@ export function RankTrackingDomainList({
 
       {archiveTarget && (
         <ConfirmDialog
-          title={`Archive ${archiveTarget.domain}?`}
-          confirmLabel="Archive"
+          title={`${archiveTarget.domain}をアーカイブしますか？`}
+          confirmLabel="アーカイブ"
           destructive
           pending={archiveMutation.isPending}
           onConfirm={() => archiveMutation.mutate(archiveTarget.id)}
           onClose={() => setArchiveTarget(null)}
         >
-          Scheduled checks will stop and this domain will be hidden from the
-          list. Ranking history is preserved.
+          定期チェックを停止し、このドメインを一覧から非表示にします。順位履歴は保持されます。
         </ConfirmDialog>
       )}
     </Card>
@@ -237,7 +236,7 @@ function DomainRow({
         to="/p/$projectId/rank-tracking/$configId"
         params={{ projectId, configId: summary.id }}
         className="absolute inset-0 z-0"
-        aria-label={`Open ${summary.domain}`}
+        aria-label={`${summary.domain}を開く`}
       />
       <div className="min-w-0 flex-1 pointer-events-none">
         <p className="font-medium truncate">{summary.domain}</p>
@@ -248,26 +247,26 @@ function DomainRow({
           &middot; {devicesLabel(summary.devices)} &middot;{" "}
           {scheduleLabel(summary.scheduleInterval)}
           {summary.scheduleInterval !== "manual" && summary.nextCheckAt && (
-            <> &middot; Next: {formatNextCheck(summary.nextCheckAt)}</>
+            <> ・次回： {formatNextCheck(summary.nextCheckAt)}</>
           )}
           {summary.lastRunCompletedAt && (
             <>
               {" "}
-              &middot; Last:{" "}
-              {new Date(summary.lastRunCompletedAt).toLocaleDateString()}
+              ・前回：{" "}
+              {new Date(summary.lastRunCompletedAt).toLocaleDateString("ja-JP")}
             </>
           )}
         </p>
         {summary.lastSkipReason === "insufficient_credits" && (
           <p className="flex items-center gap-1 text-xs text-warning">
             <AlertTriangle className="size-3" />
-            Scheduled check skipped — insufficient credits
+            クレジット不足のため定期チェックをスキップしました
           </p>
         )}
         {summary.lastSkipReason === "plan_required" && (
           <p className="flex items-center gap-1 text-xs text-warning">
             <AlertTriangle className="size-3" />
-            Scheduled check skipped — paid plan required
+            有料プランが必要なため定期チェックをスキップしました
           </p>
         )}
       </div>
@@ -275,7 +274,7 @@ function DomainRow({
         {summary.keywordCount > 0 && (
           <div className="text-center">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
-              Keywords
+              キーワード
             </p>
             <p className="font-mono font-medium">{summary.keywordCount}</p>
           </div>
@@ -285,8 +284,8 @@ function DomainRow({
         variant="ghost"
         size="icon-xs"
         className="relative z-10 text-muted-foreground hover:text-destructive"
-        title="Archive domain"
-        aria-label={`Archive ${summary.domain}`}
+        title="ドメインをアーカイブ"
+        aria-label={`${summary.domain}をアーカイブ`}
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();

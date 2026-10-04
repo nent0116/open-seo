@@ -8,9 +8,9 @@ import { TableCell, TableRow } from "@/client/components/ui/table";
 import { hasOrgPermission } from "@/lib/org-permissions";
 
 const ROLE_LABELS: Record<string, string> = {
-  owner: "Owner",
-  admin: "Admin",
-  member: "Member",
+  owner: "所有者",
+  admin: "管理者",
+  member: "メンバー",
 };
 
 function formatRole(role: string) {
@@ -67,7 +67,7 @@ export function MemberRow({
         <p className="truncate font-medium" data-ph-mask>
           {member.user.name || member.user.email}
           {isSelf ? (
-            <span className="font-normal text-muted-foreground"> (you)</span>
+            <span className="font-normal text-muted-foreground"> （自分）</span>
           ) : null}
         </p>
         <p className="truncate text-xs text-muted-foreground" data-ph-mask>
@@ -77,14 +77,14 @@ export function MemberRow({
       <TableCell>
         <Badge variant="secondary">{formatRole(member.role)}</Badge>
       </TableCell>
-      <TableCell className="text-xs text-muted-foreground">Active</TableCell>
+      <TableCell className="text-xs text-muted-foreground">有効</TableCell>
       <TableCell>
         {canRemove ? (
-          <RowActionsMenu label={`Actions for ${member.user.email}`}>
+          <RowActionsMenu label={`${member.user.email}のメンバー操作`}>
             {canTransferOwnership ? (
               <DropdownMenuItem onClick={onTransferOwnership}>
                 <Crown />
-                Transfer ownership
+                所有権を移譲
               </DropdownMenuItem>
             ) : null}
             <DropdownMenuItem
@@ -93,14 +93,14 @@ export function MemberRow({
               onClick={() => setIsConfirmingRemove(true)}
             >
               <Trash2 />
-              Remove member
+              メンバーを削除
             </DropdownMenuItem>
           </RowActionsMenu>
         ) : null}
         {isConfirmingRemove ? (
           <ConfirmDialog
-            title={`Remove ${member.user.email} from this organization?`}
-            confirmLabel="Remove member"
+            title={`${member.user.email}をこの組織から削除しますか？`}
+            confirmLabel="メンバーを削除"
             destructive
             onClose={() => setIsConfirmingRemove(false)}
             onConfirm={() => {
@@ -108,7 +108,7 @@ export function MemberRow({
               onRemove();
             }}
           >
-            They lose access immediately.
+            このメンバーは直ちにアクセスできなくなります。
           </ConfirmDialog>
         ) : null}
       </TableCell>
@@ -144,17 +144,15 @@ export function InvitationRow({
         </Badge>
       </TableCell>
       <TableCell className="text-xs text-muted-foreground">
-        Invited &middot; expires{" "}
-        {new Date(invitation.expiresAt).toLocaleDateString()}
+        招待済み・有効期限{" "}
+        {new Date(invitation.expiresAt).toLocaleDateString("ja-JP")}
       </TableCell>
       <TableCell>
         {canManageTeam ? (
-          <RowActionsMenu
-            label={`Actions for the invitation to ${invitation.email}`}
-          >
+          <RowActionsMenu label={`${invitation.email}への招待操作`}>
             <DropdownMenuItem disabled={isResending} onClick={onResend}>
               <Send />
-              Resend invitation
+              招待を再送
             </DropdownMenuItem>
             <DropdownMenuItem
               variant="destructive"
@@ -162,7 +160,7 @@ export function InvitationRow({
               onClick={onCancel}
             >
               <Trash2 />
-              Cancel invitation
+              招待を取り消す
             </DropdownMenuItem>
           </RowActionsMenu>
         ) : null}

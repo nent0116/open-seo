@@ -17,10 +17,10 @@ import {
 import { useStickToBottom } from "@/client/components/chat/useStickToBottom";
 
 const SUGGESTIONS = [
-  "What keywords should I focus on next?",
-  "Who are my top SERP competitors?",
-  "How is my Search Console traffic trending?",
-  "Find quick-win keywords I already rank for",
+  "次に注力すべきキーワードは？",
+  "検索結果で上位の競合は？",
+  "Search Consoleのトラフィックはどう推移している？",
+  "すでに上位表示されている、成果につながりやすいキーワードを探して",
 ];
 
 export function SamConversation({
@@ -107,7 +107,7 @@ export function SamConversation({
       body: JSON.stringify({ messageId }),
     }).catch(() => null);
     if (!response?.ok) {
-      toast.error("Couldn't change the conversation. Try again.");
+      toast.error("会話を変更できませんでした。再試行してください。");
       return false;
     }
     const fresh = await fetch(
@@ -172,7 +172,7 @@ export function SamConversation({
           className="absolute top-2 right-3 z-10 text-muted-foreground"
           onClick={() => clearHistory()}
         >
-          Clear history (dev)
+          履歴を消去（開発用）
         </Button>
       ) : null}
       <div
@@ -184,12 +184,10 @@ export function SamConversation({
           {messages.length === 0 ? (
             <div className="space-y-2 text-sm text-foreground/80">
               <p>
-                Hey, I’m SAM — your in-app SEO agent. I can research keywords,
-                size up competitors, read your SERPs, backlinks, rank tracking
-                and Search Console, and turn it into next steps for this
-                project.
+                こんにちは、アプリ内SEOエージェントのSAMです。キーワード調査、競合分析、検索結果、被リンク、順位計測、Search
+                Consoleのデータを読み取り、このプロジェクトで次に行う施策を提案できます。
               </p>
-              <p>Ask me anything, or start with one of these:</p>
+              <p>自由に質問するか、次の候補から始めてください：</p>
             </div>
           ) : null}
 
@@ -227,14 +225,14 @@ export function SamConversation({
 
           {isRecovering ? (
             <p className="text-xs text-muted-foreground">
-              Saving the reply that got cut off…
+              中断された回答を保存しています…
             </p>
           ) : null}
 
           {status === "error" ? (
             <ErrorState
               variant="inline"
-              message="SAM stopped before finishing this reply."
+              message="SAMは回答を完了する前に停止しました。"
               onRetry={lastUserMessage ? retryLast : undefined}
               isRetrying={isBusy}
             />
@@ -264,20 +262,22 @@ export function SamConversation({
             <div className="mb-2">
               <ErrorState
                 variant="inline"
-                message="Lost the connection to SAM."
+                message="SAMとの接続が切れました。"
                 action={
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => agent.reconnect()}
                   >
-                    Reconnect
+                    再接続
                   </Button>
                 }
               />
             </div>
           ) : isReconnecting ? (
-            <p className="mb-2 text-xs text-muted-foreground">Reconnecting…</p>
+            <p className="mb-2 text-xs text-muted-foreground">
+              再接続しています…
+            </p>
           ) : null}
           <ChatComposer
             busy={isBusy}

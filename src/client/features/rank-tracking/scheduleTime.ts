@@ -4,13 +4,13 @@ import type {
 } from "@/types/schemas/rank-tracking";
 
 export const WEEKDAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
+  "日曜日",
+  "月曜日",
+  "火曜日",
+  "水曜日",
+  "木曜日",
+  "金曜日",
+  "土曜日",
 ];
 
 /** A weekday and time as the user picks it, in the browser's timezone. */
@@ -73,30 +73,30 @@ export function describeSchedule(
   time: LocalScheduleTime,
 ): string {
   const date = nextLocalOccurrence(time);
-  const localTime = date.toLocaleTimeString([], {
+  const localTime = date.toLocaleTimeString("ja-JP", {
     hour: "numeric",
     minute: "2-digit",
   });
-  const utcTime = date.toLocaleTimeString("en-GB", {
+  const utcTime = date.toLocaleTimeString("ja-JP", {
     timeZone: "UTC",
     hour: "2-digit",
     minute: "2-digit",
   });
   const utcWeekday =
     interval === "weekly" && date.getUTCDay() !== date.getDay()
-      ? `${WEEKDAYS[date.getUTCDay()].slice(0, 3)} `
+      ? `${WEEKDAYS[date.getUTCDay()]} `
       : "";
   const when =
     interval === "daily"
-      ? "daily"
+      ? "毎日"
       : interval === "weekly"
-        ? `weekly on ${WEEKDAYS[time.weekday]}s`
-        : "on the last day of each month";
-  return `Runs ${when} at ${localTime} (${utcWeekday}${utcTime} UTC)`;
+        ? `毎週${WEEKDAYS[time.weekday]}`
+        : "毎月末";
+  return `${when} ${localTime}に実行（UTC：${utcWeekday}${utcTime}）`;
 }
 
 export function formatNextCheck(nextCheckAt: string): string {
-  return new Date(nextCheckAt).toLocaleString([], {
+  return new Date(nextCheckAt).toLocaleString("ja-JP", {
     weekday: "short",
     month: "short",
     day: "numeric",

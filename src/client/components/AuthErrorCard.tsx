@@ -45,7 +45,7 @@ export function AuthErrorCard({
 
   const message = getStandardErrorMessage(
     error,
-    "Something went wrong. Please try again.",
+    "問題が発生しました。もう一度お試しください。",
   );
   return (
     <div className="flex h-full min-w-0 flex-1 items-center justify-center p-4">
@@ -69,7 +69,7 @@ function AuthConfigErrorCard({ message, onRetry }: CardProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ShieldAlert className="size-5 text-destructive" />
-          Authentication setup required
+          認証設定が必要です
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -79,24 +79,24 @@ function AuthConfigErrorCard({ message, onRetry }: CardProps) {
 
         {clientAuthMode === "hosted" ? (
           <p className="text-muted-foreground">
-            Hosted mode requires{" "}
+            ホストモードを使用するには、デプロイ先に
             <code className="mx-1">BETTER_AUTH_SECRET</code>
-            (32+ characters), <code className="mx-1">BETTER_AUTH_URL</code>, and
-            Google OAuth credentials on the deployment.
+            （32文字以上）、<code className="mx-1">BETTER_AUTH_URL</code>
+            、Google OAuth の認証情報を設定してください。
           </p>
         ) : null}
         {clientAuthMode === "cloudflare_access" ? (
           <p className="text-muted-foreground">
-            Cloudflare Access mode requires
-            <code className="mx-1">TEAM_DOMAIN</code> (a full https URL) and
-            <code className="mx-1">POLICY_AUD</code> set on the deployment, with
-            an Access application protecting this hostname.
+            Cloudflare Access モードを使用するには、デプロイ先に
+            <code className="mx-1">TEAM_DOMAIN</code>（完全な https URL）と
+            <code className="mx-1">POLICY_AUD</code>を設定し、このホスト名を
+            Access アプリケーションで保護してください。
           </p>
         ) : null}
       </CardContent>
       <CardFooter className="justify-end gap-2">
         <Button variant="ghost" onClick={onRetry}>
-          Try Again
+          再試行
         </Button>
         <Button
           nativeButton={false}
@@ -108,7 +108,7 @@ function AuthConfigErrorCard({ message, onRetry }: CardProps) {
             />
           }
         >
-          Open Setup Guide
+          セットアップガイドを開く
         </Button>
       </CardFooter>
     </Card>
@@ -137,17 +137,17 @@ function UnauthenticatedErrorCard({ message, onRetry }: CardProps) {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Authentication required</CardTitle>
+        <CardTitle>認証が必要です</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 text-muted-foreground">
         <p>{message}</p>
         <p>
-          This deployment uses external authentication. Refresh your access
-          session, then try again.
+          この環境では外部認証を使用しています。アクセスセッションを更新してから、
+          もう一度お試しください。
         </p>
       </CardContent>
       <CardFooter className="justify-end">
-        <Button onClick={onRetry}>Try Again</Button>
+        <Button onClick={onRetry}>再試行</Button>
       </CardFooter>
     </Card>
   );

@@ -75,7 +75,7 @@ export function TeamSettings() {
     mutationFn: (email: string) => sendTeamInvitation({ data: { email } }),
     onSuccess: () => {
       captureClientEvent("team:invitation_resend");
-      toast.success("Invitation resent");
+      toast.success("招待を再送しました");
       void refreshTeam();
     },
     onError: (error: Error) => {
@@ -90,12 +90,14 @@ export function TeamSettings() {
         memberIdOrEmail: memberId,
       });
       if (result.error) {
-        throw new Error(result.error.message || "Failed to remove the member");
+        throw new Error(
+          result.error.message || "メンバーを削除できませんでした",
+        );
       }
     },
     onSuccess: () => {
       captureClientEvent("team:member_remove");
-      toast.success("Member removed");
+      toast.success("メンバーを削除しました");
       void refreshTeam();
     },
   });
@@ -107,14 +109,12 @@ export function TeamSettings() {
         invitationId,
       });
       if (result.error) {
-        throw new Error(
-          result.error.message || "Failed to cancel the invitation",
-        );
+        throw new Error(result.error.message || "招待を取り消せませんでした");
       }
     },
     onSuccess: () => {
       captureClientEvent("team:invitation_cancel");
-      toast.success("Invitation canceled");
+      toast.success("招待を取り消しました");
       void refreshTeam();
     },
   });
@@ -141,7 +141,7 @@ export function TeamSettings() {
   const loadError = failedQuery ? (
     <QueryError
       error={failedQuery.error}
-      fallback="We couldn't load your team right now."
+      fallback="現在、チームを読み込めません。"
       onRetry={() => void failedQuery.refetch()}
       isRetrying={failedQuery.isFetching}
     />
@@ -151,21 +151,20 @@ export function TeamSettings() {
   return (
     <section className="space-y-3">
       <SectionHeader
-        title="Members"
+        title="メンバー"
         action={
           canManageTeam ? (
             <Button size="sm" onClick={() => setIsInviteOpen(true)}>
-              Invite teammate
+              メンバーを招待
             </Button>
           ) : null
         }
       />
       <p className="text-sm text-muted-foreground">
-        Teammates join as Admins. Admins have full access to each project except
-        for billing.
+        メンバーは管理者として参加します。管理者は請求を除く各プロジェクトのすべての機能を利用できます。
       </p>
       {orgContextQuery.isSuccess && !canManageTeam ? (
-        <PermissionHint action="invite or remove teammates" />
+        <PermissionHint action="チームメンバーの招待または削除" />
       ) : null}
       {loadError}
 
@@ -176,9 +175,9 @@ export function TeamSettings() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Member</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>メンバー</TableHead>
+                <TableHead>権限</TableHead>
+                <TableHead>ステータス</TableHead>
                 <TableHead className="w-10" />
               </TableRow>
             </TableHeader>

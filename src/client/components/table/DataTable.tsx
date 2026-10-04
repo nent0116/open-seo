@@ -86,7 +86,7 @@ export function makeSelectionColumn<TData>(
         indeterminate={table.getIsSomeRowsSelected()}
         disabled={table.getRowModel().rows.length === 0}
         onCheckedChange={(checked) => table.toggleAllRowsSelected(checked)}
-        aria-label="Select all rows"
+        aria-label="すべての行を選択"
       />
     ),
     cell: ({ row, table }) => (
@@ -107,7 +107,7 @@ function SelectionCheckbox<TData>({
   return (
     <Checkbox
       checked={row.getIsSelected()}
-      aria-label="Select row"
+      aria-label="行を選択"
       // The checkbox is a span, so a shift+click would also select page text.
       onMouseDown={(event) => {
         if (event.shiftKey) event.preventDefault();
@@ -231,8 +231,8 @@ export function DataTable<TData>({
                     <EmptyState
                       kind="filtered"
                       variant="plain"
-                      title="No rows match these filters"
-                      description="Change or clear the filters to see more rows."
+                      title="条件に一致する行がありません"
+                      description="条件を変更するか解除してください。"
                       action={
                         onClearFilters ? (
                           <Button
@@ -240,7 +240,7 @@ export function DataTable<TData>({
                             size="sm"
                             onClick={onClearFilters}
                           >
-                            Clear filters
+                            絞り込みを解除
                           </Button>
                         ) : undefined
                       }

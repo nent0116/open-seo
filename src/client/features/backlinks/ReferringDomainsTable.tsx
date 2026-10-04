@@ -29,8 +29,8 @@ const baseColumns = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Domain"
-        helpText="The referring site linking to your target."
+        label="ドメイン"
+        helpText="対象へリンクしている参照サイトです。"
       />
     ),
     cell: ({ getValue }) => {
@@ -50,8 +50,8 @@ const baseColumns = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Backlinks"
-        helpText="Total backlinks found from this domain."
+        label="被リンク"
+        helpText="このドメインから見つかった被リンクの合計です。"
       />
     ),
     cell: ({ getValue }) => formatNumber(getValue()),
@@ -62,8 +62,8 @@ const baseColumns = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Referring Pages"
-        helpText="Unique pages on this domain that link to your target."
+        label="参照ページ"
+        helpText="このドメイン内で対象へリンクしている固有ページです。"
       />
     ),
     cell: ({ getValue }) => formatNumber(getValue()),
@@ -74,8 +74,8 @@ const baseColumns = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Rank"
-        helpText="Authority score for the referring domain."
+        label="ランク"
+        helpText="参照ドメインの評価スコアです。"
       />
     ),
     cell: ({ getValue }) => formatNumber(getValue()),
@@ -86,8 +86,8 @@ const baseColumns = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Spam"
-        helpText="Spam risk score for this referring domain."
+        label="スパム"
+        helpText="参照ドメインのスパムリスクスコアです。"
       />
     ),
     cell: ({ getValue }) => formatDecimal(getValue()),
@@ -98,8 +98,8 @@ const baseColumns = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="First Seen"
-        helpText="When this domain was first discovered linking to your target."
+        label="初回検出"
+        helpText="このドメインから対象へのリンクを初めて検出した日時です。"
       />
     ),
     cell: ({ getValue }) => formatCompactDate(getValue()),
@@ -110,15 +110,15 @@ const baseColumns = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Issues"
-        helpText="Broken link and broken page counts tied to this domain."
+        label="問題"
+        helpText="このドメインに関連するリンク切れとエラーページの件数です。"
       />
     ),
     cell: ({ row }) => (
       <div className="text-sm">
-        <div>Broken links: {formatNumber(row.original.brokenBacklinks)}</div>
+        <div>リンク切れ： {formatNumber(row.original.brokenBacklinks)}</div>
         <div className="text-muted-foreground">
-          Broken pages: {formatNumber(row.original.brokenPages)}
+          エラーページ： {formatNumber(row.original.brokenPages)}
         </div>
       </div>
     ),
@@ -141,7 +141,7 @@ function buildReferringDomainColumns(domainRatings: DomainRatings | null) {
     header: () => (
       <HelpLabel
         label="Ahrefs DR"
-        helpText="Ahrefs Domain Rating (0-100) for this referring domain."
+        helpText="この参照ドメインのAhrefs Domain Rating（0～100）です。"
       />
     ),
     cell: ({ row }) => {
@@ -195,7 +195,7 @@ export function ReferringDomainsTable({
   return (
     <DataTable
       table={table}
-      empty={{ title: "No referring domains found for this target." }}
+      empty={{ title: "この対象の参照ドメインは見つかりませんでした。" }}
       {...frame}
     />
   );

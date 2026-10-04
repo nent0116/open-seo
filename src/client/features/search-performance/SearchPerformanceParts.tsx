@@ -40,7 +40,7 @@ function strikingExportTable(report: Report): ExportTable {
   const stamp = `${report.range.startDate}-to-${report.range.endDate}`;
   return {
     filename: `search-performance-striking-distance-${stamp}`,
-    headers: ["Query", "Page", "Impressions", "Clicks", "Position"],
+    headers: ["検索語句", "ページ", "表示回数", "クリック数", "掲載順位"],
     rows: report.strikingDistance.map((row) => [
       row.query,
       row.page,
@@ -60,11 +60,11 @@ function dimensionExportTable(
   return {
     filename: `search-performance-${isPage ? "pages" : "queries"}-${stamp}`,
     headers: [
-      isPage ? "Page" : "Query",
-      "Clicks",
-      "Impressions",
+      isPage ? "ページ" : "検索語句",
+      "クリック数",
+      "表示回数",
       "CTR",
-      "Position",
+      "掲載順位",
     ],
     rows: rows.map((row) => [
       row.key,
@@ -124,17 +124,17 @@ function positionDelta(current: number, previous: number): Delta {
 
 export function TotalsCards({ report }: { report: Report }) {
   const { totals, prevTotals, range } = report;
-  const deltaTitle = `vs ${range.prevStartDate} to ${range.prevEndDate}`;
+  const deltaTitle = `比較期間：${range.prevStartDate}～${range.prevEndDate}`;
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       <TotalCard
-        label="Clicks"
+        label="クリック数"
         value={formatCount(totals.clicks)}
         delta={percentDelta(totals.clicks, prevTotals.clicks)}
         deltaTitle={deltaTitle}
       />
       <TotalCard
-        label="Impressions"
+        label="表示回数"
         value={formatCount(totals.impressions)}
         delta={percentDelta(totals.impressions, prevTotals.impressions)}
         deltaTitle={deltaTitle}
@@ -146,7 +146,7 @@ export function TotalsCards({ report }: { report: Report }) {
         deltaTitle={deltaTitle}
       />
       <TotalCard
-        label="Avg position"
+        label="平均掲載順位"
         value={formatPosition(totals.position)}
         delta={positionDelta(totals.position, prevTotals.position)}
         deltaTitle={deltaTitle}
@@ -216,17 +216,18 @@ export function DimensionTable({
       empty={
         isPastEnd
           ? {
-              title: "No rows on this page",
-              description: "This page is past the end of the results.",
+              title: "このページにデータはありません",
+              description: "結果の最終ページを超えています。",
               action: (
                 <Button variant="outline" size="sm" onClick={onFirstPage}>
-                  Go to first page
+                  最初のページへ
                 </Button>
               ),
             }
           : {
-              title: "No Search Console data yet",
-              description: "Search Console data can take a few days to appear.",
+              title: "Search Consoleのデータがまだありません",
+              description:
+                "Search Consoleのデータが表示されるまで数日かかる場合があります。",
             }
       }
     />
@@ -284,11 +285,9 @@ export function StrikingDistanceTable({
         .map((query) => normalizeExportValue(query))
         .join("\n");
       await navigator.clipboard.writeText(text);
-      toast.success(
-        `Copied ${selectedQueries.length} ${selectedQueries.length === 1 ? "keyword" : "keywords"}`,
-      );
+      toast.success(`${selectedQueries.length}件のキーワードをコピーしました`);
     } catch {
-      toast.error("Couldn't copy to clipboard");
+      toast.error("クリップボードにコピーできませんでした");
     }
   };
 
@@ -303,9 +302,7 @@ export function StrikingDistanceTable({
       void queryClient.invalidateQueries({
         queryKey: ["savedKeywords", projectId],
       });
-      toast.success(
-        `Saved ${keywords.length} ${keywords.length === 1 ? "keyword" : "keywords"}`,
-      );
+      toast.success(`${keywords.length}件のキーワードを保存しました`);
       setRowSelection({});
     },
   });
@@ -314,8 +311,7 @@ export function StrikingDistanceTable({
     <>
       <div className="p-4">
         <p className="mb-3 text-sm text-muted-foreground">
-          Queries ranking at positions 5 to 20, sorted by impressions. Improve
-          the listed page to move them into the top results.
+          掲載順位が5～20位の検索語句を表示回数順に表示します。対象ページを改善し、上位表示を目指しましょう。
         </p>
         <DataTable
           table={table}
@@ -324,22 +320,22 @@ export function StrikingDistanceTable({
           empty={
             isPastEnd
               ? {
-                  title: "No rows on this page",
-                  description: "This page is past the end of the results.",
+                  title: "このページにデータはありません",
+                  description: "結果の最終ページを超えています。",
                   action: (
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => onPageChange(1)}
                     >
-                      Go to first page
+                      最初のページへ
                     </Button>
                   ),
                 }
               : {
-                  title: "No striking-distance queries",
+                  title: "上位表示まであと一歩の検索語句はありません",
                   description:
-                    "Queries ranking at positions 5 to 20 will appear here.",
+                    "掲載順位が5～20位の検索語句がここに表示されます。",
                 }
           }
         />
@@ -358,7 +354,7 @@ export function StrikingDistanceTable({
       )}
       <TableBulkActionBar
         selectedCount={selectedQueries.length}
-        selectedLabel={selectedQueries.length === 1 ? "query" : "queries"}
+        selectedLabel="件の検索語句を選択中"
         onClear={() => setRowSelection({})}
         actions={
           <div className="flex items-center gap-1 px-1.5">
@@ -366,7 +362,7 @@ export function StrikingDistanceTable({
               icon={<Copy className="size-3.5" />}
               onClick={() => void copyKeywords()}
             >
-              Copy keywords
+              キーワードをコピー
             </TableBulkActionButton>
             <TableBulkActionButton
               icon={
@@ -379,7 +375,7 @@ export function StrikingDistanceTable({
               onClick={() => save.mutate(selectedQueries)}
               disabled={save.isPending}
             >
-              Save as keywords
+              キーワードとして保存
             </TableBulkActionButton>
           </div>
         }

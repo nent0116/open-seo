@@ -508,7 +508,7 @@ export function DomainOverviewPage({
   // hostname plus subdomains, so anything narrower needs a label.
   const overviewMetricsHint =
     state.overview && state.overview.scope !== "subdomains"
-      ? "Whole domain incl. subdomains"
+      ? "サブドメインを含むドメイン全体"
       : undefined;
 
   const tabs = (
@@ -518,8 +518,8 @@ export function DomainOverviewPage({
         state.handleTabChange(value === "pages" ? "pages" : "keywords")
       }
     >
-      <TabsTrigger value="keywords">Top Keywords</TabsTrigger>
-      <TabsTrigger value="pages">Top Pages</TabsTrigger>
+      <TabsTrigger value="keywords">上位キーワード</TabsTrigger>
+      <TabsTrigger value="pages">上位ページ</TabsTrigger>
     </DataTableTabs>
   );
 
@@ -528,7 +528,7 @@ export function DomainOverviewPage({
   const overviewError = state.overviewQuery.isError ? (
     <QueryError
       error={state.overviewQuery.error}
-      fallback="Lookup failed."
+      fallback="調査に失敗しました。"
       onRetry={() => void state.overviewQuery.refetch()}
       isRetrying={state.overviewQuery.isFetching}
     />
@@ -549,8 +549,8 @@ export function DomainOverviewPage({
     <div className="px-4 py-4 md:px-6 md:py-6 pb-24 md:pb-8 overflow-auto">
       <div className="mx-auto max-w-7xl space-y-4">
         <PageHeader
-          title="Domain Overview"
-          description="Analyze any domain's SEO profile: traffic, keywords, and backlinks."
+          title="ドメイン分析"
+          description="任意のドメインについて、トラフィック、キーワード、被リンクなどのSEO状況を分析します。"
           backLink={
             routeState.domain ? (
               <BackButton
@@ -559,7 +559,7 @@ export function DomainOverviewPage({
                   onShowRecentSearches();
                 }}
               >
-                Recent searches
+                最近の検索
               </BackButton>
             ) : undefined
           }
@@ -596,7 +596,7 @@ export function DomainOverviewPage({
               loaded={state.historyLoaded}
               onRemove={state.removeHistoryItem}
               emptyIcon={Globe}
-              emptyTitle="Enter a domain to get started"
+              emptyTitle="ドメインを入力して始めましょう"
               getTitle={(item) => item.domain}
               getSubtitle={(item) => RESEARCH_SCOPE_LABELS[item.scope]}
               renderLink={(item, props) => (
@@ -616,8 +616,7 @@ export function DomainOverviewPage({
               <Alert variant="info">
                 <Info />
                 <AlertDescription className="text-foreground">
-                  Not enough data for this scope yet. Try another domain or a
-                  broader scope.
+                  この範囲のデータが不足しています。別のドメインを試すか、対象範囲を広げてください。
                 </AlertDescription>
               </Alert>
             ) : null}
@@ -634,7 +633,7 @@ export function DomainOverviewPage({
               <div className="px-4 pb-4">
                 <div className="grid grid-cols-1 gap-3 rounded-lg border border-border p-3 md:grid-cols-2">
                   <StatTile
-                    label="Estimated Organic Traffic"
+                    label="推定自然検索トラフィック"
                     value={formatMetric(
                       state.overview.organicTraffic,
                       state.overview.hasData,
@@ -642,7 +641,7 @@ export function DomainOverviewPage({
                     hint={overviewMetricsHint}
                   />
                   <StatTile
-                    label="Organic Keywords"
+                    label="自然検索キーワード"
                     value={formatMetric(
                       state.overview.organicKeywords,
                       state.overview.hasData,

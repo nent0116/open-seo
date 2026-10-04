@@ -36,7 +36,7 @@ import { authClient } from "@/lib/auth-client";
 const MAX_KEY_NAME_LENGTH = 32;
 
 const createKeySchema = z.object({
-  name: z.string().trim().min(1, "Name is required"),
+  name: z.string().trim().min(1, "名前を入力してください"),
 });
 
 export function ApiKeySettings() {
@@ -57,7 +57,9 @@ export function ApiKeySettings() {
     queryFn: async () => {
       const result = await authClient.apiKey.list();
       if (result.error) {
-        throw new Error(result.error.message ?? "Failed to load API keys");
+        throw new Error(
+          result.error.message ?? "APIキーを読み込めませんでした",
+        );
       }
       return result.data.apiKeys.map((key) => ({
         id: key.id,
@@ -73,7 +75,9 @@ export function ApiKeySettings() {
     mutationFn: async (keyName: string) => {
       const result = await authClient.apiKey.create({ name: keyName });
       if (result.error || !result.data?.key) {
-        throw new Error(result.error?.message ?? "Failed to create the key");
+        throw new Error(
+          result.error?.message ?? "APIキーを作成できませんでした",
+        );
       }
       return result.data.key;
     },
@@ -88,12 +92,14 @@ export function ApiKeySettings() {
     mutationFn: async (keyId: string) => {
       const result = await authClient.apiKey.delete({ keyId });
       if (result.error) {
-        throw new Error(result.error.message ?? "Failed to revoke the key");
+        throw new Error(
+          result.error.message ?? "APIキーを無効化できませんでした",
+        );
       }
     },
     onSuccess: () => {
       captureClientEvent("mcp:api_key_revoked");
-      toast.success("API key revoked");
+      toast.success("APIキーを無効化しました");
       setRevoking(null);
       void queryClient.invalidateQueries({ queryKey: ["apiKeys"] });
     },
@@ -116,15 +122,12 @@ export function ApiKeySettings() {
 
   return (
     <section className="space-y-3">
-      <SectionHeader title="API keys" />
+      <SectionHeader title="APIキー" />
       <div className="flex items-start justify-between gap-6">
         <div>
-          <p className="text-sm">
-            Authenticate MCP clients when OAuth doesn't work
-          </p>
+          <p className="text-sm">OAuthを利用できないMCPクライアントを認証</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Use this for remote agents like Hermes where the normal login flow
-            doesn't work.
+            通常のログイン手順を利用できないHermesなどのリモートエージェントで使用します。
           </p>
           <p className="mt-1 text-sm">
             <a
@@ -133,31 +136,33 @@ export function ApiKeySettings() {
               target="_blank"
               rel="noreferrer"
             >
-              Setup guide
+              セットアップガイド
             </a>
           </p>
         </div>
         <Button size="sm" onClick={() => setIsCreateOpen(true)}>
-          Create API key
+          APIキーを作成
         </Button>
       </div>
 
       <QueryState
         query={apiKeysQuery}
-        errorFallback="We couldn't load your API keys."
+        errorFallback="APIキーを読み込めませんでした。"
       >
         {(apiKeys) =>
           apiKeys.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No API keys yet.</p>
+            <p className="text-sm text-muted-foreground">
+              APIキーはまだありません。
+            </p>
           ) : (
             <TableCard>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Key</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Last used</TableHead>
+                    <TableHead>名前</TableHead>
+                    <TableHead>キー</TableHead>
+                    <TableHead>作成日時</TableHead>
+                    <TableHead>最終使用日時</TableHead>
                     <TableHead className="w-10" />
                   </TableRow>
                 </TableHeader>
@@ -165,7 +170,7 @@ export function ApiKeySettings() {
                   {apiKeys.map((key) => (
                     <TableRow key={key.id}>
                       <TableCell className="max-w-[220px] truncate font-medium">
-                        {key.name || "Unnamed key"}
+                        {key.name || "名前のないキー"}
                       </TableCell>
                       <TableCell
                         className="font-mono text-xs text-muted-foreground"
@@ -174,28 +179,28 @@ export function ApiKeySettings() {
                         {key.start || "oseo_"}…
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
-                        {key.createdAt.toLocaleDateString()}
+                        {key.createdAt.toLocaleDateString("ja-JP")}
                       </TableCell>
                       <TableCell className="text-xs text-muted-foreground">
                         {key.lastRequest
-                          ? key.lastRequest.toLocaleDateString()
-                          : "Never"}
+                          ? key.lastRequest.toLocaleDateString("ja-JP")
+                          : "未使用"}
                       </TableCell>
                       <TableCell>
                         <RowActionsMenu
-                          label={`Actions for ${key.name || "API key"}`}
+                          label={`${key.name || "APIキー"}の操作`}
                         >
                           <DropdownMenuItem
                             variant="destructive"
                             onClick={() =>
                               setRevoking({
                                 id: key.id,
-                                name: key.name || "Unnamed key",
+                                name: key.name || "名前のないキー",
                               })
                             }
                           >
                             <Trash2 />
-                            Revoke key
+                            キーを無効化
                           </DropdownMenuItem>
                         </RowActionsMenu>
                       </TableCell>
@@ -210,14 +215,14 @@ export function ApiKeySettings() {
 
       {revoking ? (
         <ConfirmDialog
-          title={`Revoke \u201c${revoking.name}\u201d?`}
-          confirmLabel="Revoke key"
+          title={`「${revoking.name}」を無効化しますか？`}
+          confirmLabel="キーを無効化"
           destructive
           pending={revokeMutation.isPending}
           onClose={() => setRevoking(null)}
           onConfirm={() => revokeMutation.mutate(revoking.id)}
         >
-          Clients using it will stop working.
+          このキーを使用しているクライアントは動作しなくなります。
         </ConfirmDialog>
       ) : null}
 
@@ -238,14 +243,15 @@ export function ApiKeySettings() {
           {createdKey ? (
             <>
               <DialogHeader>
-                <DialogTitle>Copy your new API key</DialogTitle>
+                <DialogTitle>新しいAPIキーをコピー</DialogTitle>
                 <DialogDescription>
-                  It won't be shown again. Send it as{" "}
+                  このキーは再表示されません。MCPサーバーURL（
+                  <span className="font-mono text-xs break-all">{mcpUrl}</span>
+                  ）へのリクエストで、
                   <span className="font-mono text-xs">
                     Authorization: Bearer
-                  </span>{" "}
-                  to{" "}
-                  <span className="font-mono text-xs break-all">{mcpUrl}</span>.
+                  </span>
+                  形式の認証情報として送信してください。
                 </DialogDescription>
               </DialogHeader>
               <div className="flex items-center gap-2">
@@ -257,27 +263,27 @@ export function ApiKeySettings() {
                 </code>
                 <CopyButton
                   value={createdKey}
-                  successMessage="API key copied"
-                  label="Copy API key"
+                  successMessage="APIキーをコピーしました"
+                  label="APIキーをコピー"
                   variant="ghost"
                   size="icon-sm"
                 />
               </div>
               <DialogFooter>
-                <Button onClick={closeCreateModal}>Done</Button>
+                <Button onClick={closeCreateModal}>完了</Button>
               </DialogFooter>
             </>
           ) : (
             <form.AppForm>
               <form.Form className="grid gap-4">
                 <DialogHeader>
-                  <DialogTitle>Create API key</DialogTitle>
+                  <DialogTitle>APIキーを作成</DialogTitle>
                 </DialogHeader>
                 <form.AppField name="name">
                   {(field) => (
                     <field.TextField
-                      label="Name"
-                      placeholder="Claude Code on laptop"
+                      label="名前"
+                      placeholder="例：ノートPCのClaude Code"
                       maxLength={MAX_KEY_NAME_LENGTH}
                       required
                       autoFocus
@@ -286,9 +292,9 @@ export function ApiKeySettings() {
                 </form.AppField>
                 <DialogFooter>
                   <Button variant="ghost" onClick={closeCreateModal}>
-                    Cancel
+                    キャンセル
                   </Button>
-                  <form.SubmitButton>Create</form.SubmitButton>
+                  <form.SubmitButton>作成</form.SubmitButton>
                 </DialogFooter>
               </form.Form>
             </form.AppForm>

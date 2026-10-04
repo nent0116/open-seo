@@ -19,16 +19,14 @@ export const RANK_TRACKING_HEADER_CLASS =
   "text-xs uppercase tracking-wide text-muted-foreground";
 
 const HEADER_TOOLTIPS: Record<string, string> = {
-  keyword: "The search term being tracked in Google",
-  volume: "Estimated monthly search volume from Google",
-  kd: "Keyword difficulty score (0-100) — higher means harder to rank",
-  cpc: "Average cost per click in Google Ads (USD)",
-  desktopPosition:
-    "Current Google ranking position, showing change from the comparison period",
-  mobilePosition:
-    "Current Google ranking position, showing change from the comparison period",
-  url: "The page on your site that ranks for this keyword",
-  serp: "Special result features appearing on the search results page (e.g. AI Overview, People Also Ask)",
+  keyword: "Googleで順位を計測している検索語句",
+  volume: "Googleの推定月間検索ボリューム",
+  kd: "キーワード難易度（0～100）。数値が高いほど上位表示が難しくなります",
+  cpc: "Google広告の平均クリック単価（USD）",
+  desktopPosition: "現在のGoogle掲載順位と比較期間からの変化",
+  mobilePosition: "現在のGoogle掲載順位と比較期間からの変化",
+  url: "このキーワードで上位表示されているサイト内のページ",
+  serp: "検索結果に表示される特殊な要素（例：AI Overview、関連する質問）",
 };
 
 // Local configs fetch volume scoped to the tracked city, so the header must
@@ -41,10 +39,10 @@ function makeVolumeColumn(locationLabel?: string): ColumnDef<RankTrackingRow> {
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label={locationLabel ? "Local volume" : "Volume"}
+        label={locationLabel ? "地域別ボリューム" : "検索ボリューム"}
         title={
           locationLabel
-            ? `Estimated monthly searches in ${locationLabel} from Google Ads`
+            ? `Google広告による${locationLabel}の推定月間検索数`
             : HEADER_TOOLTIPS.volume
         }
         className={RANK_TRACKING_HEADER_CLASS}
@@ -103,7 +101,7 @@ function makeKeywordColumn(
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Keyword"
+        label="キーワード"
         title={HEADER_TOOLTIPS.keyword}
         className={RANK_TRACKING_HEADER_CLASS}
       />
@@ -114,7 +112,7 @@ function makeKeywordColumn(
           type="button"
           className="text-left font-medium decoration-dotted underline-offset-2 hover:underline"
           onClick={() => onKeywordClick(row.original)}
-          title="View position history"
+          title="順位履歴を表示"
         >
           {row.original.keyword}
         </button>
@@ -123,7 +121,7 @@ function makeKeywordColumn(
             variant="secondary"
             size="sm"
             className="cursor-help"
-            title="Tracked exactly as typed, not lowercased"
+            title="小文字に変換せず入力どおりに計測"
           >
             Aa
           </Badge>
@@ -144,7 +142,7 @@ function makeDeviceColumn(
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        label="Position"
+        label="掲載順位"
         title={HEADER_TOOLTIPS[id]}
         className={RANK_TRACKING_HEADER_CLASS}
       />
@@ -189,7 +187,7 @@ function makeSerpColumn(
         className="cursor-help text-xs font-medium tracking-wide uppercase text-muted-foreground"
         title={HEADER_TOOLTIPS.serp}
       >
-        SERP Features
+        検索結果の機能
       </span>
     ),
     cell: ({ row }) => {

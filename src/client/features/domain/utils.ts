@@ -63,12 +63,12 @@ export function getResearchInputPath(input: string): string {
 
 export function formatNumber(value: number | null | undefined) {
   if (value == null) return "-";
-  return new Intl.NumberFormat().format(value);
+  return new Intl.NumberFormat("ja-JP").format(value);
 }
 
 export function formatRounded(value: number | null | undefined) {
   if (value == null) return "-";
-  return new Intl.NumberFormat().format(Math.round(value));
+  return new Intl.NumberFormat("ja-JP").format(Math.round(value));
 }
 
 export function formatMetric(
@@ -84,7 +84,15 @@ type ExportTable = { headers: string[]; rows: (string | number | null)[][] };
 
 export function keywordsToTable(rows: KeywordRow[]): ExportTable {
   return {
-    headers: ["Keyword", "Rank", "Volume", "Traffic", "CPC", "URL", "Score"],
+    headers: [
+      "キーワード",
+      "順位",
+      "検索ボリューム",
+      "トラフィック",
+      "CPC",
+      "URL",
+      "スコア",
+    ],
     rows: rows.map((row) => [
       row.keyword,
       row.position,
@@ -99,7 +107,7 @@ export function keywordsToTable(rows: KeywordRow[]): ExportTable {
 
 export function pagesToTable(rows: PageRow[]): ExportTable {
   return {
-    headers: ["Page", "Organic Traffic", "Keywords"],
+    headers: ["ページ", "自然検索トラフィック", "キーワード数"],
     rows: rows.map((row) => [row.page, row.organicTraffic, row.keywords]),
   };
 }

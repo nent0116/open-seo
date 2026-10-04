@@ -16,8 +16,8 @@ function AuthenticatedShellLayout() {
     return (
       <AuthPageShell>
         <AuthPageCard
-          title="Not available"
-          helperText="This page isn't available right now."
+          title="利用できません"
+          helperText="このページは現在利用できません。"
         >
           <Button
             nativeButton={false}
@@ -25,7 +25,7 @@ function AuthenticatedShellLayout() {
             variant="secondary"
             className="w-full"
           >
-            Back to OpenSEO
+            OpenSEOへ戻る
           </Button>
         </AuthPageCard>
       </AuthPageShell>

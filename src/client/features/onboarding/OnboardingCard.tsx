@@ -19,11 +19,11 @@ export function OnboardingCard({
         <div
           className="mb-8 flex gap-2"
           role="progressbar"
-          aria-label="Onboarding progress"
+          aria-label="初期設定の進行状況"
           aria-valuemin={1}
           aria-valuemax={total}
           aria-valuenow={step}
-          aria-valuetext={`Step ${step} of ${total}`}
+          aria-valuetext={`全${total}ステップ中${step}ステップ目`}
         >
           {Array.from({ length: total }, (_, index) => (
             <span

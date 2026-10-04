@@ -16,11 +16,11 @@ export function NotFound() {
           <CardTitle>404</CardTitle>
         </CardHeader>
         <CardContent className="text-muted-foreground">
-          The page you are looking for does not exist.
+          お探しのページは見つかりませんでした。
         </CardContent>
         <CardFooter>
           <Button nativeButton={false} render={<Link to="/" />}>
-            Home
+            ホーム
           </Button>
         </CardFooter>
       </Card>

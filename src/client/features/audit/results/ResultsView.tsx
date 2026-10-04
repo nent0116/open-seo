@@ -101,8 +101,8 @@ export function ResultsView({
         <Alert variant="warning">
           <ShieldAlert />
           <AlertTitle>
-            Bot protection blocked our crawler on {blockedCount}{" "}
-            {blockedCount === 1 ? "page" : "pages"}.
+            Bot対策によりクローラーがブロックされました：
+            {blockedCount}ページ。
           </AlertTitle>
           <AlertDescription>
             <BotProtectionAdvice
@@ -118,15 +118,14 @@ export function ResultsView({
           <ShieldAlert />
           <AlertTitle>
             {crawlStopped
-              ? "The crawl stopped early because of the site’s rate limit."
-              : `The site rate limited us on ${rateLimitedCount} ${rateLimitedCount === 1 ? "page" : "pages"}.`}
+              ? "サイトのレート制限により、クロールが途中で停止しました。"
+              : `${rateLimitedCount}ページでサイトのレート制限が発生しました。`}
           </AlertTitle>
           <AlertDescription>
             {crawlStopped
-              ? "The requested cooldown exceeded the audit time limit, so some URLs were left unvisited. This report is incomplete. "
-              : "Pages that returned 429 Too Many Requests could not be audited. "}
-            Re-run the audit after the rate limit resets, or ask the site owner
-            to allow the "OpenSEO-Audit" crawler.
+              ? "要求された待機時間が監査の制限時間を超えたため、一部のURLをクロールできませんでした。このレポートは不完全です。"
+              : "429 Too Many Requestsが返されたページは監査できませんでした。"}
+            レート制限の解除後に監査を再実行するか、サイト所有者に「OpenSEO-Audit」クローラーの許可を依頼してください。
           </AlertDescription>
         </Alert>
       )}
@@ -225,13 +224,13 @@ function ResultsHeader({
   onExport: (format: "csv" | "json" | "sheets") => void;
 }) {
   const tabs: Array<{ tab: ResultsTab; label: string }> = [
-    { tab: "issues", label: `Issues (${issueCount})` },
-    { tab: "pages", label: `Pages (${pageCount})` },
+    { tab: "issues", label: `問題（${issueCount}）` },
+    { tab: "pages", label: `ページ（${pageCount}）` },
     ...(hasPerformanceTab
       ? [
           {
             tab: "performance" as const,
-            label: `Performance (${lighthouseCount})`,
+            label: `パフォーマンス（${lighthouseCount}）`,
           },
         ]
       : []),
@@ -291,9 +290,9 @@ function StatsStrip({
   }, [issues]);
 
   const items: StatItem[] = [
-    { label: "Pages crawled", value: String(pagesCrawled) },
+    { label: "クロール済みページ", value: String(pagesCrawled) },
     {
-      label: "Issues found",
+      label: "検出した問題",
       value: String(issues.length),
       valueClass: issues.length === 0 ? "text-success" : "",
       sub: issues.length > 0 && (
@@ -312,14 +311,14 @@ function StatsStrip({
         </span>
       ),
     },
-    { label: "Avg response", value: `${averageResponseMs}ms` },
+    { label: "平均応答時間", value: `${averageResponseMs}ms` },
   ];
 
   if (totalLighthouse > 0) {
     items.push(
-      { label: "Lighthouse tests", value: String(totalLighthouse) },
+      { label: "Lighthouseテスト", value: String(totalLighthouse) },
       {
-        label: "Avg Lighthouse perf",
+        label: "Lighthouse平均性能",
         value:
           lighthouseSummary.avgPerformance == null
             ? "-"
@@ -327,7 +326,7 @@ function StatsStrip({
         valueClass: scoreClass(lighthouseSummary.avgPerformance),
       },
       {
-        label: "Avg Lighthouse SEO",
+        label: "Lighthouse平均SEO",
         value:
           lighthouseSummary.avgSeo == null
             ? "-"
@@ -335,7 +334,7 @@ function StatsStrip({
         valueClass: scoreClass(lighthouseSummary.avgSeo),
       },
       {
-        label: "Avg Lighthouse a11y",
+        label: "Lighthouse平均アクセシビリティ",
         value:
           lighthouseSummary.avgAccessibility == null
             ? "-"
@@ -343,7 +342,7 @@ function StatsStrip({
         valueClass: scoreClass(lighthouseSummary.avgAccessibility),
       },
       {
-        label: "Lighthouse failures",
+        label: "Lighthouse失敗件数",
         value: String(lighthouseSummary.failed),
         valueClass:
           lighthouseSummary.failed > 0 ? "text-destructive" : "text-success",

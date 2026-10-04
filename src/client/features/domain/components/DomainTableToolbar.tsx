@@ -51,7 +51,8 @@ export function DomainTableToolbar({
           onToggle={onToggleFilters}
         />
         <span className="text-sm text-muted-foreground">
-          {(totalCount ?? fallbackCount).toLocaleString()} {countLabel}
+          {(totalCount ?? fallbackCount).toLocaleString("ja-JP")}
+          {countLabel}
         </span>
         {children}
       </DataTableToolbar>
@@ -61,8 +62,8 @@ export function DomainTableToolbar({
           <Alert variant="warning">
             <AlertTriangle />
             <AlertDescription className="text-foreground">
-              Saved filters exceed this scope&apos;s {overBudgetLimit}-condition
-              limit and were not applied. Open Filters to trim them.
+              保存した絞り込み条件が、この範囲で指定できる {overBudgetLimit}
+              件の上限を超えたため適用されませんでした。絞り込みを開いて条件を減らしてください。
             </AlertDescription>
           </Alert>
         </div>

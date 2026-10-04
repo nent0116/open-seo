@@ -40,9 +40,9 @@ export function useTagManage(projectId: string) {
         },
       });
       await invalidate();
-      toast.success("Tag updated");
+      toast.success("タグを更新しました");
     } catch (error) {
-      toast.error(getStandardErrorMessage(error, "Could not update tag"));
+      toast.error(getStandardErrorMessage(error, "タグを更新できませんでした"));
     } finally {
       markBusy(input.tagId, false);
     }
@@ -53,13 +53,13 @@ export function useTagManage(projectId: string) {
     try {
       await deleteSavedKeywordTag({ data: { projectId, tagId } });
       await invalidate();
-      toast.success("Tag deleted");
+      toast.success("タグを削除しました");
       return true;
     } catch (error) {
       toast.error(
         getStandardErrorMessage(
           error,
-          "Could not delete tag. Detach it from all keywords and try again.",
+          "タグを削除できませんでした。すべてのキーワードからタグを外して、もう一度お試しください。",
         ),
       );
       return false;

@@ -31,18 +31,18 @@ function NoResultsState({
       <EmptyState
         variant="card"
         icon={Globe}
-        title="Not enough keyword data for this query yet"
+        title="この検索条件のキーワードデータが不足しています"
         description={
           <>
-            We could not find keyword opportunities for
+            「
             <span className="font-medium text-foreground">
-              {` "${lastSearchKeyword}" `}
+              {lastSearchKeyword}
             </span>
-            in
+            」について、
             <span className="font-medium text-foreground">
-              {` ${LOCATIONS[lastSearchLocationCode] || "this location"}`}
+              {LOCATIONS[lastSearchLocationCode] || "この地域"}
             </span>
-            .
+            のキーワード候補が見つかりませんでした。
           </>
         }
       />
@@ -64,8 +64,8 @@ function SearchHistoryState({
         loaded={controller.historyLoaded}
         onRemove={controller.removeHistoryItem}
         emptyIcon={Search}
-        emptyTitle="Enter a keyword to get started"
-        emptyDescription="Search for any keyword to see volume, difficulty, CPC, and related keyword ideas."
+        emptyTitle="キーワードを入力して始めましょう"
+        emptyDescription="キーワードを検索すると、検索ボリューム、難易度、クリック単価、関連候補を確認できます。"
         getTitle={(item) => item.keyword}
         getSubtitle={(item) => item.locationName}
         renderLink={(item, props) => (

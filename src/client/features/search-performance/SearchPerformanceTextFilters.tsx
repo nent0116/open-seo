@@ -14,8 +14,8 @@ import {
 import type { searchPerformanceInputSchema } from "@/types/schemas/search-performance";
 
 const MATCH_ITEMS = [
-  { value: "contains", label: "Contains" },
-  { value: "equals", label: "Exactly matches" },
+  { value: "contains", label: "含む" },
+  { value: "equals", label: "完全一致" },
 ];
 
 export type TextFilters = Pick<
@@ -79,9 +79,9 @@ export function SearchPerformanceTextFilters({
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <p className="text-sm font-semibold">Refine table results</p>
+          <p className="text-sm font-semibold">表の結果を絞り込む</p>
           {activeFilterCount > 0 ? (
-            <Badge size="sm">{activeFilterCount} active</Badge>
+            <Badge size="sm">適用中 {activeFilterCount}件</Badge>
           ) : null}
           {dirtyCount > 0 ? (
             <Badge variant="warning" size="sm">
@@ -103,13 +103,13 @@ export function SearchPerformanceTextFilters({
           }}
         >
           <RotateCcw data-icon="inline-start" />
-          Clear all
+          すべて解除
         </Button>
       </div>
       <div className="grid gap-3 md:grid-cols-2">
         <div className="space-y-1.5">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Page URL
+            ページURL
           </span>
           <div className="flex flex-col gap-2 sm:flex-row">
             <Select
@@ -122,7 +122,7 @@ export function SearchPerformanceTextFilters({
               <SelectTrigger
                 size="sm"
                 className="w-full sm:w-44 sm:shrink-0"
-                aria-label="Page match"
+                aria-label="ページの一致条件"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -136,17 +136,17 @@ export function SearchPerformanceTextFilters({
             </Select>
             <Input
               className="h-7 w-full min-w-0 sm:flex-1"
-              aria-label="Page URL filter"
+              aria-label="ページURLで絞り込む"
               value={page}
               maxLength={4096}
               onChange={(event) => setPage(event.target.value)}
-              placeholder="URL or subfolder"
+              placeholder="URLまたはサブフォルダ"
             />
           </div>
         </div>
         <div className="space-y-1.5">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-            Query
+            検索文
           </span>
           <div className="flex flex-col gap-2 sm:flex-row">
             <Select
@@ -159,7 +159,7 @@ export function SearchPerformanceTextFilters({
               <SelectTrigger
                 size="sm"
                 className="w-full sm:w-44 sm:shrink-0"
-                aria-label="Query match"
+                aria-label="検索語句の一致条件"
               >
                 <SelectValue />
               </SelectTrigger>
@@ -173,19 +173,17 @@ export function SearchPerformanceTextFilters({
             </Select>
             <Input
               className="h-7 w-full min-w-0 sm:flex-1"
-              aria-label="Query filter"
+              aria-label="検索語句で絞り込む"
               value={query}
               maxLength={4096}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search term"
+              placeholder="検索語句"
             />
           </div>
         </div>
       </div>
       <p className="text-xs text-muted-foreground">
-        All filters must match. Contains ignores case and matches text anywhere,
-        including a subfolder. Exactly matches compares the full URL or query,
-        including case.
+        すべての条件に一致する結果を表示します。「含む」は大文字・小文字を区別せず、サブフォルダを含む任意の位置に一致します。「完全一致」は大文字・小文字を区別してURLまたは検索語句全体を比較します。
       </p>
       <div className="flex items-center justify-end gap-2 pt-1">
         <Button
@@ -195,10 +193,10 @@ export function SearchPerformanceTextFilters({
           onClick={cancel}
           disabled={dirtyCount === 0}
         >
-          Cancel
+          キャンセル
         </Button>
         <Button size="sm" type="submit" disabled={dirtyCount === 0}>
-          Apply filters
+          絞り込みを適用
           {dirtyCount > 0 ? (
             <Badge variant="secondary" size="sm" className="ml-1">
               {dirtyCount}

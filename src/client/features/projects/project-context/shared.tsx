@@ -34,7 +34,7 @@ export function useContextUpdate(projectId: string) {
     onMutate: () => queryClient.cancelQueries({ queryKey }),
     onSuccess: (context) => {
       queryClient.setQueryData(queryKey, context);
-      toast.success("Project context updated");
+      toast.success("プロジェクト情報を更新しました");
     },
     // The page instantiates this mutation per section, so two concurrent
     // patches can settle out of order and the slower (earlier-snapshotted)
@@ -45,17 +45,17 @@ export function useContextUpdate(projectId: string) {
 }
 
 const AUTHOR_LABELS: Record<ContextAuthor, string> = {
-  user: "you",
+  user: "あなた",
   sam: "SAM",
-  mcp: "your AI client",
+  mcp: "AIクライアント",
 };
 
 export function Provenance({ by, at }: { by: ContextAuthor; at?: string }) {
   return (
     <span className="text-xs text-muted-foreground">
       {at
-        ? `Updated by ${AUTHOR_LABELS[by]} · ${formatRelativeTime(at)}`
-        : `Added by ${AUTHOR_LABELS[by]}`}
+        ? `${AUTHOR_LABELS[by]}が更新・${formatRelativeTime(at)}`
+        : `${AUTHOR_LABELS[by]}が追加`}
     </span>
   );
 }

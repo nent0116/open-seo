@@ -19,12 +19,10 @@ import {
 import { Spinner } from "@/client/components/ui/spinner";
 import { Textarea } from "@/client/components/ui/textarea";
 
-// Turn a tool part type ("tool-get_serp_results") into a readable label
-// ("Get serp results"). SAM exposes the full MCP tool surface, too many tools
-// to curate a per-tool label map by hand.
-function humanizeToolLabel(partType: string): string {
-  const name = partType.replace(/^tool-/, "").replace(/_/g, " ");
-  return name.charAt(0).toUpperCase() + name.slice(1);
+// Keep the exact MCP tool identifier visible while the surrounding status copy
+// stays localized. SAM exposes too many tools to curate a translation map.
+function toolNameFromPartType(partType: string): string {
+  return partType.replace(/^tool-/, "");
 }
 
 // activate_skill is the one tool where the target matters more than the tool
@@ -87,8 +85,8 @@ function MessageActions({
     >
       <CopyButton
         value={messageText(message)}
-        successMessage="Message copied"
-        label="Copy message"
+        successMessage="メッセージをコピーしました"
+        label="メッセージをコピー"
         variant="ghost"
         size="icon-xs"
       />
@@ -96,8 +94,8 @@ function MessageActions({
         <Button
           variant="ghost"
           size="icon-xs"
-          aria-label="Edit message"
-          title="Edit and resend"
+          aria-label="メッセージを編集"
+          title="編集して再送信"
           onClick={onStartEdit}
         >
           <Pencil />
@@ -107,8 +105,8 @@ function MessageActions({
         <Button
           variant="ghost"
           size="icon-xs"
-          aria-label="Undo from this message"
-          title="Undo — remove this message and everything after it"
+          aria-label="このメッセージ以降を元に戻す"
+          title="このメッセージと、それ以降の内容を削除します"
           onClick={onUndo}
         >
           <Undo2 />
@@ -140,7 +138,7 @@ function ReasoningBlock({
         ) : (
           <ChevronRight className="size-3 transition-transform group-data-panel-open:rotate-90" />
         )}
-        <span>{isStreaming ? "Thinking…" : "Thought process"}</span>
+        <span>{isStreaming ? "考えています…" : "思考過程"}</span>
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-1.5 whitespace-pre-wrap border-l-2 border-border pl-3 text-xs">
         {part.text}
@@ -158,10 +156,12 @@ function ToolBadge({
   part: UIMessage["parts"][number];
   live: boolean;
 }) {
-  const label = humanizeToolLabel(part.type);
+  const toolName = toolNameFromPartType(part.type);
   const skillName = skillNameFromPart(part);
-  const runningText = skillName ? `Activating ${skillName}` : label;
-  const doneText = skillName ? `Skill: ${skillName}` : label;
+  const runningText = skillName
+    ? `${skillName}を有効化しています`
+    : `ツール実行中：${toolName}`;
+  const doneText = skillName ? `スキル：${skillName}` : `ツール：${toolName}`;
   const state = "state" in part ? part.state : undefined;
   const isDone = state === "output-available";
   // A "running" part in a message that is no longer being generated never
@@ -231,10 +231,10 @@ export function ChatMessage({
           />
           <div className="flex gap-1.5">
             <Button variant="ghost" size="xs" onClick={() => setEditing(false)}>
-              Cancel
+              キャンセル
             </Button>
             <Button size="xs" onClick={submit}>
-              Save & resend
+              保存して再送信
             </Button>
           </div>
         </div>

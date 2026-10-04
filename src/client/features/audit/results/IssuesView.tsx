@@ -21,9 +21,9 @@ const SEVERITY_RULE: Record<IssueSeverity, string> = {
 };
 
 const SEVERITY_LABEL: Record<IssueSeverity, string> = {
-  critical: "Critical",
-  warning: "Warning",
-  info: "Info",
+  critical: "重大",
+  warning: "警告",
+  info: "情報",
 };
 
 interface IssueGroup {
@@ -99,8 +99,8 @@ export function IssuesView({
       {issues.length === 0 ? (
         <EmptyState
           variant="plain"
-          title="No issues recorded for this audit."
-          description="Either the site is in great shape, or this audit ran before issue checks existed — run a new audit to get the full report."
+          title="この監査では問題が記録されていません。"
+          description="サイトが良好な状態か、問題チェック機能の追加前に実行された監査です。完全なレポートを取得するには新しい監査を実行してください。"
         />
       ) : (
         <div>
@@ -161,7 +161,7 @@ function IssueRow({ group }: { group: IssueGroup }) {
           {group.title}
         </span>
         <span className="text-xs tabular-nums text-muted-foreground shrink-0">
-          {group.issues.length} {group.issues.length === 1 ? "page" : "pages"}
+          {group.issues.length}ページ
         </span>
         <ChevronRight
           className={`size-4 shrink-0 text-muted-foreground transition-transform ${
@@ -179,7 +179,7 @@ function IssueRow({ group }: { group: IssueGroup }) {
           )}
           {group.howToFix && (
             <p className="text-sm max-w-prose">
-              <span className="font-medium">How to fix: </span>
+              <span className="font-medium">修正方法： </span>
               <span className="text-foreground/80">{group.howToFix}</span>
             </p>
           )}
@@ -215,7 +215,7 @@ function AffectedUrlList({ issues }: { issues: AuditIssueRow[] }) {
       ))}
       {remaining > 0 && (
         <div className="px-3 py-2 text-xs text-muted-foreground">
-          …and {remaining} more — export the issues CSV for the full list.
+          …ほか{remaining}件。完全な一覧は問題CSVを出力して確認できます。
         </div>
       )}
     </div>
@@ -254,7 +254,7 @@ function IssueDetails({ detailsJson }: { detailsJson: string | null }) {
             : String(value);
           return `${key}: ${rendered}`;
         })
-        .join(" · ")}
+        .join("・")}
     </span>
   );
 }

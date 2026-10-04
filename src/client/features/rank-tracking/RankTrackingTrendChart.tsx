@@ -53,9 +53,9 @@ export function RankTrendChart({
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-[11px] text-muted-foreground">
-        <span>Google position (1 = best)</span>
+        <span>Google掲載順位（1位が最高）</span>
         <span className="inline-flex items-center gap-1">
-          Better <span aria-hidden>↑</span>
+          上位 <span aria-hidden>↑</span>
         </span>
       </div>
       <ChartContainer config={config} className="h-56">
@@ -119,7 +119,7 @@ export const TIME_AXIS = {
 } as const;
 
 function formatDateTick(value: number): string {
-  return new Date(value).toLocaleDateString("en-US", {
+  return new Date(value).toLocaleDateString("ja-JP", {
     month: "short",
     day: "numeric",
   });
@@ -128,7 +128,7 @@ function formatDateTick(value: number): string {
 /** Tooltip label for a `checkedAt` timestamp: "Sep 28, 2026". */
 export function formatDateLabel(label: unknown): string {
   return typeof label === "number"
-    ? new Date(label).toLocaleDateString("en-US", {
+    ? new Date(label).toLocaleDateString("ja-JP", {
         month: "short",
         day: "numeric",
         year: "numeric",
@@ -138,9 +138,9 @@ export function formatDateLabel(label: unknown): string {
 
 /** 30d / 90d / All range toggle shared by the modal and overview charts. */
 const TREND_RANGES = [
-  { value: "30", icon: null, label: "30d" },
-  { value: "90", icon: null, label: "90d" },
-  { value: "730", icon: null, label: "All" },
+  { value: "30", icon: null, label: "30日" },
+  { value: "90", icon: null, label: "90日" },
+  { value: "730", icon: null, label: "すべて" },
 ];
 
 export function TrendRangeToggle({
@@ -166,11 +166,13 @@ export function TrendEmptyState({ checks }: { checks: number }) {
     <EmptyState
       icon={TrendingUp}
       size="sm"
-      title={checks === 0 ? "No history yet" : "Only 1 check so far"}
+      title={
+        checks === 0 ? "履歴はまだありません" : "チェックはまだ1回だけです"
+      }
       description={
         checks === 0
-          ? "Run a check to start tracking positions over time."
-          : "The trend fills in after the next check."
+          ? "チェックを実行すると、順位の推移を記録できます。"
+          : "次回のチェック後に推移が表示されます。"
       }
     />
   );
