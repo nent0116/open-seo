@@ -61,6 +61,7 @@ import {
 import { isHostedServerAuthMode } from "@/server/lib/runtime-env";
 import { AppError } from "@/server/lib/errors";
 import { enforceDataforseoSafetyLimits } from "@/server/lib/dataforseo/usage-limits";
+import { DATAFORSEO_DEFAULT_REQUEST_ATTEMPTS } from "@/server/lib/dataforseo/core";
 
 export { mapDataforseoPathToCreditFeature };
 
@@ -83,6 +84,7 @@ function meter<I, T>(
   fetcher: (input: I) => Promise<DataforseoApiResponse<T>>,
   estimateRawUsd: (input: I) => number,
   defaultFeature?: CreditFeature,
+  maxRequestAttempts = DATAFORSEO_DEFAULT_REQUEST_ATTEMPTS,
 ): (input: I & { creditFeature?: CreditFeature }) => Promise<T> {
   return (input) =>
     meterDataforseoCall(
@@ -90,6 +92,7 @@ function meter<I, T>(
       () => fetcher(input),
       estimateRawUsd(input),
       input.creditFeature ?? defaultFeature,
+      maxRequestAttempts,
     );
 }
 
@@ -121,12 +124,14 @@ export function createDataforseoClient(customer: BillingCustomerContext) {
         postGoogleReviewsTask,
         dataforseoPricing.business.reviewsTaskPost,
         "local_seo",
+        1,
       ),
       updatesTaskPost: meter(
         customer,
         postMyBusinessUpdatesTask,
         dataforseoPricing.business.updatesTaskPost,
         "local_seo",
+        1,
       ),
     },
     backlinks: {
@@ -249,6 +254,8 @@ export function createDataforseoClient(customer: BillingCustomerContext) {
         customer,
         fetchLighthouseResult,
         dataforseoPricing.lighthouse.live,
+        undefined,
+        1,
       ),
     },
     aiSearch: {
@@ -298,11 +305,12 @@ async function meterDataforseoCalls<T>(
   executes: Array<() => Promise<DataforseoApiResponse<T>>>,
   estimatedCostsUsd: number[],
   creditFeature?: CreditFeature,
+  maxRequestAttempts = DATAFORSEO_DEFAULT_REQUEST_ATTEMPTS,
 ): Promise<PromiseSettledResult<T>[]> {
   if (executes.length === 0) return [];
   await enforceDataforseoSafetyLimits({
     estimatedCostUsd: estimatedCostsUsd.reduce((sum, cost) => sum + cost, 0),
-    requests: executes.length,
+    requests: executes.length * maxRequestAttempts,
   });
 
   const isHostedMode = await isHostedServerAuthMode();
@@ -386,12 +394,14 @@ async function meterDataforseoCall<T>(
   execute: () => Promise<DataforseoApiResponse<T>>,
   estimatedCostUsd: number,
   creditFeature?: CreditFeature,
+  maxRequestAttempts = DATAFORSEO_DEFAULT_REQUEST_ATTEMPTS,
 ): Promise<T> {
   const [result] = await meterDataforseoCalls(
     customer,
     [execute],
     [estimatedCostUsd],
     creditFeature,
+    maxRequestAttempts,
   );
   if (result.status === "rejected") throw result.reason;
   return result.value;

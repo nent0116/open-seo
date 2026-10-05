@@ -139,6 +139,7 @@ import { DataforseoChargedTaskError } from "@/server/lib/dataforseo/envelope";
 import { AppError } from "@/server/lib/errors";
 import { fetchBacklinksSummary } from "@/server/lib/dataforseo/backlinks";
 import { fetchRankCheckSerp } from "@/server/lib/dataforseo/serp";
+import { postGoogleReviewsTask } from "@/server/lib/dataforseo/business";
 
 const billingCustomer = {
   organizationId: "org_123",
@@ -194,10 +195,39 @@ describe("meterDataforseoCall", () => {
     expect(result).toEqual({ rank: 42 });
     expect(enforceUsageLimitsMock).toHaveBeenCalledWith({
       estimatedCostUsd: dataforseoPricing.backlinks.summary(backlinksInput),
-      requests: 1,
+      requests: 3,
     });
     expect(checkMock).not.toHaveBeenCalled();
     expect(finalizeMock).not.toHaveBeenCalled();
+  });
+
+  it("reserves one request for a billed task post that disables retries", async () => {
+    isHostedServerAuthModeMock.mockResolvedValue(false);
+    vi.mocked(postGoogleReviewsTask).mockResolvedValue({
+      data: "task_123",
+      billing: {
+        costUsd: RAW_COST,
+        path: ["v3", "business_data", "google", "reviews", "task_post"],
+      },
+    });
+    const input = {
+      cid: "123",
+      locationCode: 2840,
+      languageCode: "en",
+      depth: 20,
+      sortBy: "newest",
+      includeOtherSources: false,
+    };
+
+    const client = createDataforseoClient(billingCustomer);
+    await expect(client.business.reviewsTaskPost(input)).resolves.toBe(
+      "task_123",
+    );
+
+    expect(enforceUsageLimitsMock).toHaveBeenCalledWith({
+      estimatedCostUsd: dataforseoPricing.business.reviewsTaskPost(input),
+      requests: 1,
+    });
   });
 
   it("does not call DataForSEO when the operator safety limit is exceeded", async () => {
@@ -365,7 +395,7 @@ describe("rankCheckBatch", () => {
     expect(checkMock).toHaveBeenCalledTimes(1);
     expect(enforceUsageLimitsMock).toHaveBeenCalledWith({
       estimatedCostUsd: 3 * dataforseoPricing.serp.rankCheck(input),
-      requests: 3,
+      requests: 9,
     });
     expect(checkMock.mock.calls[0][0]).toMatchObject({
       requiredBalance: 3 * callEstimate,
