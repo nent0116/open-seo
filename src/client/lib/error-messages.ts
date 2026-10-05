@@ -27,6 +27,8 @@ const STANDARD_MESSAGES: Record<ErrorCode, string> = {
     "連携中のDataForSEOアカウントで、請求または残高の問題が発生しています。",
   DATAFORSEO_AUTH_FAILED:
     "DataForSEOがAPIキーを拒否しました。DATAFORSEO_API_KEYにDataForSEOの「ログイン名:パスワード」をBase64エンコードした値が設定されているか確認してください。",
+  DATAFORSEO_USAGE_LIMIT_EXCEEDED:
+    "DataForSEOの安全上限に達したため、API呼び出しを停止しました。設定画面で利用状況と上限を確認してください。",
   RATE_LIMITED:
     "リクエストが多すぎます。時間をおいて、もう一度お試しください。",
   UPSTREAM_UNAVAILABLE:

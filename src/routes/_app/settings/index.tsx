@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ApiKeySettings } from "@/client/features/settings/ApiKeySettings";
+import { DataforseoUsageSettings } from "@/client/features/settings/DataforseoUsageSettings";
 import { SectionHeader } from "@/client/components/PageHeader";
 import { ThemePreferenceRadio } from "@/client/components/ThemePreferenceMenuItems";
 import { Switch } from "@/client/components/ui/switch";
@@ -77,15 +78,18 @@ function PersonalSettings() {
           </section>
         </>
       ) : (
-        <section className="space-y-3">
-          <SectionHeader title="情報" />
-          <div className="flex items-center justify-between gap-6">
-            <span className="text-sm">バージョン</span>
-            <span className="font-mono text-sm text-muted-foreground">
-              v{version}
-            </span>
-          </div>
-        </section>
+        <>
+          <DataforseoUsageSettings />
+          <section className="space-y-3">
+            <SectionHeader title="情報" />
+            <div className="flex items-center justify-between gap-6">
+              <span className="text-sm">バージョン</span>
+              <span className="font-mono text-sm text-muted-foreground">
+                v{version}
+              </span>
+            </div>
+          </section>
+        </>
       )}
     </div>
   );

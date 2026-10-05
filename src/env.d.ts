@@ -61,6 +61,9 @@ declare namespace Cloudflare {
 
     // DataForSEO API Basic auth value (base64 of login:password)
     DATAFORSEO_API_KEY: string;
+    // Optional operator safety ceilings for paid DataForSEO calls.
+    DATAFORSEO_DAILY_SPEND_LIMIT_USD?: string;
+    DATAFORSEO_REQUESTS_PER_MINUTE_LIMIT?: string;
 
     // OpenRouter API key for the SAM in-app chat agent.
     OPENROUTER_API_KEY?: string;

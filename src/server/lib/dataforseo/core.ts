@@ -15,6 +15,7 @@ const DATAFORSEO_REQUEST_TIMEOUT_MS = 60_000;
 // Retry idempotent reads on transient 5xx. Total attempts = retries + 1; the
 // shared request-timeout signal still caps overall wall time.
 const DATAFORSEO_MAX_RETRIES = 2;
+export const DATAFORSEO_DEFAULT_REQUEST_ATTEMPTS = DATAFORSEO_MAX_RETRIES + 1;
 const DATAFORSEO_RETRY_BACKOFF_MS = 250;
 
 /**
