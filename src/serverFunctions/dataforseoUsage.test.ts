@@ -22,8 +22,8 @@ vi.mock("@/server/lib/runtime-env", () => ({
   isHostedServerAuthMode,
 }));
 
-vi.mock("@/server/features/dataforseo/services/DataforseoUsageService", () => ({
-  DataforseoUsageService: { getAccountUsage },
+vi.mock("@/server/lib/dataforseo/usage-limits", () => ({
+  getDataforseoUsageSnapshot: getAccountUsage,
 }));
 
 import { getDataforseoAccountUsage } from "./dataforseoUsage";

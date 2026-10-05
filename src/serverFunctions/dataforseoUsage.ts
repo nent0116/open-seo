@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { DataforseoUsageService } from "@/server/features/dataforseo/services/DataforseoUsageService";
 import { AppError } from "@/server/lib/errors";
+import { getDataforseoUsageSnapshot } from "@/server/lib/dataforseo/usage-limits";
 import {
   getOptionalEnvValue,
   isHostedServerAuthMode,
@@ -19,6 +19,6 @@ export const getDataforseoAccountUsage = createServerFn({ method: "GET" })
 
     return {
       configured: true as const,
-      usage: await DataforseoUsageService.getAccountUsage(),
+      usage: await getDataforseoUsageSnapshot(),
     };
   });
