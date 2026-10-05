@@ -55,4 +55,21 @@ describe("runSelfhostPreflight", () => {
     expect(itemFor(result, "Search Console")?.level).toBe("warn");
     expect(itemFor(result, "Search Console")?.message).toContain("32");
   });
+
+  it("fails invalid DataForSEO safety limits before startup", () => {
+    const result = runSelfhostPreflight({
+      AUTH_MODE: "local_noauth",
+      DATAFORSEO_API_KEY: btoa("user@example.com:secret"),
+      DATAFORSEO_DAILY_SPEND_LIMIT_USD: "0",
+      DATAFORSEO_REQUESTS_PER_MINUTE_LIMIT: "1.5",
+    });
+
+    expect(result.failed).toBe(true);
+    expect(itemFor(result, "DATAFORSEO_DAILY_SPEND_LIMIT_USD")?.level).toBe(
+      "fail",
+    );
+    expect(
+      itemFor(result, "DATAFORSEO_REQUESTS_PER_MINUTE_LIMIT")?.message,
+    ).toContain("whole number");
+  });
 });

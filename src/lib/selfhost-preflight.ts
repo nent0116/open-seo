@@ -151,6 +151,27 @@ function checkDataForSeo(env: EnvRecord, items: PreflightItem[]): void {
     level: "ok",
     message: "Set",
   });
+
+  for (const { name, integer } of [
+    { name: "DATAFORSEO_DAILY_SPEND_LIMIT_USD", integer: false },
+    { name: "DATAFORSEO_REQUESTS_PER_MINUTE_LIMIT", integer: true },
+  ]) {
+    const rawValue = get(env, name);
+    if (rawValue === undefined) continue;
+    const value = Number(rawValue);
+    if (
+      !Number.isFinite(value) ||
+      value <= 0 ||
+      (integer && !Number.isInteger(value))
+    ) {
+      items.push({
+        key: "dataforseo",
+        name,
+        level: "fail",
+        message: `${name} must be a positive${integer ? " whole" : ""} number.`,
+      });
+    }
+  }
 }
 
 function checkOptionalFeatures(env: EnvRecord, items: PreflightItem[]): void {

@@ -60,6 +60,7 @@ import {
 } from "@/server/lib/dataforseo/ai";
 import { isHostedServerAuthMode } from "@/server/lib/runtime-env";
 import { AppError } from "@/server/lib/errors";
+import { enforceDataforseoSafetyLimits } from "@/server/lib/dataforseo/usage-limits";
 
 export { mapDataforseoPathToCreditFeature };
 
@@ -87,7 +88,7 @@ function meter<I, T>(
     meterDataforseoCall(
       customer,
       () => fetcher(input),
-      creditsForProviderUsd(estimateRawUsd(input)),
+      estimateRawUsd(input),
       input.creditFeature ?? defaultFeature,
     );
 }
@@ -208,9 +209,7 @@ export function createDataforseoClient(customer: BillingCustomerContext) {
         meterDataforseoCalls(
           customer,
           inputs.map((input) => () => fetchRankCheckSerp(input)),
-          inputs.map((input) =>
-            creditsForProviderUsd(dataforseoPricing.serp.rankCheck(input)),
-          ),
+          inputs.map((input) => dataforseoPricing.serp.rankCheck(input)),
           "rank_tracking",
         ),
       // Posts up to 100 queued rank check tasks; one metered charge covers the
@@ -297,10 +296,15 @@ export function createDataforseoClient(customer: BillingCustomerContext) {
 async function meterDataforseoCalls<T>(
   customer: BillingCustomerContext,
   executes: Array<() => Promise<DataforseoApiResponse<T>>>,
-  callCredits: number[],
+  estimatedCostsUsd: number[],
   creditFeature?: CreditFeature,
 ): Promise<PromiseSettledResult<T>[]> {
   if (executes.length === 0) return [];
+  await enforceDataforseoSafetyLimits({
+    estimatedCostUsd: estimatedCostsUsd.reduce((sum, cost) => sum + cost, 0),
+    requests: executes.length,
+  });
+
   const isHostedMode = await isHostedServerAuthMode();
 
   if (!isHostedMode) {
@@ -313,7 +317,7 @@ async function meterDataforseoCalls<T>(
   const { holds, refusedCalls } = await reserveUsageCredits({
     customer,
     customerId: billingCustomer.id,
-    callCredits,
+    callCredits: estimatedCostsUsd.map(creditsForProviderUsd),
     creditFeature,
   });
 
@@ -380,13 +384,13 @@ async function meterDataforseoCalls<T>(
 async function meterDataforseoCall<T>(
   customer: BillingCustomerContext,
   execute: () => Promise<DataforseoApiResponse<T>>,
-  estimatedCredits: number,
+  estimatedCostUsd: number,
   creditFeature?: CreditFeature,
 ): Promise<T> {
   const [result] = await meterDataforseoCalls(
     customer,
     [execute],
-    [estimatedCredits],
+    [estimatedCostUsd],
     creditFeature,
   );
   if (result.status === "rejected") throw result.reason;

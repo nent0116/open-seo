@@ -1,4 +1,6 @@
+import { z } from "zod";
 import { dataforseoGet } from "@/server/lib/dataforseo/core";
+import { AppError } from "@/server/lib/errors";
 import {
   assertOk,
   type DataforseoTaskLike,
@@ -9,21 +11,31 @@ import {
  * optional on the wire; `money.statistics.day` / `.minute` group spend by
  * function under `total_<function>` keys, so those stay untyped records.
  */
-interface DataforseoUserData {
-  login?: string | null;
-  timezone?: string | null;
-  money?: {
-    total?: number | null;
-    balance?: number | null;
-    statistics?: {
-      day?: Record<string, unknown> | null;
-      minute?: Record<string, unknown> | null;
-      [key: string]: unknown;
-    } | null;
-    [key: string]: unknown;
-  } | null;
-  [key: string]: unknown;
-}
+const usageWindowsSchema = z.looseObject({
+  day: z.record(z.string(), z.unknown()).nullish(),
+  minute: z.record(z.string(), z.unknown()).nullish(),
+});
+
+const dataforseoUserDataSchema = z.looseObject({
+  login: z.string().nullish(),
+  timezone: z.string().nullish(),
+  rates: z
+    .looseObject({
+      limits: usageWindowsSchema.nullish(),
+      statistics: usageWindowsSchema.nullish(),
+    })
+    .nullish(),
+  money: z
+    .looseObject({
+      total: z.number().nullish(),
+      balance: z.number().nullish(),
+      limits: usageWindowsSchema.nullish(),
+      statistics: usageWindowsSchema.nullish(),
+    })
+    .nullish(),
+});
+
+export type DataforseoUserData = z.infer<typeof dataforseoUserDataSchema>;
 
 /**
  * Reads account spend + balance from DataForSEO's free GET
@@ -46,5 +58,16 @@ export async function fetchUserData(): Promise<DataforseoUserData | undefined> {
   // envelope to build.
   const task = assertOk(response);
 
-  return task.result?.[0];
+  const rawResult = task.result?.[0];
+  if (rawResult === undefined) return undefined;
+
+  const result = dataforseoUserDataSchema.safeParse(rawResult);
+  if (!result.success) {
+    throw new AppError(
+      "UPSTREAM_UNAVAILABLE",
+      "DataForSEO returned invalid account usage data",
+    );
+  }
+
+  return result.data;
 }

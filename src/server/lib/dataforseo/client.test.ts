@@ -28,6 +28,7 @@ const {
   checkMock,
   finalizeMock,
   getOrCreateMock,
+  enforceUsageLimitsMock,
   isHostedServerAuthModeMock,
   mockEnv,
 } = vi.hoisted(() => ({
@@ -35,6 +36,7 @@ const {
   finalizeMock:
     vi.fn<(arg: FinalizeCallArg) => Promise<{ success: boolean }>>(),
   getOrCreateMock: vi.fn(),
+  enforceUsageLimitsMock: vi.fn().mockResolvedValue(undefined),
   isHostedServerAuthModeMock: vi.fn(),
   mockEnv: {},
 }));
@@ -65,6 +67,10 @@ vi.mock("@/server/billing/subscription", async (importOriginal) => {
 
 vi.mock("@/server/lib/runtime-env", () => ({
   isHostedServerAuthMode: isHostedServerAuthModeMock,
+}));
+
+vi.mock("@/server/lib/dataforseo/usage-limits", () => ({
+  enforceDataforseoSafetyLimits: enforceUsageLimitsMock,
 }));
 
 vi.mock("@/server/lib/posthog", () => ({
@@ -186,8 +192,28 @@ describe("meterDataforseoCall", () => {
     const result = await client.backlinks.summary(backlinksInput);
 
     expect(result).toEqual({ rank: 42 });
+    expect(enforceUsageLimitsMock).toHaveBeenCalledWith({
+      estimatedCostUsd: dataforseoPricing.backlinks.summary(backlinksInput),
+      requests: 1,
+    });
     expect(checkMock).not.toHaveBeenCalled();
     expect(finalizeMock).not.toHaveBeenCalled();
+  });
+
+  it("does not call DataForSEO when the operator safety limit is exceeded", async () => {
+    isHostedServerAuthModeMock.mockResolvedValue(false);
+    enforceUsageLimitsMock.mockRejectedValueOnce(
+      new AppError("DATAFORSEO_USAGE_LIMIT_EXCEEDED"),
+    );
+    mockDataforseoResult(RAW_COST);
+
+    const client = createDataforseoClient(billingCustomer);
+    await expect(
+      client.backlinks.summary(backlinksInput),
+    ).rejects.toMatchObject({ code: "DATAFORSEO_USAGE_LIMIT_EXCEEDED" });
+
+    expect(fetchBacklinksSummary).not.toHaveBeenCalled();
+    expect(checkMock).not.toHaveBeenCalled();
   });
 
   it("never calls the provider when the hold is refused", async () => {
@@ -337,6 +363,10 @@ describe("rankCheckBatch", () => {
       "fulfilled",
     ]);
     expect(checkMock).toHaveBeenCalledTimes(1);
+    expect(enforceUsageLimitsMock).toHaveBeenCalledWith({
+      estimatedCostUsd: 3 * dataforseoPricing.serp.rankCheck(input),
+      requests: 3,
+    });
     expect(checkMock.mock.calls[0][0]).toMatchObject({
       requiredBalance: 3 * callEstimate,
     });
