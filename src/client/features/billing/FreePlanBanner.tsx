@@ -1,14 +1,30 @@
 import { Link } from "@tanstack/react-router";
 import { AppBanner } from "@/client/layout/AppBanner";
+import { BASE_PLAN_OFFER } from "@/client/features/billing/plan-offers";
 import { useCreditBalance } from "@/client/features/billing/useCreditBalance";
+import { useCanManageBilling } from "@/client/features/team/organizationQueries";
 import { BILLING_ROUTE, SUBSCRIBE_ROUTE } from "@/shared/billing";
 
 export function FreePlanBanner() {
-  const { customerQuery, isFreePlan, isOutOfCredits, isLowCredits } =
+  const { accountQuery, isFreePlan, isOutOfCredits, isLowCredits, refillDate } =
     useCreditBalance();
+  const canManageBilling = useCanManageBilling();
 
-  if (customerQuery.isLoading || !customerQuery.data) {
+  if (!accountQuery.data) {
     return null;
+  }
+
+  // Only the owner can change the plan or buy credits, so a link would lead
+  // everyone else to a page where they can't act.
+  if (!canManageBilling && (isOutOfCredits || isLowCredits)) {
+    return (
+      <AppBanner variant={isOutOfCredits ? "destructive" : "warning"}>
+        {isOutOfCredits
+          ? "組織のクレジットをすべて使用しました。"
+          : "組織のクレジット残高が少なくなっています。"}{" "}
+        追加が必要な場合は組織の所有者へ依頼してください。
+      </AppBanner>
+    );
   }
 
   const creditsActionLink = isFreePlan ? (
@@ -31,8 +47,18 @@ export function FreePlanBanner() {
   if (isOutOfCredits) {
     return (
       <AppBanner variant="destructive">
-        クレジットをすべて使用しました。{creditsActionLink}
-        してOpenSEOの利用を続けてください。
+        {isFreePlan ? (
+          <>
+            無料クレジットをすべて使用しました。{creditsActionLink}すると毎月$
+            {BASE_PLAN_OFFER.monthlyCreditsUsd}相当のクレジットを利用できます。
+          </>
+        ) : (
+          <>
+            今月のクレジットをすべて使用しました。{creditsActionLink}して
+            利用を続けてください
+            {refillDate ? `。または、${refillDate}の補充をお待ちください` : ""}.
+          </>
+        )}
       </AppBanner>
     );
   }

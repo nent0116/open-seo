@@ -64,6 +64,16 @@ declare namespace Cloudflare {
     // Optional operator safety ceilings for paid DataForSEO calls.
     DATAFORSEO_DAILY_SPEND_LIMIT_USD?: string;
     DATAFORSEO_REQUESTS_PER_MINUTE_LIMIT?: string;
+    AI_VISIBILITY_WORKFLOW: Workflow<
+      ({ runId: string } | { setupProjectId: string }) & {
+        customer: {
+          organizationId: string;
+          userId: string;
+          userEmail: string;
+          projectId?: string;
+        };
+      }
+    >;
 
     // OpenRouter API key for the SAM in-app chat agent.
     OPENROUTER_API_KEY?: string;

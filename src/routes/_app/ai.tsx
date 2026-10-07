@@ -42,6 +42,14 @@ const SKILLS = [
     "seo-audit",
     "今週取り組む施策を1つに絞った、1ページのサイト監査を作成します。",
   ],
+  [
+    "ai-visibility-audit",
+    "AIの回答に引用されるための優先的な改善点を見つけます。",
+  ],
+  [
+    "ai-prompt-research",
+    "市場についてChatGPTで尋ねられる内容と、引用されるサイトを調べます。",
+  ],
   ["keyword-research", "いくつかのテーマからキーワード機会を見つけます。"],
   [
     "keyword-clustering",

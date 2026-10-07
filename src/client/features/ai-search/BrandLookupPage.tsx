@@ -5,6 +5,7 @@ import { BarChart3, Quote, Sparkles, TrendingUp } from "lucide-react";
 import { lookupBrand } from "@/serverFunctions/ai-search";
 import { useHostedPlanGate } from "@/client/features/billing/HostedPlanGate";
 import { ResearchPageShell } from "@/client/features/ai-search/ResearchPageShell";
+import { PromptTrackingWithoutUpgradeButton } from "@/client/features/ai-visibility/shared";
 import { BrandLookupResults } from "@/client/features/ai-search/components/BrandLookupResults";
 import { BrandLookupSearchCard } from "@/client/features/ai-search/components/BrandLookupSearchCard";
 import { RecentSearches } from "@/client/components/RecentSearches";
@@ -207,12 +208,14 @@ export function BrandLookupPage({
     <ResearchPageShell
       title="ブランド調査"
       description="AI検索がブランド名やドメインをどのように引用しているか確認します。"
-      planStatus={planStatus}
       gate={{
         feature: "ブランド検索",
         description:
           "ChatGPTやGoogle AI Overviewにおけるブランドやドメインの引用状況を、言及総数、表示されたプロンプト例、一緒に引用されたページから確認します。",
-        bullets: BRAND_LOOKUP_BULLETS,
+        features: BRAND_LOOKUP_BULLETS,
+        alternative: (
+          <PromptTrackingWithoutUpgradeButton projectId={projectId} />
+        ),
       }}
       form={
         <BrandLookupSearchCard
