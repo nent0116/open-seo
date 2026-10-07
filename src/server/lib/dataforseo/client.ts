@@ -241,6 +241,7 @@ export function createDataforseoClient(customer: BillingCustomerContext) {
         postLocalSerpTasks,
         dataforseoPricing.serp.localTaskPost,
         "local_seo",
+        1,
       ),
     },
     labs: {
@@ -301,6 +302,7 @@ export function createDataforseoClient(customer: BillingCustomerContext) {
         postAiTrackingTasks,
         dataforseoPricing.aiSearch.trackingTaskPost,
         "ai_prompt_responses",
+        1,
       ),
     },
   } as const;
