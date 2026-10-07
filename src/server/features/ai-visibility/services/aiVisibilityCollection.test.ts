@@ -67,6 +67,53 @@ beforeEach(async () => {
 });
 
 describe("AI answer collection", () => {
+  it("does not replace evidence belonging to a different run", async () => {
+    const original = {
+      status: "completed" as const,
+      answerMarkdown: "Original answer",
+    };
+    await repo.persistAnswer({
+      runId,
+      observationId: "answer-0",
+      values: original,
+      sources: [
+        {
+          id: "source",
+          observationId: "answer-0",
+          url: "https://openseo.so/",
+          domain: "openseo.so",
+          position: 1,
+        },
+      ],
+      matches: [],
+    });
+    await repo.updateRun(runId, { status: "completed" });
+    const rows = await repo.getConfiguration("project");
+    if (!rows) throw new Error("Missing tracker");
+    await repo.createRun(
+      {
+        id: "other-run",
+        trackerId: rows.tracker.id,
+        projectId: "project",
+        trigger: "manual",
+        status: "running",
+        ...market,
+        createdAt: "2026-09-06T12:00:00.000Z",
+      },
+      [],
+    );
+    dataforseo.fetchTaskResult.mockResolvedValueOnce({
+      status: "completed",
+      result: { markdown: "Wrong answer", sources: [] },
+    });
+    await collectAiRound("other-run", [
+      { tag: "answer-0", taskId: "foreign-task", engine: "chatgpt" },
+    ]);
+    expect(await repo.getObservation("answer-0")).toMatchObject(original);
+    expect((await repo.getEvidence(["answer-0"])).sources).toMatchObject([
+      { id: "source" },
+    ]);
+  });
   it("saves an answer with its citations and each brand's mention and citation", async () => {
     dataforseo.fetchTaskResult.mockResolvedValue({
       status: "completed",

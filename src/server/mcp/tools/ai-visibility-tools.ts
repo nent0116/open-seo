@@ -182,7 +182,7 @@ export const researchAiVisibilityPromptsTool = defineAiTool({
   title: "Research AI prompts",
   input: researchAiPromptsSchema,
   output: aiPromptResearchOutput,
-  readOnly: true,
+  readOnly: false,
   openWorld: true,
   path: "research",
   description:

@@ -606,37 +606,33 @@ export async function trackUsageCreditSpend(args: {
     ...args.properties,
   };
 
-  if (monthlyDeduct > 0) {
-    await autumn.track(
+  for (const [featureId, value] of [
+    [AUTUMN_SEO_DATA_BALANCE_FEATURE_ID, monthlyDeduct],
+    [AUTUMN_SEO_DATA_TOPUP_BALANCE_FEATURE_ID, topupDeduct],
+  ] as const) {
+    if (value <= 0) continue;
+    const result = await autumn.track(
       {
         customerId: args.customerId,
-        featureId: AUTUMN_SEO_DATA_BALANCE_FEATURE_ID,
-        value: monthlyDeduct,
+        featureId,
+        value,
         // Research explicitly permits debt; Autumn otherwise caps at zero.
         overageBehavior: args.overdraft ? "overflow" : undefined,
         properties: {
           ...properties,
-          balanceFeatureId: AUTUMN_SEO_DATA_BALANCE_FEATURE_ID,
+          balanceFeatureId: featureId,
         },
       },
       AUTUMN_TRACK_RETRY_OPTIONS,
     );
-  }
-
-  if (topupDeduct > 0) {
-    await autumn.track(
-      {
-        customerId: args.customerId,
-        featureId: AUTUMN_SEO_DATA_TOPUP_BALANCE_FEATURE_ID,
-        value: topupDeduct,
-        overageBehavior: args.overdraft ? "overflow" : undefined,
-        properties: {
-          ...properties,
-          balanceFeatureId: AUTUMN_SEO_DATA_TOPUP_BALANCE_FEATURE_ID,
-        },
-      },
-      AUTUMN_TRACK_RETRY_OPTIONS,
-    );
+    // The SDK turns timeouts/5xx into a fake success with no customer and
+    // value 0. A genuine 202 acknowledgement can have no balance, so check
+    // the accepted customer/value instead. Never replay an uncertain track.
+    if (result.customerId !== args.customerId || result.value !== value)
+      throw new AppError(
+        "INTERNAL_ERROR",
+        `Unconfirmed Autumn deduction: ${featureId}, ${value} credits. Do not replay automatically.`,
+      );
   }
 
   await captureCreditsConsumed(args.customer, {

@@ -89,11 +89,17 @@ export async function postAiTrackingTasks(input: {
   // Cost is summed over every entry, accepted or not, so anything DataForSEO
   // charged is metered.
   const posted: PostedAiTrackingTask[] = [];
+  const unacceptedTags = new Set(input.tasks.map((task) => task.tag));
   let costUsd = 0;
   for (const entry of response.tasks ?? []) {
     costUsd += entry.cost ?? 0;
     const tag: unknown = entry.data?.tag;
-    if (entry.status_code !== 20100 || !entry.id || typeof tag !== "string") {
+    if (
+      entry.status_code !== 20100 ||
+      !entry.id ||
+      typeof tag !== "string" ||
+      !unacceptedTags.delete(tag)
+    ) {
       console.warn(
         `dataforseo.ai_tracking.task_post.rejected-entry (${entry.status_code}): ${entry.status_message}`,
       );

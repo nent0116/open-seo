@@ -45,14 +45,16 @@ export async function setSchedule(
     !tracker.nextCheckAt
       ? computeNextCheckAt(scheduleInterval, null, input.scheduleTime)
       : tracker.nextCheckAt;
-  await repo.updateTracker(tracker.id, {
-    enabled: true,
-    scheduleInterval,
-    nextCheckAt,
-    lastSkipReason: null,
-  });
   let run: AiRun | null = null;
-  if (!(await repo.getLatestScheduledRun(input.projectId))) {
+  const latest = await repo.getLatestScheduledRun(input.projectId);
+  // A failed first start must not permanently suppress the baseline. An
+  // explicit re-enable after a failed baseline retries it immediately.
+  if (
+    !latest ||
+    (!tracker.enabled &&
+      latest.trigger === "baseline" &&
+      latest.status === "failed")
+  ) {
     try {
       run = await startRun(config, "baseline", billing);
     } catch (error) {
@@ -64,5 +66,13 @@ export async function setSchedule(
         throw error;
     }
   }
+  // Commit enablement only after startup succeeds (or an active check can
+  // stand in for it). Later collection failures never pause the schedule.
+  await repo.updateTracker(tracker.id, {
+    enabled: true,
+    scheduleInterval,
+    nextCheckAt,
+    lastSkipReason: null,
+  });
   return { state: await getTracker(input), run };
 }

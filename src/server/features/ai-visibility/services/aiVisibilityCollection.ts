@@ -143,6 +143,7 @@ export async function collectAiRound(
         continue;
       }
       await repo.persistAnswer({
+        runId,
         observationId: task.tag,
         values: {
           status: "completed",

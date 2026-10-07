@@ -5,7 +5,7 @@ export const suggestedAiTopicSchema = z.object({
     .string()
     .trim()
     .min(1)
-    .max(120)
+    .max(100)
     .regex(
       /^\S+(?:\s+\S+){0,4}$/,
       "Generated topic names must contain five words or fewer.",

@@ -163,11 +163,18 @@ async function getEvidence(observationIds: string[]) {
 
 /** Replaces an answer's evidence, so a retried collect step stays idempotent. */
 async function persistAnswer(input: {
+  runId: string;
   observationId: string;
-  values: Partial<ObservationRow>;
+  values: Partial<
+    Pick<ObservationRow, "status" | "collectedAt" | "answerMarkdown" | "error">
+  >;
   sources: (typeof aiSources.$inferInsert)[];
   matches: (typeof aiMatches.$inferInsert)[];
 }) {
+  // A provider tag is untrusted. Authorize the immutable answer/run relation
+  // before replacing any evidence, not just before the final answer update.
+  const observation = await getObservation(input.observationId);
+  if (observation?.runId !== input.runId) return;
   await runBatch((tx) => [
     tx
       .delete(aiSources)
@@ -175,12 +182,21 @@ async function persistAnswer(input: {
     tx
       .delete(aiMatches)
       .where(eq(aiMatches.observationId, input.observationId)),
-    ...input.sources.map((s) => tx.insert(aiSources).values(s)),
-    ...input.matches.map((m) => tx.insert(aiMatches).values(m)),
+    ...input.sources.map((s) =>
+      tx.insert(aiSources).values({ ...s, observationId: input.observationId }),
+    ),
+    ...input.matches.map((m) =>
+      tx.insert(aiMatches).values({ ...m, observationId: input.observationId }),
+    ),
     tx
       .update(aiObservations)
       .set(input.values)
-      .where(eq(aiObservations.id, input.observationId)),
+      .where(
+        and(
+          eq(aiObservations.id, input.observationId),
+          eq(aiObservations.runId, input.runId),
+        ),
+      ),
   ]);
 }
 

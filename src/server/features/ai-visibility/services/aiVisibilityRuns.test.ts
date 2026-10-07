@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { aiObservations, aiRuns } from "@/db/schema";
 import { AiVisibilityRepository as repo } from "../repositories/AiVisibilityRepository";
 import { runCheck } from "./aiVisibilityRuns";
+import { setSchedule } from "./aiVisibilitySchedule";
 import { configuration, customer } from "./aiVisibilityTestFixtures";
 
 const { testDb, workflow } = await vi.hoisted(async () => {
@@ -35,9 +36,24 @@ beforeEach(async () => {
     }),
   );
   workflowStatus("running");
+  workflow.create.mockResolvedValue(undefined);
 });
 
 describe("AI visibility checks", () => {
+  it("keeps scheduling disabled after startup fails and starts a fresh baseline on retry", async () => {
+    workflow.create.mockRejectedValueOnce(new Error("Workflow unavailable"));
+    await expect(
+      setSchedule({ projectId, enabled: true }, customer),
+    ).rejects.toThrow("Workflow unavailable");
+    expect(await repo.getTracker(projectId)).toMatchObject({ enabled: false });
+    const { run, state } = await setSchedule(
+      { projectId, enabled: true },
+      customer,
+    );
+    expect(run).toMatchObject({ trigger: "baseline", status: "queued" });
+    expect(state.tracker).toMatchObject({ enabled: true });
+    expect(workflow.create).toHaveBeenCalledTimes(2);
+  });
   it("runs one check at a time and points a second start at the running one", async () => {
     const run = await runCheck({ projectId, maxCostUsd: 1 }, customer);
     expect(run).toMatchObject({ status: "queued", expected: 2, pending: 2 });

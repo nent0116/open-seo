@@ -73,6 +73,7 @@ async function seedRun(
   for (const [index, answer] of answers.entries()) {
     const id = `${runId}:prompt-${index}`;
     await repo.persistAnswer({
+      runId,
       observationId: id,
       values: answer.failed
         ? { status: "failed", error: "Provider failed" }

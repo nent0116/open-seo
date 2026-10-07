@@ -70,7 +70,7 @@ export async function generateAiPrompts(
       "You need usage credits to generate prompts.",
     );
   const outputSchema = topicName
-    ? suggestedAiTopicSchema.extend({ name: z.string().trim().min(1).max(120) })
+    ? suggestedAiTopicSchema.extend({ name: z.string().trim().min(1).max(100) })
     : suggestedAiTopicSchema;
   const result = await generateText({
     model: buildChatAgentModel(

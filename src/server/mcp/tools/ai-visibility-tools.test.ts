@@ -70,6 +70,18 @@ beforeEach(() => {
 });
 
 describe("AI visibility assistant tools", () => {
+  it("advertises paid prompt research as a non-read-only MCP operation", () => {
+    const register = vi.spyOn(McpServer.prototype, "registerTool");
+    createOpenSeoMcpServer({ openSeoAuth: context.auth });
+    const registration = register.mock.calls.find(
+      ([name]) => name === "research_ai_visibility_prompts",
+    );
+    expect(registration?.[1].annotations).toMatchObject({
+      readOnlyHint: false,
+      openWorldHint: true,
+    });
+    register.mockRestore();
+  });
   it("registers the same tools in MCP and SAM and hides SAM's project argument", () => {
     const register = vi.spyOn(McpServer.prototype, "registerTool");
     createOpenSeoMcpServer({ openSeoAuth: context.auth });
