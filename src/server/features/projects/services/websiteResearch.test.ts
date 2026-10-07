@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type * as Serp from "@/server/lib/dataforseo/serp";
 
 const {
   generateText,
@@ -25,7 +26,7 @@ vi.mock("ai", () => ({
 }));
 vi.mock("@/server/lib/scrape", () => ({ readSite }));
 vi.mock("@/server/lib/dataforseo/serp", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("@/server/lib/dataforseo/serp")>()),
+  ...(await importOriginal<typeof Serp>()),
   fetchLiveSerp: search,
 }));
 vi.mock("@/server/lib/dataforseo/usage-limits", () => ({
@@ -103,7 +104,7 @@ beforeEach(() => {
     async ({ tools }: { tools?: ResearchTools }) => {
       if (tools) {
         await tools.search_competitors.execute({
-          queries: ["business competitors"],
+          queries: ["business competitors", "alternative products"],
         });
         await tools.read_business_sites.execute({
           domains: [competitor.domain],
@@ -134,6 +135,10 @@ describe("researchWebsite", () => {
     await expect(
       researchWebsite("https://saved.com", project, customer),
     ).rejects.toMatchObject({ code: "DATAFORSEO_USAGE_LIMIT_EXCEEDED" });
+    expect(enforceSafetyLimits).toHaveBeenCalledExactlyOnceWith({
+      estimatedCostUsd: 0.004,
+      requests: 6,
+    });
     expect(search).not.toHaveBeenCalled();
   });
 
@@ -174,7 +179,7 @@ describe("researchWebsite", () => {
         suggestedTopics: field === "keywords" ? topics : [],
         suggestedKeywords: field === "keywords" ? ["site audit"] : [],
       });
-      if (field === "competitors") expect(search).toHaveBeenCalledOnce();
+      if (field === "competitors") expect(search).toHaveBeenCalledTimes(2);
       else expect(search).not.toHaveBeenCalled();
       if (field === "keywords") expect(readSite).not.toHaveBeenCalled();
     },
