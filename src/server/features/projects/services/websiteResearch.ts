@@ -7,6 +7,9 @@ import {
 } from "@/server/billing/researchSpend";
 import { requireOpenRouterCostUsd } from "@/server/lib/chatAgent";
 import { fetchLiveSerp } from "@/server/lib/dataforseo/serp";
+import { dataforseoPricing } from "@/server/lib/dataforseo/pricing";
+import { enforceDataforseoSafetyLimits } from "@/server/lib/dataforseo/usage-limits";
+import { DATAFORSEO_DEFAULT_REQUEST_ATTEMPTS } from "@/server/lib/dataforseo/core";
 import { DataforseoChargedTaskError } from "@/server/lib/dataforseo/envelope";
 import { normalizeBacklinksTarget } from "@/server/lib/dataforseoBacklinksTarget";
 import { AppError } from "@/server/lib/errors";
@@ -166,6 +169,22 @@ export async function researchWebsite(
                     "The search budget is exhausted. Use the existing results.",
                   );
                 searched = true;
+                // Research owns Autumn settlement, but operator ceilings still
+                // apply in every deployment mode before any paid provider call.
+                await enforceDataforseoSafetyLimits({
+                  estimatedCostUsd: queries.reduce(
+                    (total, keyword) =>
+                      total +
+                      dataforseoPricing.serp.live({
+                        keyword,
+                        ...market,
+                        depth: 10,
+                      }),
+                    0,
+                  ),
+                  requests:
+                    queries.length * DATAFORSEO_DEFAULT_REQUEST_ATTEMPTS,
+                });
                 const results = await Promise.allSettled(
                   queries.map(async (keyword) => {
                     // Searches belong to the already-admitted research task; collect

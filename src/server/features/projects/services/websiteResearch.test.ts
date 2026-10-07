@@ -7,6 +7,7 @@ const {
   listSections,
   listCompetitors,
   listKeywords,
+  enforceSafetyLimits,
 } = vi.hoisted(() => ({
   generateText: vi.fn(),
   readSite: vi.fn(),
@@ -14,6 +15,7 @@ const {
   listSections: vi.fn(),
   listCompetitors: vi.fn(),
   listKeywords: vi.fn(),
+  enforceSafetyLimits: vi.fn(),
 }));
 vi.mock("ai", () => ({
   generateText,
@@ -22,7 +24,13 @@ vi.mock("ai", () => ({
   tool: (value: unknown) => value,
 }));
 vi.mock("@/server/lib/scrape", () => ({ readSite }));
-vi.mock("@/server/lib/dataforseo/serp", () => ({ fetchLiveSerp: search }));
+vi.mock("@/server/lib/dataforseo/serp", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/server/lib/dataforseo/serp")>()),
+  fetchLiveSerp: search,
+}));
+vi.mock("@/server/lib/dataforseo/usage-limits", () => ({
+  enforceDataforseoSafetyLimits: enforceSafetyLimits,
+}));
 vi.mock("@/server/lib/runtime-env", () => ({
   getRequiredEnvValue: vi.fn(),
   getOptionalEnvValue: vi.fn(),
@@ -44,6 +52,7 @@ vi.mock(
 );
 
 import { researchWebsite } from "./websiteResearch";
+import { AppError } from "@/server/lib/errors";
 import { customer } from "@/server/features/ai-visibility/services/aiVisibilityTestFixtures";
 
 const project = {
@@ -80,6 +89,7 @@ type ResearchTools = {
 };
 
 beforeEach(() => {
+  enforceSafetyLimits.mockResolvedValue(undefined);
   listSections.mockResolvedValue([
     { key: "business_overview", content: overview },
   ]);
@@ -115,6 +125,18 @@ beforeEach(() => {
 });
 
 describe("researchWebsite", () => {
+  it("does not search DataForSEO when the operator safety limit denies research", async () => {
+    listCompetitors.mockResolvedValue([]);
+    enforceSafetyLimits.mockRejectedValueOnce(
+      new AppError("DATAFORSEO_USAGE_LIMIT_EXCEEDED"),
+    );
+
+    await expect(
+      researchWebsite("https://saved.com", project, customer),
+    ).rejects.toMatchObject({ code: "DATAFORSEO_USAGE_LIMIT_EXCEEDED" });
+    expect(search).not.toHaveBeenCalled();
+  });
+
   it("does no research when all project fields are already saved", async () => {
     expect(
       await researchWebsite("https://saved.com", project, customer),
