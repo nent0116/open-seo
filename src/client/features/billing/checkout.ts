@@ -8,9 +8,13 @@ import { hasOrgPermission } from "@/lib/org-permissions";
 import { createPlanCheckout } from "@/serverFunctions/billing";
 import { AUTUMN_PAID_PLAN_ID, type CheckoutPlanId } from "@/shared/billing";
 
-const planCheckoutQueryOptions = (planId: CheckoutPlanId, redirectTo: string) =>
+const planCheckoutQueryOptions = (
+  organizationId: string,
+  planId: CheckoutPlanId,
+  redirectTo: string,
+) =>
   queryOptions({
-    queryKey: ["billing", "checkout-url", planId, redirectTo],
+    queryKey: ["billing", "checkout-url", organizationId, planId, redirectTo],
     queryFn: () => createPlanCheckout({ data: { planId, redirectTo } }),
     // Autumn's checkout sessions last an hour; start over after 10 minutes.
     staleTime: 10 * 60_000,
@@ -44,24 +48,30 @@ export function prefetchUpgradeCheckout() {
         return;
       }
       return queryClient.prefetchQuery(
-        planCheckoutQueryOptions(AUTUMN_PAID_PLAN_ID, UPGRADE_REDIRECT),
+        planCheckoutQueryOptions(
+          organization.organizationId,
+          AUTUMN_PAID_PLAN_ID,
+          UPGRADE_REDIRECT,
+        ),
       );
     })
     // The click creates the link itself if this didn't.
     .catch(() => undefined);
 }
 
-/** Sends the browser to checkout, using the link made ahead of time if any. */
+/** Revalidates the active organization and billing permission before checkout. */
 export async function openPlanCheckout(
   planId: CheckoutPlanId,
   redirectTo: string,
 ) {
-  const options = planCheckoutQueryOptions(planId, redirectTo);
   captureClientEvent("billing:checkout_start", {
     planId,
-    link_ready: queryClient.getQueryData(options.queryKey) !== undefined,
   });
-  window.location.assign(await queryClient.fetchQuery(options));
+  // Another tab can change the shared session while this tab retains a fresh
+  // checkout URL. Always ask the server; Autumn reuses its warmed session.
+  window.location.assign(
+    await createPlanCheckout({ data: { planId, redirectTo } }),
+  );
 }
 
 export function openUpgradeCheckout() {
