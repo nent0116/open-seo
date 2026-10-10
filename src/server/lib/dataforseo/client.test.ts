@@ -94,6 +94,7 @@ vi.mock("@/server/lib/dataforseo/serp", () => ({
   fetchRankCheckSerp: vi.fn(),
   postRankCheckTasks: vi.fn(),
   fetchLocalSerp: vi.fn(),
+  postLocalSerpTasks: vi.fn(),
   clampSerpDepth: (depth: number) => depth,
   SERP_ANALYSIS_DEPTH: 20,
 }));
@@ -128,6 +129,9 @@ vi.mock("@/server/lib/dataforseo/ai", () => ({
   resolveLlmMentionsLimit: (limit?: number) => limit ?? 100,
   LLM_RESPONSE_WEB_SEARCH_DEFAULT: true,
 }));
+vi.mock("@/server/lib/dataforseo/ai-tracking", () => ({
+  postAiTrackingTasks: vi.fn(),
+}));
 
 import { waitUntil } from "cloudflare:workers";
 import {
@@ -138,7 +142,11 @@ import { dataforseoPricing } from "@/server/lib/dataforseo/pricing";
 import { DataforseoChargedTaskError } from "@/server/lib/dataforseo/envelope";
 import { AppError } from "@/server/lib/errors";
 import { fetchBacklinksSummary } from "@/server/lib/dataforseo/backlinks";
-import { fetchRankCheckSerp } from "@/server/lib/dataforseo/serp";
+import {
+  fetchRankCheckSerp,
+  postLocalSerpTasks,
+} from "@/server/lib/dataforseo/serp";
+import { postAiTrackingTasks } from "@/server/lib/dataforseo/ai-tracking";
 import { postGoogleReviewsTask } from "@/server/lib/dataforseo/business";
 
 const billingCustomer = {
@@ -229,6 +237,53 @@ describe("meterDataforseoCall", () => {
       requests: 1,
     });
   });
+
+  it.each(["maps", "ai"] as const)(
+    "reserves one request for the no-retry %s task queue",
+    async (queue) => {
+      isHostedServerAuthModeMock.mockResolvedValue(false);
+      const client = createDataforseoClient(billingCustomer);
+      const market = { locationCode: 2840, languageCode: "en" };
+      if (queue === "maps") {
+        vi.mocked(postLocalSerpTasks).mockResolvedValueOnce({
+          data: [],
+          billing: {
+            costUsd: RAW_COST,
+            path: ["v3", "serp", "google", "maps", "task_post"],
+          },
+        });
+        await client.serp.localTaskPost({
+          keyword: "coffee",
+          locationCoordinates: ["40,-73,10"],
+          languageCode: market.languageCode,
+          device: "desktop",
+          depth: 20,
+        });
+      } else {
+        vi.mocked(postAiTrackingTasks).mockResolvedValueOnce({
+          data: [],
+          billing: {
+            costUsd: RAW_COST,
+            path: [
+              "v3",
+              "ai_optimization",
+              "chat_gpt",
+              "llm_scraper",
+              "task_post",
+            ],
+          },
+        });
+        await client.aiSearch.trackingTaskPost({
+          ...market,
+          engine: "chatgpt",
+          tasks: [{ tag: "answer_1", prompt: "best coffee" }],
+        });
+      }
+      expect(enforceUsageLimitsMock).toHaveBeenCalledWith(
+        expect.objectContaining({ requests: 1 }),
+      );
+    },
+  );
 
   it("does not call DataForSEO when the operator safety limit is exceeded", async () => {
     isHostedServerAuthModeMock.mockResolvedValue(false);
@@ -469,6 +524,10 @@ describe("mapDataforseoPathToCreditFeature", () => {
     ["v3/ai_optimization/llm_mentions/search/live", "ai_citations"],
     ["v3/ai_optimization/llm_mentions/aggregated_metrics/live", "ai_citations"],
     ["v3/ai_optimization/llm_mentions/top_pages/live", "ai_citations"],
+    [
+      "v3/ai_optimization/ai_keyword_data/keywords_search_volume/live",
+      "keyword_research",
+    ],
     ["v3/ai_optimization/chat_gpt/llm_responses/live", "ai_prompt_responses"],
     ["v3/ai_optimization/claude/llm_responses/live", "ai_prompt_responses"],
     ["v3/ai_optimization/gemini/llm_responses/live", "ai_prompt_responses"],

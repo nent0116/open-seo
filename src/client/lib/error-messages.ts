@@ -8,7 +8,7 @@ const STANDARD_MESSAGES: Record<ErrorCode, string> = {
   PAYMENT_REQUIRED:
     "OpenSEOを利用するには、有効なホスト版サブスクリプションが必要です。",
   INSUFFICIENT_CREDITS:
-    "クレジットを使い切りました。続行するにはクレジットを追加するか、プランをアップグレードしてください。",
+    "クレジットが不足しています。続行するにはクレジットを追加するか、プランをアップグレードしてください。",
   FORBIDDEN: "このリソースへのアクセス権がありません。",
   NOT_FOUND: "指定されたリソースが見つかりませんでした。",
   AUDIT_CAPACITY_REACHED:
@@ -25,6 +25,8 @@ const STANDARD_MESSAGES: Record<ErrorCode, string> = {
     "連携中のDataForSEOアカウントで、請求または残高の問題が発生しています。",
   AI_SEARCH_BILLING_ISSUE:
     "連携中のDataForSEOアカウントで、請求または残高の問題が発生しています。",
+  AI_VISIBILITY_ERROR:
+    "AI検索での表示状況を確認できませんでした。追跡設定を確認し、もう一度お試しください。",
   DATAFORSEO_AUTH_FAILED:
     "DataForSEOがAPIキーを拒否しました。DATAFORSEO_API_KEYにDataForSEOの「ログイン名:パスワード」をBase64エンコードした値が設定されているか確認してください。",
   DATAFORSEO_USAGE_LIMIT_EXCEEDED:

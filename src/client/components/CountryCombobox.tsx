@@ -15,14 +15,6 @@ import { formatJapaneseCountryName } from "@/shared/country-labels-ja";
 type SourceLocationOption = (typeof LOCATION_OPTIONS)[number];
 type LocationOption = SourceLocationOption & { originalLabel: string };
 
-const LOCALIZED_LOCATION_OPTIONS: LocationOption[] = LOCATION_OPTIONS.map(
-  (option) => ({
-    ...option,
-    originalLabel: option.label,
-    label: formatJapaneseCountryName(getIsoCountryCode(option.code)),
-  }),
-);
-
 // Matches the start of the name or of any word in it, so "uni" finds United
 // States, not Tunisia, and "united states" still finds United States.
 function matchesCountry(option: LocationOption, query: string) {
@@ -42,17 +34,25 @@ export function CountryCombobox({
   id,
   value,
   onChange,
+  options = LOCATION_OPTIONS,
 }: {
   id?: string;
   value: number;
   onChange: (locationCode: number) => void;
+  /** Defaults to the full country list. */
+  options?: readonly SourceLocationOption[];
 }) {
+  const localizedOptions: LocationOption[] = options.map((option) => ({
+    ...option,
+    originalLabel: option.label,
+    label: formatJapaneseCountryName(getIsoCountryCode(option.code)),
+  }));
   const country =
-    LOCALIZED_LOCATION_OPTIONS.find((option) => option.code === value) ?? null;
+    localizedOptions.find((option) => option.code === value) ?? null;
 
   return (
     <Combobox
-      items={LOCALIZED_LOCATION_OPTIONS}
+      items={localizedOptions}
       value={country}
       itemToStringLabel={(option) => option.label}
       autoHighlight

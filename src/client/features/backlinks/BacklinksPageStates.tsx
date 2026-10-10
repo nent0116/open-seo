@@ -1,4 +1,3 @@
-import { ErrorState } from "@/client/components/ErrorState";
 import { SkeletonTableRows } from "@/client/components/SkeletonPresets";
 import { Card } from "@/client/components/ui/card";
 import { Skeleton } from "@/client/components/ui/skeleton";
@@ -37,24 +36,5 @@ export function BacklinksLoadingState() {
         </div>
       </div>
     </Card>
-  );
-}
-
-export function BacklinksErrorState({
-  errorMessage,
-  onRetry,
-  isRetrying,
-}: {
-  errorMessage: string | null;
-  onRetry: () => void;
-  isRetrying: boolean;
-}) {
-  return (
-    <ErrorState
-      title="被リンクを読み込めませんでした"
-      message={errorMessage ?? "時間をおいて、もう一度お試しください。"}
-      onRetry={onRetry}
-      isRetrying={isRetrying}
-    />
   );
 }
