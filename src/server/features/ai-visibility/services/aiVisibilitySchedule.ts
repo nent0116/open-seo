@@ -47,27 +47,20 @@ export async function setSchedule(
       : tracker.nextCheckAt;
   let run: AiRun | null = null;
   const latest = await repo.getLatestScheduledRun(input.projectId);
-  // A failed first start must not permanently suppress the baseline. An
-  // explicit re-enable after a failed baseline retries it immediately.
+  // A queued run may still be awaiting workflow creation in another request.
+  // Only a finished baseline can stand in for a disabled tracker's first start;
+  // startRun rejects overlapping starts without enabling or charging again.
   if (
     !latest ||
     (!tracker.enabled &&
       latest.trigger === "baseline" &&
-      latest.status === "failed")
+      latest.status !== "completed" &&
+      latest.status !== "partial")
   ) {
-    try {
-      run = await startRun(config, "baseline", billing);
-    } catch (error) {
-      // A check already running stands in for the baseline.
-      if (
-        !(error instanceof AiVisibilityError) ||
-        error.reason !== "RUN_IN_PROGRESS"
-      )
-        throw error;
-    }
+    run = await startRun(config, "baseline", billing);
   }
-  // Commit enablement only after startup succeeds (or an active check can
-  // stand in for it). Later collection failures never pause the schedule.
+  // Commit enablement only after startup succeeds. Later collection failures
+  // never pause an already-enabled schedule.
   await repo.updateTracker(tracker.id, {
     enabled: true,
     scheduleInterval,

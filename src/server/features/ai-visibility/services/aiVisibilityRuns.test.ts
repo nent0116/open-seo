@@ -40,6 +40,51 @@ beforeEach(async () => {
 });
 
 describe("AI visibility checks", () => {
+  it.each(["baseline", "manual"] as const)(
+    "does not enable scheduling while a concurrent %s startup is unconfirmed",
+    async (trigger) => {
+      let rejectStart!: (error: Error) => void;
+      let notifyStarting!: () => void;
+      const starting = new Promise<void>((resolve) => {
+        notifyStarting = resolve;
+      });
+      workflow.create.mockImplementationOnce(() => {
+        notifyStarting();
+        return new Promise((_resolve, reject) => {
+          rejectStart = reject;
+        });
+      });
+      const first =
+        trigger === "baseline"
+          ? setSchedule({ projectId, enabled: true }, customer)
+          : runCheck({ projectId, maxCostUsd: 1 }, customer);
+      const firstFailure = expect(first).rejects.toThrow(
+        "Workflow unavailable",
+      );
+      await starting;
+
+      const competingError = await setSchedule(
+        { projectId, enabled: true },
+        customer,
+      ).then(
+        () => null,
+        (error: unknown) => error,
+      );
+      rejectStart(new Error("Workflow unavailable"));
+      await firstFailure;
+
+      expect(competingError).toMatchObject({ reason: "RUN_IN_PROGRESS" });
+      expect(await repo.getTracker(projectId)).toMatchObject({
+        enabled: false,
+      });
+      const { run, state } = await setSchedule(
+        { projectId, enabled: true },
+        customer,
+      );
+      expect(run).toMatchObject({ trigger: "baseline", status: "queued" });
+      expect(state.tracker).toMatchObject({ enabled: true });
+    },
+  );
   it("keeps scheduling disabled after startup fails and starts a fresh baseline on retry", async () => {
     workflow.create.mockRejectedValueOnce(new Error("Workflow unavailable"));
     await expect(
