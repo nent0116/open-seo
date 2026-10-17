@@ -118,7 +118,7 @@ export function GooglePropertyPicker({
   };
   const saveButton = readOnly ? null : (
     <Button size="sm" onClick={onSave} disabled={!canSave || saving}>
-      {saving ? "Saving…" : saveLabel}
+      {saving ? "保存しています…" : saveLabel}
     </Button>
   );
   return (
@@ -241,7 +241,7 @@ export function GooglePropertyPicker({
                               variant="ghost"
                               size="xs"
                               onClick={onReconnect}
-                              aria-label={`Reconnect ${accountLabel(account)}`}
+                              aria-label={`${accountLabel(account)}を再連携`}
                               disabled={linking}
                               aria-busy={linking}
                             >
