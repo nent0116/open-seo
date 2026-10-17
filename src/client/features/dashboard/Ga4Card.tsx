@@ -1,12 +1,10 @@
+import { SkeletonTableRows } from "@/client/components/SkeletonPresets";
 import { CardShell } from "@/client/components/CardShell";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Area, AreaChart, XAxis, YAxis } from "recharts";
-import {
-  moreDetailsClass,
-  StatGridSkeleton,
-} from "@/client/features/dashboard/cardParts";
-import { StatTile } from "@/client/components/StatTile";
+import { moreDetailsClass } from "@/client/features/dashboard/cardParts";
+import { MetricsTable, percentChange } from "@/client/components/MetricsTable";
 import { Ga4ConnectCard } from "@/client/features/dashboard/Ga4ConnectCard";
 import {
   formatCount,
@@ -67,7 +65,6 @@ export function Ga4Card({
   return (
     <CardShell
       title="自然検索トラフィック"
-      stamp="Google Analytics・過去28日間"
       action={
         <Link
           to="/p/$projectId/settings"
@@ -79,6 +76,9 @@ export function Ga4Card({
         </Link>
       }
     >
+      <p className="mb-4 text-sm text-muted-foreground">
+        Google Analytics・過去28日間
+      </p>
       {reportQuery.isError ? (
         <p className="text-sm text-muted-foreground">
           Google
@@ -86,7 +86,7 @@ export function Ga4Card({
         </p>
       ) : !report ? (
         <div className="space-y-3" aria-busy>
-          <StatGridSkeleton tileClassName="h-16" />
+          <SkeletonTableRows rows={5} columns={3} />
           <Skeleton className="h-24" />
         </div>
       ) : !report.totals.sessions ? (
@@ -95,36 +95,58 @@ export function Ga4Card({
         </p>
       ) : (
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <StatTile
-              label="セッション"
-              value={statValue(report.totals.sessions, formatCount)}
-              delta={{
-                current: report.totals.sessions,
-                previous: report.prevTotals.sessions,
-              }}
-            />
-            <StatTile
-              label="アクティブユーザー"
-              value={statValue(report.totals.activeUsers, formatCount)}
-              delta={{
-                current: report.totals.activeUsers,
-                previous: report.prevTotals.activeUsers,
-              }}
-            />
-            <StatTile
-              label="エンゲージメント率"
-              value={statValue(report.totals.engagementRate, formatCtr)}
-            />
-            <StatTile
-              label="キーイベント"
-              value={statValue(report.totals.keyEvents, formatCount)}
-              delta={{
-                current: report.totals.keyEvents,
-                previous: report.prevTotals.keyEvents,
-              }}
-            />
-          </div>
+          <MetricsTable
+            showChange
+            rows={[
+              {
+                label: "セッション",
+                value: statValue(report.totals.sessions, formatCount),
+                change: percentChange(
+                  report.totals.sessions,
+                  report.prevTotals.sessions,
+                ),
+              },
+              {
+                label: "アクティブユーザー",
+                value: statValue(report.totals.activeUsers, formatCount),
+                change: percentChange(
+                  report.totals.activeUsers,
+                  report.prevTotals.activeUsers,
+                ),
+              },
+              {
+                label: "エンゲージメント率",
+                value: statValue(report.totals.engagementRate, formatCtr),
+                change: null,
+              },
+              {
+                label: "キーイベント",
+                value: statValue(report.totals.keyEvents, formatCount),
+                change: percentChange(
+                  report.totals.keyEvents,
+                  report.prevTotals.keyEvents,
+                ),
+              },
+            ].map((metric) => ({
+              label: metric.label,
+              value: metric.value,
+              change:
+                metric.change === null ? undefined : (
+                  <span
+                    className={
+                      metric.change > 0
+                        ? "text-success"
+                        : metric.change < 0
+                          ? "text-destructive"
+                          : "text-muted-foreground"
+                    }
+                  >
+                    {metric.change > 0 ? "+" : ""}
+                    {metric.change}%
+                  </span>
+                ),
+            }))}
+          />
           <ChartContainer config={sessionsChartConfig} className="h-24">
             <AreaChart
               data={report.trend}

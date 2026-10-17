@@ -136,8 +136,8 @@ describe("researchWebsite", () => {
       researchWebsite("https://saved.com", project, customer),
     ).rejects.toMatchObject({ code: "DATAFORSEO_USAGE_LIMIT_EXCEEDED" });
     expect(enforceSafetyLimits).toHaveBeenCalledExactlyOnceWith({
-      estimatedCostUsd: 0.004,
-      requests: 6,
+      estimatedCostUsd: 0.016,
+      requests: 24,
     });
     expect(search).not.toHaveBeenCalled();
   });
@@ -202,5 +202,36 @@ describe("researchWebsite", () => {
     );
 
     expect(result.suggestedKeywords).toEqual(valid.slice(0, 15));
+  });
+
+  it.each([
+    { failures: 1, calls: 3, competitors: [competitor] },
+    { failures: 8, calls: 8, competitors: [] },
+  ])(
+    "retries search outages and skips competitors when $failures attempts fail",
+    async ({ failures, calls, competitors }) => {
+      vi.useFakeTimers();
+      listCompetitors.mockResolvedValue([]);
+      for (let n = 0; n < failures; n++)
+        search.mockRejectedValueOnce(new AppError("UPSTREAM_UNAVAILABLE"));
+
+      const research = researchWebsite("https://saved.com", project, customer);
+      await vi.runAllTimersAsync();
+      const result = await research;
+      vi.useRealTimers();
+
+      expect(search).toHaveBeenCalledTimes(calls);
+      expect(result.competitors).toEqual(competitors);
+    },
+  );
+
+  it("fails instead of skipping competitors when search fails for a non-outage reason", async () => {
+    listCompetitors.mockResolvedValue([]);
+    search.mockRejectedValue(new AppError("DATAFORSEO_AUTH_FAILED"));
+
+    await expect(
+      researchWebsite("https://saved.com", project, customer),
+    ).rejects.toThrow("Website research was incomplete");
+    expect(search).toHaveBeenCalledTimes(2);
   });
 });

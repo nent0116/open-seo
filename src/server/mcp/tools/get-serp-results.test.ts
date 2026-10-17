@@ -273,6 +273,7 @@ describe("get_serp_results", () => {
           {
             type: "people_also_ask",
             rank: null,
+            organicRank: null,
             title: null,
             url: null,
             domain: null,
@@ -292,6 +293,26 @@ describe("get_serp_results", () => {
       languageCode: "en",
       locationName: undefined,
       depth: 20,
+      device: undefined,
     });
+  });
+
+  it("fetches a mobile SERP separately from a saved desktop one", async () => {
+    const live = mockLiveSerp(20);
+    const query = { projectId: "project_1" };
+
+    await getSerpResultsTool.handler(
+      { ...query, queries: [{ keyword: "seo tools" }] },
+      toolContext,
+    );
+    await getSerpResultsTool.handler(
+      { ...query, queries: [{ keyword: "seo tools", device: "mobile" }] },
+      toolContext,
+    );
+
+    expect(live).toHaveBeenCalledTimes(2);
+    expect(live).toHaveBeenLastCalledWith(
+      expect.objectContaining({ device: "mobile" }),
+    );
   });
 });

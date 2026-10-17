@@ -1,3 +1,8 @@
+import {
+  GscPropertySetupHelp,
+  hasNoGscWebsites,
+  EmptyAccountMessage,
+} from "./GscPropertySetupHelp";
 import { GoogleAccountRemovalDialog } from "@/client/features/integrations/GoogleAccountRemovalDialog";
 import { QueryError } from "@/client/components/QueryState";
 import { Spinner } from "@/client/components/Spinner";
@@ -25,6 +30,7 @@ export type GooglePickerAccount = {
   email: string | null;
   requiresReconnect: boolean;
   unavailable?: boolean;
+  apiDisabled?: boolean;
   properties: Property[];
 };
 type SecondaryAction = {
@@ -68,7 +74,7 @@ export function GooglePropertyPicker({
   onRetry: () => void;
   onReconnect: () => void;
   secondaryAction?: SecondaryAction;
-  renderActions?: (saveButton: ReactNode) => ReactNode;
+  renderActions?: (disabled: boolean) => ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const [removing, setRemoving] = useState<GooglePickerAccount | null>(null);
@@ -87,6 +93,8 @@ export function GooglePropertyPicker({
     !selectedAccount?.unavailable &&
     !loading &&
     !error;
+  const emptyGsc =
+    provider === "gsc" && hasNoGscWebsites(accounts, loading, error);
   const query = search.trim().toLowerCase();
   const filtered = accounts
     .map((account) => ({
@@ -127,194 +135,215 @@ export function GooglePropertyPicker({
           }}
         />
       ) : null}
-      <div>
-        <p className="mb-2 text-sm font-medium">
-          {readOnly ? "Googleアカウントを管理" : "プロパティを選択"}
-        </p>
-        <Button
-          ref={trigger}
-          variant="outline"
-          aria-expanded={open}
-          aria-controls={panelId}
-          disabled={saving}
-          className="h-auto w-full justify-between gap-3 px-3.5 py-3 text-left font-normal"
-          onClick={() => {
-            setOpen(!open);
-            setSearch("");
-          }}
-        >
-          <span className="min-w-0">
-            <span className="block truncate">
-              {selected?.name ?? "プロパティを選択…"}
-            </span>
-            {selectedAccount ? (
-              <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                {accountLabel(selectedAccount)}
-              </span>
-            ) : null}
-          </span>
-          <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-        </Button>
-        {open ? (
-          <div
-            id={panelId}
-            role="region"
-            aria-label="Googleプロパティ"
-            className="mt-2 overflow-hidden rounded-lg border border-border bg-popover shadow-sm"
-            onKeyDown={(event) => handlePropertyKeyDown(event, close)}
+      {provider === "gsc" ? (
+        <GscPropertySetupHelp
+          accounts={accounts}
+          emptyGsc={emptyGsc}
+          loading={loading}
+          error={error}
+          busy={saving || linking}
+          linking={linking}
+          onRetry={onRetry}
+          onReconnect={onReconnect}
+        />
+      ) : null}
+      {!emptyGsc || readOnly ? (
+        <div>
+          <p className="mb-2 text-sm font-medium">
+            {readOnly ? "Googleアカウントを管理" : "プロパティを選択"}
+          </p>
+          <Button
+            ref={trigger}
+            variant="outline"
+            aria-expanded={open}
+            aria-controls={panelId}
+            disabled={saving}
+            className="h-auto w-full justify-between gap-3 px-3.5 py-3 text-left font-normal"
+            onClick={() => {
+              setOpen(!open);
+              setSearch("");
+            }}
           >
-            <label className="flex items-center gap-2 border-b border-border px-3.5 py-3">
-              <Search className="size-4 shrink-0 text-muted-foreground" />
-              <Input
-                autoFocus
-                type="search"
-                aria-label="プロパティまたはアカウントを検索"
-                placeholder="プロパティまたはアカウントを検索…"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                className="h-auto min-w-0 border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
-              />
-            </label>
-            <div className="max-h-72 overflow-y-auto overscroll-contain p-1.5">
-              {loading ? (
-                <Spinner
-                  size="sm"
-                  label="プロパティを読み込んでいます…"
-                  className="p-3"
+            <span className="min-w-0">
+              <span className="block truncate">
+                {selected?.name ?? "プロパティを選択…"}
+              </span>
+              {selectedAccount ? (
+                <span className="mt-0.5 block truncate text-xs text-muted-foreground">
+                  {accountLabel(selectedAccount)}
+                </span>
+              ) : null}
+            </span>
+            <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+          </Button>
+          {open ? (
+            <div
+              id={panelId}
+              role="region"
+              aria-label="Googleプロパティ"
+              className="mt-2 overflow-hidden rounded-lg border border-border bg-popover shadow-sm"
+              onKeyDown={(event) => handlePropertyKeyDown(event, close)}
+            >
+              <label className="flex items-center gap-2 border-b border-border px-3.5 py-3">
+                <Search className="size-4 shrink-0 text-muted-foreground" />
+                <Input
+                  autoFocus
+                  type="search"
+                  aria-label="プロパティまたはアカウントを検索"
+                  placeholder="プロパティまたはアカウントを検索…"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  className="h-auto min-w-0 border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
                 />
-              ) : error ? (
-                <QueryError
-                  fallback="プロパティを読み込めませんでした。"
-                  onRetry={onRetry}
-                />
-              ) : (
-                <>
-                  {filtered.map((account) => (
-                    <div
-                      key={account.accountId}
-                      className="py-1"
-                      role="group"
-                      aria-label={accountLabel(account)}
-                    >
-                      <div className="flex items-center justify-between gap-2 px-2 py-2 text-xs font-medium text-muted-foreground">
-                        <span className="min-w-0 break-all">
-                          {accountLabel(account)}
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="xs"
-                          className="shrink-0 text-destructive"
-                          disabled={saving}
-                          onClick={() => setRemoving(account)}
-                          aria-label={`${accountLabel(account)}を削除`}
-                        >
-                          アカウントを削除
-                        </Button>
-                      </div>
-                      {account.requiresReconnect ? (
-                        <div className="flex flex-wrap items-center justify-between gap-2 px-2 pb-2 text-sm">
-                          <span className="text-muted-foreground">
-                            連携の有効期限が切れました
+              </label>
+              <div className="max-h-72 overflow-y-auto overscroll-contain p-1.5">
+                {loading ? (
+                  <Spinner
+                    size="sm"
+                    label="プロパティを読み込んでいます…"
+                    className="p-3"
+                  />
+                ) : error ? (
+                  <QueryError
+                    fallback="プロパティを読み込めませんでした."
+                    onRetry={onRetry}
+                  />
+                ) : (
+                  <>
+                    {filtered.map((account) => (
+                      <div
+                        key={account.accountId}
+                        className="py-1"
+                        role="group"
+                        aria-label={accountLabel(account)}
+                      >
+                        <div className="flex items-center justify-between gap-2 px-2 py-2 text-xs font-medium text-muted-foreground">
+                          <span className="min-w-0 break-all">
+                            {accountLabel(account)}
                           </span>
                           <Button
                             variant="ghost"
                             size="xs"
-                            onClick={onReconnect}
-                            aria-label={`${accountLabel(account)}を再連携`}
-                            disabled={linking}
-                            aria-busy={linking}
+                            className="shrink-0 text-destructive"
+                            disabled={saving}
+                            onClick={() => setRemoving(account)}
+                            aria-label={`削除：${accountLabel(account)}`}
                           >
-                            {linking ? "Googleを開いています…" : "再連携"}
+                            アカウントを削除
                           </Button>
                         </div>
-                      ) : account.unavailable ? (
-                        <div className="flex flex-wrap items-center justify-between gap-2 px-2 pb-2 text-sm">
-                          <span className="text-muted-foreground">
-                            プロパティを読み込めませんでした
-                          </span>
-                          <Button variant="ghost" size="xs" onClick={onRetry}>
-                            再試行
-                          </Button>
-                        </div>
-                      ) : account.properties.length === 0 ? (
-                        <p className="px-2 pb-3 text-sm text-muted-foreground">
-                          利用できるプロパティがありません
-                        </p>
-                      ) : (
-                        account.properties.map((property) => {
-                          const chosen =
-                            selection?.accountId === account.accountId &&
-                            selection?.propertyId === property.id;
-                          return (
+                        {account.requiresReconnect ? (
+                          <div className="flex flex-wrap items-center justify-between gap-2 px-2 pb-2 text-sm">
+                            <span className="text-muted-foreground">
+                              連携の有効期限が切れました
+                            </span>
                             <Button
-                              key={property.id}
-                              data-property
-                              type="button"
                               variant="ghost"
-                              aria-pressed={chosen}
-                              disabled={
-                                readOnly || !property.selectable || saving
-                              }
-                              className={`h-auto w-full justify-between gap-3 rounded-md px-2 py-2.5 text-left font-normal hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-40 ${chosen ? "bg-accent" : ""}`}
-                              onClick={() => {
-                                onSelect({
-                                  accountId: account.accountId,
-                                  propertyId: property.id,
-                                });
-                                close();
-                              }}
+                              size="xs"
+                              onClick={onReconnect}
+                              aria-label={`Reconnect ${accountLabel(account)}`}
+                              disabled={linking}
+                              aria-busy={linking}
                             >
-                              <span className="min-w-0">
-                                <span className="block break-words">
-                                  {property.name}
-                                </span>
-                                {property.detail ? (
-                                  <span className="mt-0.5 block text-xs text-muted-foreground">
-                                    {property.detail}
-                                  </span>
-                                ) : null}
-                                {!property.selectable ? (
-                                  <span className="block text-xs">
-                                    確認済みのアクセス権がありません
-                                  </span>
-                                ) : null}
-                              </span>
-                              {chosen ? (
-                                <Check className="size-4 shrink-0" />
-                              ) : null}
+                              {linking ? "Googleを開いています…" : "再連携"}
                             </Button>
-                          );
-                        })
-                      )}
-                    </div>
-                  ))}
-                  {filtered.length === 0 ? (
-                    <p className="p-3 text-sm text-muted-foreground">
-                      {query
-                        ? "一致するプロパティまたはアカウントがありません"
-                        : "Googleアカウントを追加してプロパティを検索してください。"}
-                    </p>
-                  ) : null}
-                </>
-              )}
+                          </div>
+                        ) : account.unavailable ? (
+                          <div className="flex flex-wrap items-center justify-between gap-2 px-2 pb-2 text-sm">
+                            <span className="text-muted-foreground">
+                              {account.apiDisabled
+                                ? "Search Console APIが有効になっていません"
+                                : "プロパティを読み込めませんでした"}
+                            </span>
+                            <Button variant="ghost" size="xs" onClick={onRetry}>
+                              再試行
+                            </Button>
+                          </div>
+                        ) : account.properties.length === 0 ? (
+                          <p className="px-2 pb-3 text-sm text-muted-foreground">
+                            <EmptyAccountMessage
+                              provider={provider}
+                              filtered={Boolean(query)}
+                            />
+                          </p>
+                        ) : (
+                          account.properties.map((property) => {
+                            const chosen =
+                              selection?.accountId === account.accountId &&
+                              selection?.propertyId === property.id;
+                            return (
+                              <Button
+                                key={property.id}
+                                data-property
+                                type="button"
+                                variant="ghost"
+                                aria-pressed={chosen}
+                                disabled={
+                                  readOnly || !property.selectable || saving
+                                }
+                                className={`h-auto w-full justify-between gap-3 rounded-md px-2 py-2.5 text-left font-normal hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-40 ${chosen ? "bg-accent" : ""}`}
+                                onClick={() => {
+                                  onSelect({
+                                    accountId: account.accountId,
+                                    propertyId: property.id,
+                                  });
+                                  close();
+                                }}
+                              >
+                                <span className="min-w-0">
+                                  <span className="block break-words">
+                                    {property.name}
+                                  </span>
+                                  {property.detail ? (
+                                    <span className="mt-0.5 block text-xs text-muted-foreground">
+                                      {property.detail}
+                                    </span>
+                                  ) : null}
+                                  {!property.selectable ? (
+                                    <span className="block text-xs">
+                                      {provider === "gsc"
+                                        ? "プロパティの所有者にフル権限を依頼するか、Search Consoleで所有権を確認してください。"
+                                        : "アクセス権が確認されていません"}
+                                    </span>
+                                  ) : null}
+                                </span>
+                                {chosen ? (
+                                  <Check className="size-4 shrink-0" />
+                                ) : null}
+                              </Button>
+                            );
+                          })
+                        )}
+                      </div>
+                    ))}
+                    {filtered.length === 0 ? (
+                      <p className="p-3 text-sm text-muted-foreground">
+                        {query
+                          ? "一致するプロパティまたはアカウントがありません"
+                          : "Googleアカウントを追加してプロパティを検索してください。"}
+                      </p>
+                    ) : null}
+                  </>
+                )}
+              </div>
+              <div className="border-t border-border p-1.5">
+                <Button
+                  variant="ghost"
+                  className="h-auto w-full justify-start px-2 py-2.5"
+                  onClick={onReconnect}
+                  disabled={saving || linking}
+                  pending={linking}
+                >
+                  {linking ? null : <Plus className="size-4" />}
+                  {linking ? "Googleを開いています…" : "Googleアカウントを追加"}
+                </Button>
+              </div>
             </div>
-            <div className="border-t border-border p-1.5">
-              <Button
-                variant="ghost"
-                className="h-auto w-full justify-start px-2 py-2.5"
-                onClick={onReconnect}
-                disabled={saving || linking}
-                pending={linking}
-              >
-                {linking ? null : <Plus className="size-4" />}
-                {linking ? "Googleを開いています…" : "Googleアカウントを追加"}
-              </Button>
-            </div>
-          </div>
-        ) : null}
-      </div>
+          ) : null}
+        </div>
+      ) : null}
       {renderActions ? (
-        renderActions(saveButton)
+        renderActions(!canSave || saving)
       ) : (
         <div className="flex flex-wrap items-center gap-1">
           {saveButton}

@@ -1,3 +1,11 @@
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/client/components/ui/table";
 import { Info, TriangleAlert } from "lucide-react";
 import { Alert, AlertTitle } from "@/client/components/ui/alert";
 import { Badge } from "@/client/components/ui/badge";
@@ -23,9 +31,6 @@ type Props = {
   result: BrandLookupResult;
   projectId: string;
 };
-
-type PlatformRow = BrandLookupResult["perPlatform"][number];
-type MetricKey = "mentions" | "aiSearchVolume";
 
 const DOMAIN_LEVEL_TIP =
   "AI検索プロバイダーはページ単位ではなくドメイン単位で言及数を報告します。この数値はドメイン全体を対象とし、下の引用ページだけが指定範囲に限定されます。";
@@ -111,7 +116,7 @@ export function BrandLookupResults({ result, projectId }: Props) {
 
 function BrandHeader({ result }: { result: BrandLookupResult }) {
   return (
-    <section className="px-4 pt-4 pb-3">
+    <section className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4 pb-3">
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="text-lg font-semibold break-all">
           {result.resolvedTarget}
@@ -121,7 +126,7 @@ function BrandHeader({ result }: { result: BrandLookupResult }) {
           <Badge variant="outline">{RESEARCH_SCOPE_LABELS[result.scope]}</Badge>
         ) : null}
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="ml-auto text-xs text-muted-foreground">
         更新日時 {formatRelative(result.fetchedAt)}
       </p>
     </section>
@@ -130,89 +135,68 @@ function BrandHeader({ result }: { result: BrandLookupResult }) {
 
 function StatsCard({ result }: { result: BrandLookupResult }) {
   return (
-    <div className="rounded-lg border border-border">
-      <div className="flex h-full flex-col divide-y divide-border">
-        <StatBlock
-          label="言及数"
-          tooltip="検索したブランドまたはドメインが回答本文や引用元に登場したAI回答の推定数です。"
-          value={result.totalMentions}
-          perPlatform={result.perPlatform}
-          metric="mentions"
-          isDomainLevel={result.aggregatesAreDomainLevel}
-        />
-        <StatBlock
-          label="AI検索ボリューム"
-          tooltip="検索したブランドまたはドメインがAI回答に登場するプロンプトの推定月間需要です。言及数ではなく、プロンプトの需要を示します。"
-          value={result.totalAiSearchVolume}
-          perPlatform={result.perPlatform}
-          metric="aiSearchVolume"
-          isDomainLevel={result.aggregatesAreDomainLevel}
-        />
-      </div>
-    </div>
-  );
-}
-
-function StatBlock({
-  label,
-  tooltip,
-  value,
-  perPlatform,
-  metric,
-  isDomainLevel,
-}: {
-  label: string;
-  tooltip: string;
-  value: number | null;
-  perPlatform: PlatformRow[];
-  metric: MetricKey;
-  isDomainLevel: boolean;
-}) {
-  return (
-    <div className="flex flex-1 flex-col justify-center p-4">
-      <div className="inline-flex items-center gap-1 text-xs font-medium tracking-wider text-muted-foreground uppercase">
-        {label}
-        <InfoTooltip text={tooltip} />
-        {isDomainLevel ? <DomainLevelBadge tooltip={DOMAIN_LEVEL_TIP} /> : null}
-      </div>
-      <p className="mt-1 text-3xl font-semibold tabular-nums">
-        {formatCount(value)}
-      </p>
-      <div className="mt-3 space-y-1 border-t border-border pt-2.5">
-        {perPlatform.map((row) => (
-          <PlatformStatRow key={row.platform} row={row} metric={metric} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function PlatformStatRow({
-  row,
-  metric,
-}: {
-  row: PlatformRow;
-  metric: MetricKey;
-}) {
-  const value = row.status === "error" ? null : row[metric];
-
-  return (
-    <div className="flex items-center justify-between text-xs">
-      <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-        <span
-          className={`size-1.5 rounded-full ${PLATFORM_DOT_CLASS[row.platform]}`}
-        />
-        {formatPlatformLabel(row.platform)}
-        {row.platform === "chat_gpt" ? (
-          <InfoTooltip text="DataForSEOが収集するChatGPTの言及データは米国英語のみです。このプラットフォームでは国を選択できません。" />
-        ) : null}
-        {row.status === "error" ? (
-          <span className="text-destructive">利用不可</span>
-        ) : null}
-      </span>
-      <span className="font-medium text-foreground tabular-nums">
-        {formatCount(value)}
-      </span>
+    <div className="w-full max-w-xl rounded-lg border border-border p-3">
+      {result.aggregatesAreDomainLevel && (
+        <div className="mb-2">
+          <DomainLevelBadge tooltip={DOMAIN_LEVEL_TIP} />
+        </div>
+      )}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>プラットフォーム</TableHead>
+            <TableHead className="text-right">
+              <span className="inline-flex items-center gap-1">
+                言及数
+                <InfoTooltip text="ブランドへの言及やウェブサイトの引用を含むAI回答の数です。" />
+              </span>
+            </TableHead>
+            <TableHead className="text-right">
+              <span className="inline-flex items-center gap-1">
+                AI検索ボリューム
+                <InfoTooltip text="ブランドがAI回答に登場するプロンプトの推定月間検索数です。" />
+              </span>
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow className="font-medium">
+            <TableCell>合計</TableCell>
+            <TableCell className="text-right tabular-nums">
+              {formatCount(result.totalMentions)}
+            </TableCell>
+            <TableCell className="text-right tabular-nums">
+              {formatCount(result.totalAiSearchVolume)}
+            </TableCell>
+          </TableRow>
+          {result.perPlatform.map((row) => (
+            <TableRow key={row.platform}>
+              <TableCell>
+                <span className="inline-flex items-center gap-1.5">
+                  <span
+                    className={`size-1.5 rounded-full ${PLATFORM_DOT_CLASS[row.platform]}`}
+                  />
+                  {formatPlatformLabel(row.platform)}
+                  {row.platform === "chat_gpt" && (
+                    <InfoTooltip text="ChatGPTのデータは米国英語のみが対象です。" />
+                  )}
+                  {row.status === "error" && (
+                    <span className="text-destructive">利用不可</span>
+                  )}
+                </span>
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {formatCount(row.status === "error" ? null : row.mentions)}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {formatCount(
+                  row.status === "error" ? null : row.aiSearchVolume,
+                )}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

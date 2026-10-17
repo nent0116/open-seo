@@ -1,5 +1,14 @@
 import { FREE_MAX_AUDIT_PAGES } from "@/shared/audit-limits";
 import { isErrorCode, type ErrorCode } from "@/shared/error-codes";
+import { isHostedClientAuthMode } from "@/lib/auth-mode";
+
+/**
+ * Copy for an error we did not expect. Hosted users cannot read our logs, so
+ * they get support; a self-hoster runs the server and can.
+ */
+export const UNEXPECTED_ERROR_MESSAGE = isHostedClientAuthMode()
+  ? "サーバー側でエラーが発生しました。もう一度お試しいただき、解消しない場合はサポートにお問い合わせください。"
+  : "予期しないエラーが発生しました。もう一度お試しいただくか、サーバーログで詳細を確認してください。";
 
 const STANDARD_MESSAGES: Record<ErrorCode, string> = {
   UNAUTHENTICATED: "ログインしてから、もう一度お試しください。",
@@ -9,6 +18,8 @@ const STANDARD_MESSAGES: Record<ErrorCode, string> = {
     "OpenSEOを利用するには、有効なホスト版サブスクリプションが必要です。",
   INSUFFICIENT_CREDITS:
     "クレジットが不足しています。続行するにはクレジットを追加するか、プランをアップグレードしてください。",
+  AUDIT_RENDERING_UNAVAILABLE:
+    "この環境ではJavaScriptレンダリングが設定されていません。管理者に設定を依頼してください。",
   FORBIDDEN: "このリソースへのアクセス権がありません。",
   NOT_FOUND: "指定されたリソースが見つかりませんでした。",
   AUDIT_CAPACITY_REACHED:
@@ -36,8 +47,7 @@ const STANDARD_MESSAGES: Record<ErrorCode, string> = {
   UPSTREAM_UNAVAILABLE:
     "データ提供元を一時的に利用できません。時間をおいて再試行してください。",
   CONFLICT: "このリクエストは既存のデータと競合しています。",
-  INTERNAL_ERROR:
-    "予期しないエラーが発生しました。サーバーログを確認して、もう一度お試しください。",
+  INTERNAL_ERROR: UNEXPECTED_ERROR_MESSAGE,
 };
 
 export function getStandardErrorMessage(

@@ -64,9 +64,8 @@ export function BrandLookupShareOfVoice({
       {/* Captions only the platforms actually summed — when one platform's
           cross_aggregated call failed, the leaderboard must not claim both. */}
       <p className="border-t border-border px-4 py-2 text-[11px] text-muted-foreground">
-        次の範囲における言及シェア：{" "}
-        {shareOfVoice.platforms.map(formatPlatformLabel).join("、")}{" "}
-        ・棒グラフは首位との相対値です。
+        言及シェアの対象：{" "}
+        {shareOfVoice.platforms.map(formatPlatformLabel).join("、")}
       </p>
     </div>
   );

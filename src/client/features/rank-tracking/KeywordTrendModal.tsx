@@ -5,6 +5,11 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { QueryState } from "@/client/components/QueryState";
 import { Skeleton } from "@/client/components/ui/skeleton";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/client/components/ui/tooltip";
 import { Button } from "@/client/components/ui/button";
 import {
   Dialog,
@@ -123,7 +128,7 @@ export function KeywordTrendModal({
   );
 
   // Keys ("<ts>:<device>") whose plotted point sits in the bottom band because
-  // the real position was null — so the tooltip can say "Not in top N"
+  // the real position was null — so the tooltip can say "Not found"
   // unambiguously even when a genuine position equals serpDepth.
   const bottomBandKeys = useMemo(() => {
     const keys = new Set<string>();
@@ -180,7 +185,7 @@ export function KeywordTrendModal({
               variant="outline"
               size="sm"
               nativeButton={false}
-              title="Search this keyword on Google with the tracked language, country, and city"
+              title="計測対象の言語・国・地域でGoogle検索を開きます"
               render={
                 <a
                   href={googleSerpUrl(target.keyword, {
@@ -194,7 +199,7 @@ export function KeywordTrendModal({
               }
             >
               <ExternalLink data-icon="inline-start" />
-              Open on Google
+              Googleで検索
             </Button>
             <TrendRangeToggle value={sinceDays} onChange={setSinceDays} />
           </div>
@@ -228,7 +233,7 @@ export function KeywordTrendModal({
                       typeof item.dataKey === "string" &&
                       bottomBandKeys.has(`${checkedAt}:${item.dataKey}`) ? (
                       <span className="font-normal text-muted-foreground">
-                        上位{serpDepth}位圏外
+                        見つかりません
                       </span>
                     ) : (
                       String(value)
@@ -279,9 +284,19 @@ export function KeywordTrendModal({
                             )}
                             <TableCell>
                               {r.position === null ? (
-                                <span className="text-xs text-muted-foreground">
-                                  上位{serpDepth}位圏外
-                                </span>
+                                <Tooltip>
+                                  <TooltipTrigger
+                                    delay={150}
+                                    render={
+                                      <span className="cursor-help text-xs text-muted-foreground underline decoration-dotted underline-offset-2" />
+                                    }
+                                  >
+                                    見つかりません
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    順位が確認できないか、検索結果の取得が不完全です
+                                  </TooltipContent>
+                                </Tooltip>
                               ) : (
                                 <span className="font-mono text-sm">
                                   {r.position}

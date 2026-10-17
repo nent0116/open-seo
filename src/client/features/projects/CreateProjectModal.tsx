@@ -24,6 +24,7 @@ import {
   getLanguageCode,
 } from "@/client/features/keywords/locations";
 import { ProjectMarketFields } from "@/client/features/projects/ProjectMarketFields";
+import { toastInitialAudit } from "@/client/features/projects/initialAuditToast";
 import { createProject } from "@/serverFunctions/projects";
 
 const createProjectSchema = z.object({
@@ -67,6 +68,7 @@ export function CreateProjectModal({ onClose }: { onClose: () => void }) {
       });
       onClose();
       toast.success("プロジェクトを作成しました");
+      toastInitialAudit(created.initialAudit);
       // Continue setup through the new project’s dashboard.
       void navigate({
         to: "/p/$projectId",
@@ -125,6 +127,9 @@ export function CreateProjectModal({ onClose }: { onClose: () => void }) {
               )}
             </form.AppField>
 
+            <p className="text-sm text-muted-foreground">
+              ウェブサイトを登録すると、JavaScriptレンダリングを使用した最大50ページの監査を開始します。レンダリングにはクレジットを使用します。
+            </p>
             <form.AppField name="domain">
               {(field) => (
                 <field.TextField

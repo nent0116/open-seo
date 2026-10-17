@@ -15,7 +15,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/client/components/ui/chart";
-import { BillingUsageCard } from "@/client/features/billing/BillingUsageCard";
+import { BillingUsageSection } from "@/client/features/billing/BillingUsageSection";
 import {
   BILLING_USAGE_DAYS,
   useBillingUsageEvents,
@@ -29,7 +29,7 @@ export function BillingUsageChart() {
   const eventsQuery = useBillingUsageEvents();
 
   return (
-    <BillingUsageCard title="使用量">
+    <BillingUsageSection title="使用量">
       <QueryState
         query={eventsQuery}
         errorFallback="使用量を読み込めませんでした"
@@ -37,7 +37,7 @@ export function BillingUsageChart() {
       >
         {(events) => <UsageChart events={events} />}
       </QueryState>
-    </BillingUsageCard>
+    </BillingUsageSection>
   );
 }
 

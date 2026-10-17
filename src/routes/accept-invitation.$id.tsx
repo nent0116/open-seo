@@ -5,6 +5,7 @@ import { Button } from "@/client/components/ui/button";
 import { Link, createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuthPageCard, AuthPageShell } from "@/client/features/auth/AuthPage";
+import { clearLastProjectId } from "@/client/lib/active-project";
 import { captureClientEvent } from "@/client/lib/posthog";
 import { authClient, signOutAndRedirect, useSession } from "@/lib/auth-client";
 import { isHostedClientAuthMode } from "@/lib/auth-mode";
@@ -117,8 +118,9 @@ function InvitationCard({
         organizationId: accepted.data.invitation.organizationId,
       });
       captureClientEvent("team:invitation_accept");
-      // Full navigation: every cached query in this tab belongs to the old
-      // workspace.
+      // Full navigation: every cached query in this tab, and the remembered
+      // project, belong to the old workspace.
+      clearLastProjectId();
       window.location.assign("/");
     } catch {
       setActionError("招待を承認できませんでした。もう一度お試しください。");
@@ -253,7 +255,7 @@ function InvitationCard({
           disabled={pendingAction !== null}
           onClick={() => void handleDecline()}
         >
-          {pendingAction === "decline" ? "Declining..." : "Decline"}
+          {pendingAction === "decline" ? "辞退しています…" : "辞退"}
         </Button>
       </div>
     </AuthPageCard>

@@ -13,7 +13,6 @@ import {
   Card,
   CardAction,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/client/components/ui/card";
@@ -295,10 +294,9 @@ function ProgressCard({
             <CardTitle className="font-medium text-muted-foreground">
               クロール済みページ（{crawledUrls.length}）
             </CardTitle>
-            <CardDescription className="text-xs">
-              更新日時：
-              {new Date(crawledUrls[0].crawledAt).toLocaleTimeString("ja-JP")}
-            </CardDescription>
+            <CardAction className="text-xs text-muted-foreground">
+              更新日時 {new Date(crawledUrls[0].crawledAt).toLocaleTimeString()}
+            </CardAction>
           </CardHeader>
           <CardContent className="max-h-[400px] overflow-y-auto">
             {crawledUrls.map((entry, i) => (
