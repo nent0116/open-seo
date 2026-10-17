@@ -47,6 +47,23 @@ function mockLiveSerp(rows: number) {
   return live;
 }
 
+const paa = {
+  type: "people_also_ask",
+  items: [
+    {
+      title: "How do I find food suppliers?",
+      expanded_element: [
+        {
+          description: "Compare suppliers and their minimum orders.",
+          title: "Supplier guide",
+          url: "https://example.com/suppliers",
+        },
+      ],
+    },
+    { title: "Can I request samples?", expanded_element: null },
+  ],
+};
+
 describe("get_serp_results", () => {
   beforeEach(() => {
     mocks.cache.clear();
@@ -86,5 +103,195 @@ describe("get_serp_results", () => {
 
     expect(live).toHaveBeenCalledTimes(1);
     expect(repeat.structuredContent).toEqual(first.structuredContent);
+  });
+
+  it("returns PAA questions and answer sources in structured and text content", async () => {
+    mocks.createDataforseoClient.mockReturnValue({
+      serp: { live: vi.fn().mockResolvedValue([paa]) },
+    });
+
+    const result = await getSerpResultsTool.handler(
+      {
+        projectId: "project_1",
+        queries: [{ keyword: "food suppliers" }],
+        includePaa: true,
+      },
+      toolContext,
+    );
+
+    expect(result.structuredContent).toMatchObject({
+      results: [
+        {
+          items: [
+            {
+              questions: [
+                {
+                  question: "How do I find food suppliers?",
+                  answers: [
+                    {
+                      text: "Compare suppliers and their minimum orders.",
+                      sources: [
+                        {
+                          title: "Supplier guide",
+                          url: "https://example.com/suppliers",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                { question: "Can I request samples?", answers: [] },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    expect(textContent(result)).toContain("How do I find food suppliers?");
+    expect(textContent(result)).toContain(
+      "Compare suppliers and their minimum orders.",
+    );
+    expect(textContent(result)).toContain("https://example.com/suppliers");
+    getSerpResultsTool.config.outputSchema.parse(result.structuredContent);
+  });
+
+  it.each([
+    {
+      format: "plain text",
+      answer: {
+        text: "Compare suppliers.",
+        markdown: "**Compare suppliers.**",
+      },
+      expectedText: "Compare suppliers.",
+    },
+    {
+      format: "Markdown table",
+      answer: {
+        type: "ai_overview_table_element",
+        markdown: "| Supplier | Minimum order |\n|---|---|\n| A | 10 units |",
+      },
+      expectedText: "| Supplier | Minimum order |\n|---|---|\n| A | 10 units |",
+    },
+  ])(
+    "reads $format already embedded in PAA without expanding the question",
+    async ({ answer, expectedText }) => {
+      mocks.createDataforseoClient.mockReturnValue({
+        serp: {
+          live: vi.fn().mockResolvedValue([
+            {
+              type: "people_also_ask",
+              items: [
+                {
+                  title: "How do I find food suppliers?",
+                  expanded_element: [
+                    {
+                      type: "people_also_ask_ai_overview_expanded_element",
+                      items: [
+                        {
+                          ...answer,
+                          references: [
+                            {
+                              title: "Supplier guide",
+                              url: "https://example.com/suppliers",
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ]),
+        },
+      });
+
+      const result = await getSerpResultsTool.handler(
+        {
+          projectId: "project_1",
+          queries: [{ keyword: "food suppliers" }],
+          includePaa: true,
+        },
+        toolContext,
+      );
+
+      expect(result.structuredContent).toMatchObject({
+        results: [
+          {
+            items: [
+              {
+                questions: [
+                  {
+                    question: "How do I find food suppliers?",
+                    answers: [
+                      {
+                        text: expectedText,
+                        sources: [
+                          {
+                            title: "Supplier guide",
+                            url: "https://example.com/suppliers",
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      });
+    },
+  );
+
+  it("keeps default and PAA-detail cache entries separate", async () => {
+    const live = vi.fn().mockResolvedValue([paa]);
+    mocks.createDataforseoClient.mockReturnValue({ serp: { live } });
+    const args = {
+      projectId: "project_1",
+      queries: [{ keyword: "food suppliers" }],
+    };
+
+    const normal = await getSerpResultsTool.handler(args, toolContext);
+    const detailed = await getSerpResultsTool.handler(
+      { ...args, includePaa: true },
+      toolContext,
+    );
+    const repeat = await getSerpResultsTool.handler(
+      { ...args, includePaa: true },
+      toolContext,
+    );
+    const explicitDefault = await getSerpResultsTool.handler(
+      { ...args, includePaa: false },
+      toolContext,
+    );
+
+    expect(normal.structuredContent?.results).toEqual([
+      {
+        keyword: "food suppliers",
+        ok: true,
+        items: [
+          {
+            type: "people_also_ask",
+            rank: null,
+            title: null,
+            url: null,
+            domain: null,
+            description: null,
+          },
+        ],
+      },
+    ]);
+    expect(detailed.structuredContent).not.toEqual(normal.structuredContent);
+    expect(repeat.structuredContent).toEqual(detailed.structuredContent);
+    expect(explicitDefault.structuredContent).toEqual(normal.structuredContent);
+    expect(live).toHaveBeenCalledTimes(2);
+    // PAA is extracted from the same response, without paid click expansion.
+    expect(live).toHaveBeenCalledWith({
+      keyword: "food suppliers",
+      locationCode: 2840,
+      languageCode: "en",
+      locationName: undefined,
+      depth: 20,
+    });
   });
 });

@@ -23,6 +23,88 @@ import {
 // caller that lost a response can call again instead of paying twice.
 const SERP_RESULTS_CACHE_TTL_SECONDS = 12 * 60 * 60;
 
+const paaSourceSchema = z.looseObject({
+  title: z.string().nullable(),
+  url: z.string(),
+});
+const paaAnswerSchema = z.looseObject({
+  text: z.string().nullable(),
+  sources: z.array(paaSourceSchema),
+});
+const paaQuestionSchema = z.looseObject({
+  question: z.string(),
+  answers: z.array(paaAnswerSchema),
+});
+
+const providerQuestionSchema = z.object({
+  title: z.string().trim().min(1),
+  expanded_element: z.array(z.unknown()).nullish(),
+});
+const providerSourceSchema = z.object({
+  title: z.string().nullish(),
+  url: z.string().trim().min(1),
+});
+const providerAnswerSchema = z.object({
+  description: z.string().nullish(),
+  text: z.string().nullish(),
+  markdown: z.string().nullish(),
+  title: z.string().nullish(),
+  url: z.string().nullish(),
+  references: z.array(z.unknown()).nullish(),
+  items: z.array(z.unknown()).nullish(),
+  components: z.array(z.unknown()).nullish(),
+});
+
+// PAA may already contain a regular snippet or a nested AI answer. Only read
+// what the original SERP returned; never expand questions or fetch source URLs.
+function readPaaAnswers(
+  elements: unknown[],
+): z.infer<typeof paaAnswerSchema>[] {
+  return elements.flatMap((element) => {
+    const parsed = providerAnswerSchema.safeParse(element);
+    if (!parsed.success) return [];
+    const answer = parsed.data;
+    const text =
+      answer.description?.trim() ||
+      answer.text?.trim() ||
+      answer.markdown?.trim() ||
+      null;
+    const sources = [answer, ...(answer.references ?? [])].flatMap((source) => {
+      const parsedSource = providerSourceSchema.safeParse(source);
+      return parsedSource.success
+        ? [
+            {
+              title: parsedSource.data.title ?? null,
+              url: parsedSource.data.url,
+            },
+          ]
+        : [];
+    });
+    return [
+      ...(text || sources.length ? [{ text, sources }] : []),
+      ...readPaaAnswers([
+        ...(answer.items ?? []),
+        ...(answer.components ?? []),
+      ]),
+    ];
+  });
+}
+
+function readPaaQuestions(items: unknown): z.infer<typeof paaQuestionSchema>[] {
+  if (!Array.isArray(items)) return [];
+  return items.flatMap((item) => {
+    const parsed = providerQuestionSchema.safeParse(item);
+    return parsed.success
+      ? [
+          {
+            question: parsed.data.title,
+            answers: readPaaAnswers(parsed.data.expanded_element ?? []),
+          },
+        ]
+      : [];
+  });
+}
+
 const serpItemSchema = z
   .object({
     type: z.string().nullable().optional(),
@@ -31,6 +113,7 @@ const serpItemSchema = z
     url: z.string().nullable(),
     domain: z.string().nullable(),
     description: z.string().nullable(),
+    questions: z.array(paaQuestionSchema).optional(),
   })
   .passthrough();
 
@@ -58,6 +141,12 @@ const querySchema = z.object({
 
 const inputSchema = {
   projectId: projectIdSchema,
+  includePaa: z
+    .boolean()
+    .optional()
+    .describe(
+      "Include People Also Ask questions, available answer snippets, and source URLs from the same SERP response. Default false. No extra clicks or API requests; answers may be empty. This option has a separate 12-hour cache entry.",
+    ),
   queries: z
     .array(querySchema)
     .min(1)
@@ -133,6 +222,7 @@ export const getSerpResultsTool = {
             ...market,
             locationName: q.locationName,
             depth,
+            ...(args.includePaa ? { includePaa: true } : {}),
           });
           const cached = z
             .array(serpItemSchema)
@@ -159,6 +249,9 @@ export const getSerpResultsTool = {
             url: item.url ?? null,
             domain: item.domain ?? null,
             description: item.description ?? null,
+            ...(args.includePaa && item.type === "people_also_ask"
+              ? { questions: readPaaQuestions(item.items) }
+              : {}),
           }));
           // DataForSEO reports "no results" transiently; don't pin that for
           // the whole window. waitUntil, not void: workerd cancels
@@ -195,7 +288,14 @@ export const getSerpResultsTool = {
           if (r.items.length === 0) {
             return `"${r.keyword}" (0 results)`;
           }
-          return `"${r.keyword}" (${r.items.length} results):\n${formatMcpTable(r.items, SERP_ITEM_COLUMNS)}`;
+          const questions = r.items.flatMap((item) => item.questions ?? []);
+          const paaText = questions.length
+            ? `\n\nPeople Also Ask:\n${formatMcpTable(questions, [
+                { header: "question", value: (q) => q.question },
+                { header: "answers", value: (q) => q.answers },
+              ])}`
+            : "";
+          return `"${r.keyword}" (${r.items.length} results):\n${formatMcpTable(r.items, SERP_ITEM_COLUMNS)}${paaText}`;
         })
         .join("\n\n") +
       `\n\n${okCount} of ${results.length} queries succeeded.`;
