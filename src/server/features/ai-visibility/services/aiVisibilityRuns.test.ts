@@ -53,7 +53,7 @@ describe("AI visibility checks", () => {
     "does not enable scheduling while a concurrent %s startup is unconfirmed",
     async (trigger) => {
       const tracker = await repo.getTracker(projectId);
-      await repo.updateTracker(tracker!.id, { enabled: false });
+      await repo.updateTracker(tracker.id, { enabled: false });
       let rejectStart!: (error: Error) => void;
       let notifyStarting!: () => void;
       const starting = new Promise<void>((resolve) => {
@@ -98,7 +98,7 @@ describe("AI visibility checks", () => {
   );
   it("keeps scheduling disabled after startup fails and starts a fresh baseline on retry", async () => {
     const tracker = await repo.getTracker(projectId);
-    await repo.updateTracker(tracker!.id, { enabled: false });
+    await repo.updateTracker(tracker.id, { enabled: false });
     workflow.create.mockRejectedValueOnce(new Error("Workflow unavailable"));
     await expect(
       setSchedule({ projectId, enabled: true }, customer),
