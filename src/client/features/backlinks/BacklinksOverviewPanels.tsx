@@ -1,3 +1,4 @@
+import { MetricsTable } from "@/client/components/MetricsTable";
 import { Info } from "lucide-react";
 import { Alert, AlertDescription } from "@/client/components/ui/alert";
 import { Badge } from "@/client/components/ui/badge";
@@ -44,21 +45,15 @@ export function BacklinksOverviewPanels({
 }) {
   return (
     <>
-      <div className="px-4 pt-4 pb-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4 pb-3">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-lg font-semibold break-all">
             {data.displayTarget}
           </h2>
           <Badge variant="outline">{RESEARCH_SCOPE_LABELS[data.scope]}</Badge>
         </div>
-        <p className="text-xs text-muted-foreground">
-          更新日時 {formatRelativeTimestamp(data.fetchedAt)}{" "}
-          ・概要の指標は、表の絞り込み前の対象全体を集計しています
-          {/* history/live can't exclude subdomains, so say so rather than
-              imply the charts match the domain-scoped totals. */}
-          {data.scope === "domain" ? (
-            <> ・トレンドにはサブドメインを含みます</>
-          ) : null}
+        <p className="ml-auto text-xs text-muted-foreground">
+          更新日時 {formatRelativeTimestamp(data.fetchedAt)}
         </p>
       </div>
       <div className="px-4 pb-4">
@@ -83,26 +78,24 @@ function OverviewGrid({
       className={`grid grid-cols-1 gap-3 ${domainScope ? "md:grid-cols-2 xl:grid-cols-3" : ""}`}
     >
       <div
-        className={`rounded-lg border border-border p-3 ${domainScope ? "md:col-span-2 xl:col-span-1" : ""}`}
+        className={`w-full max-w-xl rounded-lg border border-border p-3 ${domainScope ? "md:col-span-2 xl:col-span-1" : ""}`}
       >
-        <div
-          className={`grid grid-cols-2 gap-x-6 gap-y-5 xl:gap-y-6 ${domainScope ? "" : "md:grid-cols-4"}`}
-        >
-          {summaryStats.map((item) => (
-            <div key={item.label}>
-              <div className="text-xs tracking-wide text-muted-foreground uppercase">
-                <HelpLabel label={item.label} helpText={item.description} />
-              </div>
-              <p className="text-2xl font-semibold">{item.value}</p>
-            </div>
-          ))}
-        </div>
+        <MetricsTable
+          rows={summaryStats.map((item) => ({
+            label: <HelpLabel label={item.label} helpText={item.description} />,
+            value: item.value,
+          }))}
+        />
       </div>
       {domainScope ? (
         <>
           <TrendPanel
             title="被リンクの推移"
-            description="過去1年間の被リンクと参照ドメインの推移"
+            description={
+              data.scope === "domain"
+                ? "過去1年間・サブドメインを含みます"
+                : "過去1年間の被リンクと参照ドメインの推移"
+            }
           >
             <BacklinksTrendChart data={data.trends} />
           </TrendPanel>

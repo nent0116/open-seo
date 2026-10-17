@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
 import { GoogleConnectionCard } from "@/client/features/integrations/GoogleConnectionCard";
+import type { GooglePickerAccount } from "./GooglePropertyPicker";
 import { SearchConsoleOnboardingStep } from "@/client/features/onboarding/SearchConsoleOnboardingStep";
 
 vi.mock("@/serverFunctions/gsc", () => ({
@@ -38,7 +39,13 @@ function renderSetup(
   hasGrant: boolean,
   connected = false,
   canManage = true,
-  connectionError?: "initial" | "refetch",
+  {
+    connectionError,
+    accounts,
+  }: {
+    connectionError?: "initial" | "refetch";
+    accounts?: GooglePickerAccount[];
+  } = {},
 ) {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false, retryOnMount: false } },
@@ -52,6 +59,12 @@ function renderSetup(
     googleOAuthConfigured: true,
     property: "https://example.com/",
   });
+  if (accounts) {
+    client.setQueryData(
+      [provider === "gsc" ? "gscSites" : "ga4Properties", "project-a"],
+      { accounts },
+    );
+  }
   if (connectionError) {
     client
       .getQueryCache()
@@ -105,7 +118,9 @@ it.each(["gsc", "ga4"] as const)(
 
 describe("onboarding connection actions", () => {
   it("keeps cached property setup and a single footer after a failed refetch", () => {
-    const html = renderSetup("onboarding", true, false, true, "refetch");
+    const html = renderSetup("onboarding", true, false, true, {
+      connectionError: "refetch",
+    });
     expect(html).toContain("プロパティを選択");
     expect(html).not.toContain("Googleとの連携状況を確認できませんでした。");
     expect(html.match(/保存して続ける/g)).toHaveLength(1);
@@ -114,17 +129,65 @@ describe("onboarding connection actions", () => {
   });
 
   it("keeps a saved connection usable after a failed refetch", () => {
-    const html = renderSetup("onboarding", true, true, true, "refetch");
+    const html = renderSetup("onboarding", true, true, true, {
+      connectionError: "refetch",
+    });
     expect(html).toContain("https://example.com/");
     expect(html).toMatch(/>続ける[ <]/);
     expect(html).not.toContain("保存して続ける");
   });
 
   it("offers retry and disables saving when the initial connection check fails", () => {
-    const html = renderSetup("onboarding", false, false, true, "initial");
+    const html = renderSetup("onboarding", false, false, true, {
+      connectionError: "initial",
+    });
     expect(html).toContain("Googleとの連携状況を確認できませんでした。");
     expect(html).toContain("再試行");
     expect(html).not.toContain("プロパティを選択");
     expect(html).toMatch(/disabled=""[^>]*>保存して続ける/);
   });
+});
+
+describe("Search Console website setup guidance", () => {
+  const emptyAccount = {
+    accountId: "account-a",
+    email: "owner@example.com",
+    requiresReconnect: false,
+    properties: [],
+  };
+
+  it.each(["gsc", "onboarding"] as const)(
+    "explains empty accounts without opening the %s picker",
+    (surface) => {
+      const html = renderSetup(surface, true, false, true, {
+        accounts: [emptyAccount],
+      });
+      expect(html).toContain("ウェブサイトが見つかりませんでした");
+      expect(html).toContain("owner@example.com");
+      expect(html).not.toContain("プロパティを選択…");
+      expect(html).toContain("/blogs/google-search-console-setup");
+      expect(html).toContain("更新");
+      expect(html).toContain("別のGoogleアカウントを使用");
+      if (surface === "onboarding") expect(html).toContain("今はスキップ");
+    },
+  );
+
+  it.each([
+    { requiresReconnect: true },
+    { unavailable: true },
+    {
+      properties: [
+        { id: "https://example.com/", name: "example.com", selectable: true },
+      ],
+    },
+  ])(
+    "does not mistake expired, failed, or populated accounts for a new website",
+    (patch) => {
+      const html = renderSetup("gsc", true, false, true, {
+        accounts: [{ ...emptyAccount, ...patch }],
+      });
+      expect(html).toContain("プロパティを選択");
+      expect(html).not.toContain("ウェブサイトが見つかりませんでした");
+    },
+  );
 });

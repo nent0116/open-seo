@@ -131,6 +131,7 @@ vi.mock("@/server/lib/dataforseo/ai", () => ({
 }));
 vi.mock("@/server/lib/dataforseo/ai-tracking", () => ({
   postAiTrackingTasks: vi.fn(),
+  fetchAiTrackingLiveAnswer: vi.fn(),
 }));
 
 import { waitUntil } from "cloudflare:workers";
@@ -146,7 +147,10 @@ import {
   fetchRankCheckSerp,
   postLocalSerpTasks,
 } from "@/server/lib/dataforseo/serp";
-import { postAiTrackingTasks } from "@/server/lib/dataforseo/ai-tracking";
+import {
+  postAiTrackingTasks,
+  fetchAiTrackingLiveAnswer,
+} from "@/server/lib/dataforseo/ai-tracking";
 import { postGoogleReviewsTask } from "@/server/lib/dataforseo/business";
 
 const billingCustomer = {
@@ -397,6 +401,47 @@ describe("meterDataforseoCall", () => {
 
     expect(vi.mocked(waitUntil)).toHaveBeenCalledTimes(1);
     expect(finalizeMock.mock.calls[0][0]).toMatchObject({ action: "release" });
+  });
+});
+
+it("keeps live AI estimates in USD and converts to credits only at the billing seam", async () => {
+  setupHostedMode();
+  mockMonthlyBalance(6);
+  vi.mocked(fetchAiTrackingLiveAnswer).mockResolvedValueOnce({
+    data: { status: "completed", result: {} },
+    billing: {
+      costUsd: 0.004,
+      path: [
+        "v3",
+        "ai_optimization",
+        "chat_gpt",
+        "llm_scraper",
+        "live",
+        "advanced",
+      ],
+    },
+  });
+
+  const result = await createDataforseoClient(
+    billingCustomer,
+  ).aiSearch.trackingLiveBatch([
+    {
+      engine: "chatgpt",
+      task: { tag: "answer", prompt: "Which SEO tools?" },
+      locationCode: 2840,
+      languageCode: "en",
+    },
+  ]);
+
+  expect(enforceUsageLimitsMock).toHaveBeenCalledWith({
+    estimatedCostUsd: 0.004,
+    requests: 3,
+  });
+  expect(result).toMatchObject([{ status: "fulfilled" }]);
+  expect(checkMock.mock.calls[0][0]).toMatchObject({ requiredBalance: 6 });
+  expect(finalizeMock.mock.calls[0][0]).toMatchObject({
+    action: "confirm",
+    overrideValue: 6,
   });
 });
 

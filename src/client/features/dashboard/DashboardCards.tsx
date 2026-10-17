@@ -1,9 +1,15 @@
+import { GoogleSearchConsoleLogo } from "@/client/features/integrations/GoogleProductLogos";
+import { startAudit } from "@/serverFunctions/audit";
+import { QueryError } from "@/client/components/QueryState";
+import { LoaderCircle, ScanSearch } from "lucide-react";
 import { CardShell } from "@/client/components/CardShell";
+import { Progress } from "@/client/components/ui/progress";
 import { Button } from "@/client/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check } from "lucide-react";
 import { GoogleConnectionCard } from "@/client/features/integrations/GoogleConnectionCard";
+import { SeverityBadge } from "@/client/features/audit/shared";
 import { AUDIT_ISSUE_TYPES } from "@/shared/audit-issues";
 
 import {
@@ -13,17 +19,20 @@ import {
 } from "@/client/features/search-performance/SearchPerformanceColumns";
 import { getSearchPerformanceReport } from "@/serverFunctions/searchPerformance";
 import {
-  EmptyCardBody,
   formatDay,
   moreDetailsClass,
-  newLost,
-  StatGridSkeleton,
+  MetricsTableSkeleton,
 } from "@/client/features/dashboard/cardParts";
-import { StatTile } from "@/client/components/StatTile";
-import type {
-  DashboardAuditSummary,
-  DashboardBacklinkSummary,
-} from "@/server/features/dashboard/services/DashboardService";
+import { percentChange } from "@/client/components/MetricsTable";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/client/components/ui/table";
+import type { DashboardAuditSummary } from "@/server/features/dashboard/services/DashboardService";
 
 // Plain string-keyed view of the registry: issue types from the DB are not
 // statically guaranteed to be registry keys.
@@ -34,17 +43,20 @@ const issueTitles: Record<string, string | undefined> = Object.fromEntries(
 export function GscCard({
   projectId,
   connected,
+  siteUrl,
 }: {
   projectId: string;
   connected: boolean;
+  siteUrl: string | null;
 }) {
   const reportQuery = useQuery({
-    queryKey: ["dashboardGscReport", projectId],
+    queryKey: ["dashboardGscReport", projectId, siteUrl],
     queryFn: () =>
       getSearchPerformanceReport({
         data: { projectId, dateRange: "last_28_days" },
       }),
     enabled: connected,
+    staleTime: 10 * 60_000,
   });
   const report = reportQuery.data;
 
@@ -61,48 +73,81 @@ export function GscCard({
   return (
     <CardShell
       title="検索パフォーマンス"
-      stamp="Google Search Console・過去28日間"
+      icon={<GoogleSearchConsoleLogo className="size-5" />}
       action={
         <Link
           to="/p/$projectId/search-performance"
           params={{ projectId }}
           className={moreDetailsClass}
         >
-          詳細を見る
+          検索パフォーマンスの詳細を見る →
         </Link>
       }
     >
+      <p className="mb-4 text-sm font-medium text-muted-foreground">
+        過去28日間
+      </p>
       {reportQuery.isError ? (
         <p className="text-sm text-muted-foreground">
           Search
           Consoleのデータを読み込めませんでした。時間をおいて再試行してください。
         </p>
       ) : !report ? (
-        <StatGridSkeleton />
+        <MetricsTableSkeleton />
       ) : (
-        <div className="grid grid-cols-2 gap-3">
-          <StatTile
-            label="クリック数"
-            value={formatCount(report.totals.clicks)}
-            delta={{
-              current: report.totals.clicks,
-              previous: report.prevTotals.clicks,
-            }}
-          />
-          <StatTile
-            label="表示回数"
-            value={formatCount(report.totals.impressions)}
-            delta={{
-              current: report.totals.impressions,
-              previous: report.prevTotals.impressions,
-            }}
-          />
-          <StatTile label="CTR" value={formatCtr(report.totals.ctr)} />
-          <StatTile
-            label="平均掲載順位"
-            value={formatPosition(report.totals.position)}
-          />
-        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>指標</TableHead>
+              <TableHead className="text-right">値</TableHead>
+              <TableHead className="text-right">変化</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {[
+              {
+                label: "クリック数",
+                value: formatCount(report.totals.clicks),
+                change: percentChange(
+                  report.totals.clicks,
+                  report.prevTotals.clicks,
+                ),
+              },
+              {
+                label: "表示回数",
+                value: formatCount(report.totals.impressions),
+                change: percentChange(
+                  report.totals.impressions,
+                  report.prevTotals.impressions,
+                ),
+              },
+              {
+                label: "クリック率",
+                value: formatCtr(report.totals.ctr),
+                change: null,
+              },
+              {
+                label: "平均掲載順位",
+                value: formatPosition(report.totals.position),
+                change: null,
+              },
+            ].map((metric) => (
+              <TableRow key={metric.label}>
+                <TableCell>{metric.label}</TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {metric.value}
+                </TableCell>
+                <TableCell
+                  className={`text-right tabular-nums ${metric.change === null || metric.change === 0 ? "text-muted-foreground" : metric.change > 0 ? "text-success" : "text-destructive"}`}
+                >
+                  {metric.change === null
+                    ? "—"
+                    : `${metric.change > 0 ? "+" : ""}${metric.change}%`}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
     </CardShell>
   );
@@ -111,56 +156,143 @@ export function GscCard({
 export function AuditHealthCard({
   projectId,
   audit,
+  domain,
 }: {
   projectId: string;
   audit: DashboardAuditSummary | null;
+  domain: string | null;
 }) {
-  if (!audit) {
+  const queryClient = useQueryClient();
+  const scan = useMutation({
+    mutationFn: () =>
+      startAudit({
+        data: {
+          projectId,
+          startUrl: `https://${domain}`,
+          maxPages: 50,
+          renderJavaScript: true,
+        },
+      }),
+    onSuccess: () =>
+      void queryClient.invalidateQueries({
+        queryKey: ["dashboardOverview", projectId],
+      }),
+    meta: { errorToast: false },
+  });
+  if (!audit)
     return (
-      <CardShell title="サイト監査">
-        <EmptyCardBody
-          message="サイトをクロールし、リンク切れ、タグの不足、インデックス登録の問題を検出します。"
-          cta={
-            <Button
-              size="lg"
-              nativeButton={false}
-              render={<Link to="/p/$projectId/audit" params={{ projectId }} />}
-            >
-              監査を実行
+      <CardShell title="サイトの状態">
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 py-6 text-center">
+          <ScanSearch className="size-7 text-muted-foreground" />
+          <h3 className="font-medium">サイトの改善点を見つけましょう</h3>
+          <p className="max-w-sm text-sm text-muted-foreground">
+            最大50ページを監査し、リンク切れ、タイトルの不足、Googleにインデックスされないページを検出します。
+          </p>
+          {domain ? (
+            <Button disabled={scan.isPending} onClick={() => scan.mutate()}>
+              {scan.isPending ? "監査を開始しています…" : "サイトを監査"}
             </Button>
-          }
-        />
+          ) : (
+            <Button
+              nativeButton={false}
+              render={
+                <Link to="/p/$projectId/settings" params={{ projectId }} />
+              }
+            >
+              ウェブサイトを登録
+            </Button>
+          )}
+          {scan.isError && (
+            <QueryError
+              error={scan.error}
+              fallback="監査を開始できませんでした"
+            />
+          )}
+        </div>
+      </CardShell>
+    );
+
+  if (audit.status === "running") {
+    const isLighthouse = audit.currentPhase === "lighthouse";
+    const isFinalizing = audit.currentPhase === "finalizing";
+    const checked = isLighthouse
+      ? audit.lighthouseCompleted + audit.lighthouseFailed
+      : audit.pagesCrawled;
+    const total = isLighthouse ? audit.lighthouseTotal : audit.pagesTotal;
+    // A running crawl has at most a partial issue list, and an empty one is
+    // not the same as a healthy site, so show progress instead.
+    return (
+      <CardShell
+        title="サイトの状態"
+        action={
+          <Link
+            to="/p/$projectId/audit"
+            params={{ projectId }}
+            search={{ auditId: audit.id }}
+            className={moreDetailsClass}
+          >
+            進行状況を確認
+          </Link>
+        }
+      >
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 py-6 text-center">
+          <LoaderCircle className="size-7 animate-spin text-muted-foreground" />
+          <h3 className="font-medium">
+            {isLighthouse
+              ? "Lighthouseを実行しています"
+              : isFinalizing
+                ? "結果を準備しています"
+                : audit.currentPhase === "discovery"
+                  ? "監査するページを検出しています"
+                  : "サイトを監査しています"}
+          </h3>
+          {!isFinalizing && (
+            <Progress
+              className="w-full max-w-xs"
+              value={checked}
+              max={total || 1}
+              aria-label={
+                isLighthouse ? "Lighthouseのチェック" : "クロール済みページ"
+              }
+            />
+          )}
+          <p className="text-sm text-muted-foreground tabular-nums">
+            {isLighthouse
+              ? `${checked} of ${total} checks${audit.lighthouseFailed > 0 ? ` (${audit.lighthouseFailed} failed)` : ""}`
+              : isFinalizing
+                ? `${audit.pagesCrawled}ページをクロールしました。レポートを仕上げています。`
+                : `${checked} of up to ${total} pages crawled`}
+          </p>
+        </div>
       </CardShell>
     );
   }
 
   return (
     <CardShell
-      title="サイト監査"
-      stamp={`サイト監査・${
-        audit.status === "completed"
-          ? `${audit.pagesCrawled.toLocaleString("ja-JP")}ページをクロール・${formatDay(audit.startedAt)}`
-          : audit.status === "running"
-            ? "クロール中"
-            : "前回のクロールに失敗"
-      }`}
+      title="サイトの状態"
       action={
         <Link
           to="/p/$projectId/audit"
           params={{ projectId }}
+          search={{ auditId: audit.id, tab: "issues" }}
           className={moreDetailsClass}
         >
-          詳細を見る
+          問題を確認
         </Link>
       }
     >
-      {audit.status === "running" ? (
-        // A running crawl has at most a partial issue list, and an empty one
-        // is not the same as a healthy site.
-        <p className="text-sm text-muted-foreground">
-          クロールが完了すると、ここに問題が表示されます。
+      {audit.status === "failed" && (
+        <p className="mb-4 text-sm text-destructive">
+          前回の監査は完了しませんでした。結果を確認するか、もう一度実行してください。
         </p>
-      ) : audit.topIssues.length === 0 ? (
+      )}
+      {audit.status === "completed" && (
+        <p className="mb-4 text-sm text-muted-foreground">
+          {audit.pagesCrawled} ページ確認済み・ {formatDay(audit.startedAt)}
+        </p>
+      )}
+      {audit.topIssues.length === 0 ? (
         audit.status === "completed" ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Check className="size-4 text-success" />
@@ -172,131 +304,37 @@ export function AuditHealthCard({
           </p>
         )
       ) : (
-        <ul className="space-y-2">
-          {audit.topIssues.map((issue) => (
-            <li
-              key={issue.issueType}
-              className="flex items-center justify-between gap-2 text-sm"
-            >
-              <span className="flex min-w-0 items-center gap-2">
-                <span
-                  className={`size-2 shrink-0 rounded-full ${
-                    issue.severity === "critical"
-                      ? "bg-destructive"
-                      : issue.severity === "warning"
-                        ? "bg-warning"
-                        : "bg-muted-foreground/30"
-                  }`}
-                />
-                <span className="truncate">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>問題</TableHead>
+              <TableHead>重要度</TableHead>
+              <TableHead className="text-right">影響するページ</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {audit.topIssues.map((issue) => (
+              <TableRow key={issue.issueType}>
+                <TableCell>
                   {issueTitles[issue.issueType] ?? issue.issueType}
-                </span>
-              </span>
-              <span className="shrink-0 tabular-nums text-muted-foreground">
-                {issue.count.toLocaleString("ja-JP")}ページ
-              </span>
-            </li>
-          ))}
-          {audit.totalIssueTypes > audit.topIssues.length ? (
-            <li className="text-xs text-muted-foreground">
-              +{audit.totalIssueTypes - audit.topIssues.length}件の問題
-            </li>
-          ) : null}
-          {/* A failed crawl keeps what it found, as the audit page does. */}
-          {audit.status !== "completed" ? (
-            <li className="text-xs text-muted-foreground">
-              監査が停止するまでにクロールできたページの結果です。
-            </li>
-          ) : null}
-        </ul>
+                </TableCell>
+                <TableCell>
+                  <SeverityBadge severity={issue.severity}>
+                    {issue.severity === "critical"
+                      ? "重大"
+                      : issue.severity === "warning"
+                        ? "警告"
+                        : "情報"}
+                  </SeverityBadge>
+                </TableCell>
+                <TableCell className="text-right tabular-nums">
+                  {issue.count}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
-    </CardShell>
-  );
-}
-
-export function BacklinkPulseCard({
-  projectId,
-  backlinks,
-  refreshing,
-}: {
-  projectId: string;
-  backlinks: DashboardBacklinkSummary | null;
-  refreshing: boolean;
-}) {
-  if (!backlinks && refreshing) {
-    return (
-      <CardShell
-        title="被リンクの動向"
-        stamp="最初のスナップショットを取得しています…"
-      >
-        <StatGridSkeleton />
-      </CardShell>
-    );
-  }
-
-  if (!backlinks) {
-    return (
-      <CardShell title="被リンクの動向">
-        <p className="text-sm text-muted-foreground">
-          ドメインへのリンク状況を自動で記録します。追加設定は不要です。
-        </p>
-      </CardShell>
-    );
-  }
-
-  return (
-    <CardShell
-      title="被リンクの動向"
-      stamp={`被リンク・スナップショット ${formatDay(backlinks.capturedAt)}${
-        refreshing ? "・更新中…" : ""
-      }`}
-      action={
-        <Link
-          to="/p/$projectId/backlinks"
-          params={{ projectId }}
-          search={{ target: backlinks.domain, scope: "domain" }}
-          className={moreDetailsClass}
-        >
-          詳細を見る
-        </Link>
-      }
-    >
-      <div className="grid grid-cols-2 gap-3">
-        <StatTile
-          label="参照ドメイン"
-          value={
-            backlinks.referringDomains === null
-              ? "—"
-              : backlinks.referringDomains.toLocaleString("ja-JP")
-          }
-        />
-        <StatTile
-          label="被リンク"
-          value={
-            backlinks.backlinks === null
-              ? "—"
-              : backlinks.backlinks.toLocaleString("ja-JP")
-          }
-        />
-        <StatTile
-          label="新規リンク"
-          value={`▲ ${newLost(backlinks.newBacklinks)}`}
-          tone={
-            backlinks.newBacklinks && backlinks.newBacklinks > 0
-              ? "success"
-              : undefined
-          }
-        />
-        <StatTile
-          label="消失リンク"
-          value={`▼ ${newLost(backlinks.lostBacklinks)}`}
-          tone={
-            backlinks.lostBacklinks && backlinks.lostBacklinks > 0
-              ? "destructive"
-              : undefined
-          }
-        />
-      </div>
     </CardShell>
   );
 }

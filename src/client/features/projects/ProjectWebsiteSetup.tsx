@@ -52,7 +52,7 @@ export function ProjectWebsiteSetup({ projectId }: { projectId: string }) {
           queryKey: ["aiVisibility", projectId],
         }),
       ]);
-      toast.success("Project context saved");
+      toast.success("プロジェクトの情報を保存しました");
     },
   });
   if (research)
@@ -95,20 +95,19 @@ export function ProjectWebsiteSetup({ projectId }: { projectId: string }) {
               <Sparkles className="size-5" />
             </div>
             <h1 className="text-2xl font-semibold tracking-tight">
-              Set up AI visibility
+              AIでの表示状況を設定
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              We’ll research your brand and find the most relevant topics to
-              monitor.
+              ブランドを調査し、計測するトピックの候補を見つけます。
             </p>
           </div>
           <Field>
-            <FieldLabel htmlFor="project-website">Website URL</FieldLabel>
+            <FieldLabel htmlFor="project-website">ウェブサイトURL</FieldLabel>
             <Input
               id="project-website"
               inputMode="url"
               autoComplete="url"
-              placeholder="Enter your website URL"
+              placeholder="ウェブサイトURLを入力"
               value={website}
               onChange={(event) => setWebsite(event.target.value)}
               required
@@ -117,8 +116,7 @@ export function ProjectWebsiteSetup({ projectId }: { projectId: string }) {
           {researchMutation.isError && (
             <Alert variant="destructive">
               <AlertDescription>
-                We couldn’t research this website. Check the URL, provider
-                settings, and available usage credits, then try again.
+                サイトを調査できませんでした。URL、提供元の設定、利用可能なクレジットを確認し、もう一度お試しください。
               </AlertDescription>
             </Alert>
           )}
@@ -129,10 +127,10 @@ export function ProjectWebsiteSetup({ projectId }: { projectId: string }) {
               disabled={!website.trim()}
               className="w-full"
             >
-              Start research
+              調査を開始
             </Button>
             <p className="text-xs leading-relaxed text-muted-foreground">
-              Research uses a small amount of usage credits.
+              調査とプロンプトの初回チェックにはクレジットを使用します。
             </p>
           </div>
         </form>

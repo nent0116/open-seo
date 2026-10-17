@@ -7,7 +7,7 @@ import {
 import type { BillingUsageEvent } from "@/serverFunctions/billing";
 import { QueryState } from "@/client/components/QueryState";
 import { Skeleton } from "@/client/components/ui/skeleton";
-import { BillingUsageCard } from "@/client/features/billing/BillingUsageCard";
+import { BillingUsageSection } from "@/client/features/billing/BillingUsageSection";
 import { useBillingUsageEvents } from "@/client/features/billing/useBillingUsageEvents";
 
 type BillingUsageEventProperties = {
@@ -131,7 +131,7 @@ export function BillingFeatureBreakdown() {
   const eventsQuery = useBillingUsageEvents();
 
   return (
-    <BillingUsageCard title="機能別の使用量">
+    <BillingUsageSection title="機能別の使用量">
       <QueryState
         query={eventsQuery}
         errorFallback="使用量を読み込めませんでした"
@@ -145,7 +145,7 @@ export function BillingFeatureBreakdown() {
       >
         {(events) => <BreakdownRows events={events} />}
       </QueryState>
-    </BillingUsageCard>
+    </BillingUsageSection>
   );
 }
 

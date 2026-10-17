@@ -28,12 +28,11 @@ const GRANT_STATUS_KEY = ["gscGrantStatus"];
 /**
  * Onboarding step for connecting Google Search Console: link the account-level
  * OAuth grant, then bind a verified property to the user's first project — the
- * same binding the project's Integrations page does. The step lives before the
- * agent-setup screen because most users leave onboarding from that screen.
+ * same binding the project's Integrations page does.
  */
 type NavigationProps = {
   onNext: () => void;
-  onBack: () => void;
+  onBack?: () => void;
   onSkip: () => void;
 };
 
@@ -45,10 +44,10 @@ export function SearchConsoleOnboardingStep(props: NavigationProps) {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
-          Google Search Consoleを今すぐ連携しますか？
+          Google Search Consoleを連携
         </h1>
-        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          実際のクリック数と検索語句をOpenSEOとAIエージェントで利用できます。ダッシュボードから後で連携することもできます。
+        <p className="mt-3 text-sm text-muted-foreground">
+          Google検索からサイトへの流入につながる検索語句を確認できます。
         </p>
       </div>
 
@@ -89,6 +88,11 @@ function GscConnect({
   const linking = useGoogleLinkPending();
   const [selection, setSelection] =
     React.useState<GooglePickerSelection | null>(null);
+  const continueRef = React.useRef<HTMLButtonElement>(null);
+
+  React.useEffect(() => {
+    if (selection) continueRef.current?.focus();
+  }, [selection]);
 
   const connectionOptions = googleConnectionOptions("gsc", projectId);
   const connectionKey = connectionOptions.queryKey;
@@ -175,13 +179,21 @@ function GscConnect({
               onSave={() =>
                 selection && !busy && setSiteMutation.mutate(selection)
               }
-              saveLabel="保存して続ける"
-              renderActions={(saveButton) => (
+              renderActions={(disabled) => (
                 <WizardFooter
                   onBack={onBack}
                   onSkip={onSkip}
                   skipLabel="今はスキップ"
-                  continueAction={saveButton}
+                  continueLabel={
+                    setSiteMutation.isPending
+                      ? "保存しています…"
+                      : "保存して続ける"
+                  }
+                  continueDisabled={disabled}
+                  continueRef={continueRef}
+                  onContinue={() =>
+                    selection && !busy && setSiteMutation.mutate(selection)
+                  }
                 />
               )}
               saving={setSiteMutation.isPending}
