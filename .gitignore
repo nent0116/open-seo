@@ -18,7 +18,6 @@ dist-sourcemaps/
 .env.*
 !.env.example
 !.env.preview.example
-!.env.production.example
 !.env.selfhost.example
 .vercel
 .output
@@ -46,3 +45,6 @@ dist-sourcemaps/
 
 # Alchemy local state + bundle artifacts (SaaS deploys)
 .alchemy/
+
+# built by `pnpm build:report-widgets` (predev/build)
+/src/public/report-widgets/

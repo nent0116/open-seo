@@ -18,8 +18,8 @@ import { getGscGrantStatus } from "@/serverFunctions/gsc";
 import { dismissGscNudge } from "@/serverFunctions/onboarding";
 
 /**
- * One-time re-engagement prompt nudging users who finished onboarding *before*
- * the Search Console step existed to connect GSC. Hosted-only because this is
+ * One-time prompt nudging users who finished onboarding without the Search
+ * Console step (legacy users, and users onboarded by an agent) to connect GSC. Hosted-only because this is
  * a hosted onboarding re-engagement nudge. Shows once — server-persisted
  * dismissal means it never reappears after the user connects or dismisses, on
  * any device.
@@ -38,6 +38,7 @@ export function GscReEngagementModal({
   const queryClient = useQueryClient();
   const [closed, setClosed] = React.useState(false);
   const shownRef = React.useRef(false);
+  const connectRef = React.useRef<HTMLButtonElement>(null);
 
   const onboardingQuery = useQuery({
     ...onboardingAnswersQueryOptions(),
@@ -56,10 +57,11 @@ export function GscReEngagementModal({
     },
   });
 
-  // Legacy users — those who finished onboarding before it included the Search
-  // Console step — have no gscNudgeDismissedAt set, so they're the only ones who
-  // see this. Anyone who completes current onboarding gets it stamped (they
-  // already saw that step), and dismissing/connecting clears it too.
+  // Users who finished onboarding outside the wizard have no
+  // gscNudgeDismissedAt set: legacy users from before the step existed, and
+  // users whose agent completed onboarding by connecting over MCP or calling
+  // create_project. Anyone who completes the wizard gets it stamped, and
+  // dismissing/connecting clears it.
   const eligible =
     hosted &&
     !suppressed &&
@@ -110,21 +112,28 @@ export function GscReEngagementModal({
         if (!open) handleDismiss();
       }}
     >
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg" initialFocus={connectRef}>
         <DialogHeader>
           <DialogTitle className="text-lg">
-            新機能：Google Search Consoleを連携
+            Google Search Consoleと連携
           </DialogTitle>
           <DialogDescription>
             実際のクリック数、表示回数、掲載順位をOpenSEOに取り込み、MCP経由でClaudeやCodexから確認できます。クレジットは使用しません。
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <Button variant="ghost" onClick={handleDismiss}>
+          <button
+            type="button"
+            className="px-2 text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:underline"
+            onClick={handleDismiss}
+          >
             後で設定
-          </Button>
-          <Button variant="outline" onClick={handleConnect}>
-            <GoogleGlyph className="size-[18px]" />
+          </button>
+          <Button ref={connectRef} onClick={handleConnect}>
+            {/* Google's mark needs a white tile to stay legible on a colored button. */}
+            <span className="flex size-6 items-center justify-center rounded bg-white">
+              <GoogleGlyph className="size-[16px]" />
+            </span>
             Googleと連携
           </Button>
         </DialogFooter>

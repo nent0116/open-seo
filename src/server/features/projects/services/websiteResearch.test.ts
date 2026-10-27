@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type * as Serp from "@/server/lib/dataforseo/serp";
+import type * as Ai from "ai";
 
 const {
   generateText,
@@ -18,7 +19,9 @@ const {
   listKeywords: vi.fn(),
   enforceSafetyLimits: vi.fn(),
 }));
-vi.mock("ai", () => ({
+vi.mock("ai", async (importOriginal) => ({
+  NoObjectGeneratedError: (await importOriginal<typeof Ai>())
+    .NoObjectGeneratedError,
   generateText,
   Output: { object: (value: unknown) => value },
   stepCountIs: vi.fn(),
@@ -52,7 +55,9 @@ vi.mock(
   () => ({ AiVisibilityRepository: { listResearchKeywords: listKeywords } }),
 );
 
+import { NoObjectGeneratedError } from "ai";
 import { researchWebsite } from "./websiteResearch";
+import { billResearchSpend } from "@/server/billing/researchSpend";
 import { AppError } from "@/server/lib/errors";
 import { customer } from "@/server/features/ai-visibility/services/aiVisibilityTestFixtures";
 
@@ -125,22 +130,63 @@ beforeEach(() => {
   );
 });
 
-describe("researchWebsite", () => {
-  it("does not search DataForSEO when the operator safety limit denies research", async () => {
-    listCompetitors.mockResolvedValue([]);
-    enforceSafetyLimits.mockRejectedValueOnce(
-      new AppError("DATAFORSEO_USAGE_LIMIT_EXCEEDED"),
-    );
+const invalidJson = new NoObjectGeneratedError({
+  response: { id: "", timestamp: new Date(), modelId: "" },
+  usage: {
+    inputTokens: 0,
+    inputTokenDetails: {
+      noCacheTokens: 0,
+      cacheReadTokens: 0,
+      cacheWriteTokens: 0,
+    },
+    outputTokens: 0,
+    outputTokenDetails: { textTokens: 0, reasoningTokens: 0 },
+    totalTokens: 0,
+  },
+  finishReason: "stop",
+});
 
-    await expect(
-      researchWebsite("https://saved.com", project, customer),
-    ).rejects.toMatchObject({ code: "DATAFORSEO_USAGE_LIMIT_EXCEEDED" });
-    expect(enforceSafetyLimits).toHaveBeenCalledExactlyOnceWith({
-      estimatedCostUsd: 0.016,
-      requests: 24,
-    });
-    expect(search).not.toHaveBeenCalled();
-  });
+describe("researchWebsite", () => {
+  it.each([1, 2])(
+    "stops research when the safety limit denies conversation %i, even if the model consumes the tool error",
+    async (deniedAttempt) => {
+      listCompetitors.mockResolvedValue([]);
+      for (let attempt = 1; attempt < deniedAttempt; attempt++)
+        enforceSafetyLimits.mockResolvedValueOnce(undefined);
+      enforceSafetyLimits.mockRejectedValueOnce(
+        new AppError("DATAFORSEO_USAGE_LIMIT_EXCEEDED"),
+      );
+      // The real AI SDK returns tool failures to the model instead of throwing.
+      const succeed = generateText.getMockImplementation()!;
+      let attempt = 0;
+      generateText.mockImplementation(async (options) => {
+        attempt++;
+        try {
+          const result: unknown = await succeed(options);
+          if (attempt < deniedAttempt) throw invalidJson;
+          return result;
+        } catch (error) {
+          if (
+            error instanceof AppError &&
+            error.code === "DATAFORSEO_USAGE_LIMIT_EXCEEDED"
+          )
+            return { output: { competitors: [] } };
+          throw error;
+        }
+      });
+
+      await expect(
+        researchWebsite("https://saved.com", project, customer),
+      ).rejects.toMatchObject({ code: "DATAFORSEO_USAGE_LIMIT_EXCEEDED" });
+      expect(enforceSafetyLimits).toHaveBeenCalledTimes(deniedAttempt);
+      expect(enforceSafetyLimits).toHaveBeenNthCalledWith(deniedAttempt, {
+        estimatedCostUsd: 0.016,
+        requests: 24,
+      });
+      expect(search).toHaveBeenCalledTimes((deniedAttempt - 1) * 2);
+      expect(generateText).toHaveBeenCalledTimes(deniedAttempt);
+    },
+  );
 
   it("does no research when all project fields are already saved", async () => {
     expect(
@@ -225,6 +271,40 @@ describe("researchWebsite", () => {
     },
   );
 
+  it("retries with fresh tool budgets when the model returns invalid JSON", async () => {
+    listCompetitors.mockResolvedValue([]);
+    const succeed = generateText.getMockImplementation()!;
+    generateText.mockImplementationOnce(async (options) => {
+      await succeed(options);
+      throw invalidJson;
+    });
+
+    const result = await researchWebsite(
+      "https://saved.com",
+      project,
+      customer,
+    );
+
+    expect(search).toHaveBeenCalledTimes(4);
+    expect(enforceSafetyLimits).toHaveBeenCalledTimes(2);
+    expect(result.competitors).toEqual([competitor]);
+  });
+
+  it("does not credit a retry with an earlier attempt's search", async () => {
+    listCompetitors.mockResolvedValue([]);
+    const succeed = generateText.getMockImplementation()!;
+    generateText
+      .mockImplementationOnce(async (options) => {
+        await succeed(options);
+        throw invalidJson;
+      })
+      .mockResolvedValueOnce({ output: { competitors: [] } });
+
+    await expect(
+      researchWebsite("https://saved.com", project, customer),
+    ).rejects.toThrow("Website research was incomplete");
+  });
+
   it("fails instead of skipping competitors when search fails for a non-outage reason", async () => {
     listCompetitors.mockResolvedValue([]);
     search.mockRejectedValue(new AppError("DATAFORSEO_AUTH_FAILED"));
@@ -233,5 +313,22 @@ describe("researchWebsite", () => {
       researchWebsite("https://saved.com", project, customer),
     ).rejects.toThrow("Website research was incomplete");
     expect(search).toHaveBeenCalledTimes(2);
+  });
+
+  it("bills Context reads of a site that stays unreadable", async () => {
+    listSections.mockResolvedValue([]);
+    readSite.mockImplementation(
+      async (_site, _pages, usage: { contextCredits: number }) => {
+        usage.contextCredits += 1;
+        return { pages: [] };
+      },
+    );
+
+    await expect(
+      researchWebsite("https://saved.com", project, customer),
+    ).rejects.toThrow(AppError);
+    expect(billResearchSpend).toHaveBeenCalledWith(customer, [
+      expect.objectContaining({ provider: "context", costUsd: 0.0025 }),
+    ]);
   });
 });

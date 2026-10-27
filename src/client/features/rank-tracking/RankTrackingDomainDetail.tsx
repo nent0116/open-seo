@@ -10,14 +10,12 @@ import {
   getRankPositionMatrix,
   estimateRankCheckCost,
 } from "@/serverFunctions/rank-tracking";
-import { AlertTriangle } from "lucide-react";
 import { QueryState } from "@/client/components/QueryState";
 import { SkeletonCard } from "@/client/components/SkeletonPresets";
-import { Alert, AlertDescription } from "@/client/components/ui/alert";
 import { useHostedPlanGate } from "@/client/features/billing/HostedPlanGate";
 import { captureClientEvent } from "@/client/lib/posthog";
 import { FreePlanAlert } from "./FreePlanAlert";
-import { ScheduledChecksPausedAlert } from "./ScheduledChecksPausedAlert";
+import { RankTrackingChangesAlert } from "./RankTrackingChangesAlert";
 import { RankRunAlerts } from "./RankRunAlerts";
 import { RankTrackingDetailHeader } from "./RankTrackingDetailHeader";
 import { RankTrackingOverview } from "./RankTrackingOverview";
@@ -234,16 +232,7 @@ export function RankTrackingDomainDetail({
 
   return (
     <div className="space-y-3">
-      <ScheduledChecksPausedAlert />
-
-      {config.lastSkipReason === "insufficient_credits" && (
-        <Alert variant="warning">
-          <AlertTriangle />
-          <AlertDescription className="text-foreground">
-            クレジット不足のため前回の定期チェックをスキップしました。残高を追加すると自動計測が再開します。
-          </AlertDescription>
-        </Alert>
-      )}
+      <RankTrackingChangesAlert />
 
       <RankRunAlerts run={latestRun} />
 

@@ -64,8 +64,7 @@ export function ResultsView({
     [pages],
   );
 
-  // Shopify's own crawler-access signature is a real fix for a throttled or
-  // refused crawl, so it replaces the generic advice for those stores.
+  // Shopify stores get their own notice instead of the generic advice.
   const shopifyLimited =
     audit.config.sitePlatform === "shopify" &&
     (blockedCount > 0 || rateLimitedCount > 0 || crawlStopped);
@@ -95,7 +94,11 @@ export function ResultsView({
   return (
     <>
       {shopifyLimited && (
-        <ShopifyCrawlWarning projectId={projectId} audit={audit} />
+        <ShopifyCrawlWarning
+          projectId={projectId}
+          audit={audit}
+          throttled={rateLimitedCount > 0 || crawlStopped}
+        />
       )}
 
       {!shopifyLimited && !siteBlocked && blockedCount > 0 && (
@@ -126,7 +129,16 @@ export function ResultsView({
             {crawlStopped
               ? "要求された待機時間が監査の制限時間を超えたため、一部のURLをクロールできませんでした。このレポートは不完全です。"
               : "429 Too Many Requestsが返されたページは監査できませんでした。"}
-            レート制限の解除後に監査を再実行するか、サイト所有者に「OpenSEO-Audit」クローラーの許可を依頼してください。
+            レート制限の解除後に監査を再実行するか、サイト所有者に許可を依頼してください。対象：
+            <a
+              className="underline underline-offset-4"
+              href="https://openseo.so/docs/crawler"
+              target="_blank"
+              rel="noreferrer"
+            >
+              OpenSEO-Auditクローラー
+            </a>
+            .
           </AlertDescription>
         </Alert>
       )}

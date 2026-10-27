@@ -92,7 +92,7 @@ export function RankTrackingDetailHeader({
             </>
           )}
           {costEstimate && costEstimate.keywordCount > 0 && (
-            <> &middot; ~${costEstimate.costUsd.toFixed(2)}/check</>
+            <> ・最大${costEstimate.costUsd.toFixed(2)}／回</>
           )}
         </p>
       </div>

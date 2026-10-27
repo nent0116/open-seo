@@ -269,6 +269,9 @@ describe("get_serp_results", () => {
       {
         keyword: "food suppliers",
         ok: true,
+        locationCode: 2840,
+        languageCode: "en",
+        device: "desktop",
         items: [
           {
             type: "people_also_ask",
