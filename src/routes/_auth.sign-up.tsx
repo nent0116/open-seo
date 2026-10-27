@@ -5,6 +5,7 @@ import { Button } from "@/client/components/ui/button";
 import {
   AuthPageCard,
   AuthMethodChooser,
+  TermsAgreementNotice,
   authInputClassName,
   authSubmitClassName,
   authRedirectSearchSchema,
@@ -23,6 +24,13 @@ import { authClient } from "@/lib/auth-client";
 import { getSignInSearch, getVerifyEmailSearch } from "@/lib/auth-redirect";
 import { z } from "zod";
 
+const UTM_PARAMS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+] as const;
+
 const signUpSchema = z
   .object({
     email: z.string().trim().email("有効なメールアドレスを入力してください。"),
@@ -39,6 +47,13 @@ export const Route = createFileRoute("/_auth/sign-up")({
     // A site checked with the marketing site's free tool; onboarding
     // prefills it, and the website step validates it on save.
     domain: z.string().optional().catch(undefined),
+    // An ad's campaign tags, which the marketing site's landing pages carry
+    // onto the sign-up link. Passed on through the post-signup redirect so the
+    // server can save the campaign on the new account.
+    utm_source: z.string().optional().catch(undefined),
+    utm_medium: z.string().optional().catch(undefined),
+    utm_campaign: z.string().optional().catch(undefined),
+    utm_content: z.string().optional().catch(undefined),
   }),
   component: SignUpPage,
 });
@@ -47,11 +62,17 @@ function SignUpPage() {
   const search = Route.useSearch();
   const navigate = useNavigate();
   const { redirectTo, isHostedMode } = useAuthPageState(search.redirect);
+  const onboardingSearch = new URLSearchParams();
+  if (search.domain) onboardingSearch.set("domain", search.domain);
+  for (const name of UTM_PARAMS) {
+    const value = search[name];
+    if (value) onboardingSearch.set(name, value);
+  }
   const postSignupRedirect =
     redirectTo !== "/"
       ? redirectTo
-      : search.domain
-        ? `/onboarding?${new URLSearchParams({ domain: search.domain }).toString()}`
+      : onboardingSearch.size > 0
+        ? `/onboarding?${onboardingSearch.toString()}`
         : "/onboarding";
   const [showEmailForm, setShowEmailForm] = useState(false);
   const google = useGoogleAuth({ redirectTo, postSignupRedirect });
@@ -154,28 +175,6 @@ function SignUpPage() {
             </button>
           ) : (
             <div className="space-y-4">
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                アカウントを作成すると、
-                <a
-                  href="https://openseo.so/terms-and-conditions"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
-                >
-                  利用規約
-                </a>
-                および
-                <a
-                  href="https://openseo.so/privacy"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-foreground underline underline-offset-2 hover:text-foreground/80 transition-colors"
-                >
-                  プライバシーポリシー
-                </a>
-                に同意したものとみなされます。
-              </p>
-
               <p className="text-sm text-foreground/50">
                 すでにアカウントをお持ちですか？{" "}
                 <Link
@@ -205,6 +204,7 @@ function SignUpPage() {
               google.clearError();
             }}
           />
+          {isHostedMode ? <TermsAgreementNotice action="続行すると" /> : null}
           {google.error ? (
             <p className="text-sm text-destructive">{google.error}</p>
           ) : null}
@@ -283,6 +283,7 @@ function SignUpPage() {
                         ? "アカウントを作成しています…"
                         : "アカウントを作成"}
                     </Button>
+                    <TermsAgreementNotice action="アカウントを作成すると" />
                   </>
                 );
               }}

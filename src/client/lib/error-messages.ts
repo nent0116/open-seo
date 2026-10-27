@@ -39,7 +39,7 @@ const STANDARD_MESSAGES: Record<ErrorCode, string> = {
   AI_VISIBILITY_ERROR:
     "AI検索での表示状況を確認できませんでした。追跡設定を確認し、もう一度お試しください。",
   DATAFORSEO_AUTH_FAILED:
-    "DataForSEOがAPIキーを拒否しました。DATAFORSEO_API_KEYにDataForSEOの「ログイン名:パスワード」をBase64エンコードした値が設定されているか確認してください。",
+    "DataForSEOがAPIキーを拒否しました。DATAFORSEO_API_KEYにDataForSEOの「ログイン名:パスワード」をBase64エンコードした値が設定されているか、アカウントの認証とAPIの利用権限が有効か確認してください。",
   DATAFORSEO_USAGE_LIMIT_EXCEEDED:
     "DataForSEOの安全上限に達したため、API呼び出しを停止しました。設定画面で利用状況と上限を確認してください。",
   RATE_LIMITED:

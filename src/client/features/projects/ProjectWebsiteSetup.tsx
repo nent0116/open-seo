@@ -8,6 +8,8 @@ import { Button } from "@/client/components/ui/button";
 import { Input } from "@/client/components/ui/input";
 import { Field, FieldLabel } from "@/client/components/ui/field";
 import { Alert, AlertDescription } from "@/client/components/ui/alert";
+import { InsufficientCreditsError } from "@/client/features/billing/InsufficientCreditsError";
+import { getErrorCode } from "@/client/lib/error-messages";
 import { projectsQueryOptions } from "@/client/features/projects/projectQueries";
 import { projectContextQueryKey } from "@/client/features/projects/project-context/shared";
 import { getProjectContext } from "@/serverFunctions/projectContext";
@@ -113,12 +115,17 @@ export function ProjectWebsiteSetup({ projectId }: { projectId: string }) {
               required
             />
           </Field>
-          {researchMutation.isError && (
-            <Alert variant="destructive">
-              <AlertDescription>
-                サイトを調査できませんでした。URL、提供元の設定、利用可能なクレジットを確認し、もう一度お試しください。
-              </AlertDescription>
-            </Alert>
+          {getErrorCode(researchMutation.error) === "INSUFFICIENT_CREDITS" ? (
+            <InsufficientCreditsError title="サイトを調査できませんでした" />
+          ) : (
+            researchMutation.isError && (
+              <Alert variant="destructive">
+                <AlertDescription>
+                  サイトを調査できませんでした.
+                  URLと提供元の設定を確認し、もう一度お試しください。
+                </AlertDescription>
+              </Alert>
+            )
           )}
           <div className="space-y-3">
             <Button

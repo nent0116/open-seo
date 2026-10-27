@@ -101,7 +101,7 @@ describe.each(["gsc", "ga4", "onboarding"] as const)(
     it("opens property selection without a browser resume flag after authorization", () => {
       const html = renderSetup(surface, true);
       expect(html).toContain("プロパティを選択");
-      expect(html).toContain("プロパティを選択…");
+      expect(html).toContain("Googleアカウントを追加");
       expect(html).not.toContain("Googleと連携");
     });
   },
@@ -112,6 +112,7 @@ it.each(["gsc", "ga4"] as const)(
   (surface) => {
     const html = renderSetup(surface, true, false, false);
     expect(html).not.toContain("プロパティを選択…");
+    expect(html).not.toContain("プロパティを保存");
     expect(html).toContain("Googleアカウントを管理");
   },
 );
@@ -164,7 +165,7 @@ describe("Search Console website setup guidance", () => {
       });
       expect(html).toContain("ウェブサイトが見つかりませんでした");
       expect(html).toContain("owner@example.com");
-      expect(html).not.toContain("プロパティを選択…");
+      expect(html).not.toContain("プロパティを選択");
       expect(html).toContain("/blogs/google-search-console-setup");
       expect(html).toContain("更新");
       expect(html).toContain("別のGoogleアカウントを使用");

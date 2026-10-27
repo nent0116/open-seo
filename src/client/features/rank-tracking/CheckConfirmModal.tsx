@@ -42,7 +42,7 @@ export function CheckConfirmModal({
       {costUsd != null ? (
         <>
           {" "}
-          推定費用：{" "}
+          費用上限：{" "}
           <span className="font-mono font-semibold text-foreground">
             ${costUsd.toFixed(2)}
           </span>

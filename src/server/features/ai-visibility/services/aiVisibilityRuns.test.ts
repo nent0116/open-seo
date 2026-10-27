@@ -6,6 +6,7 @@ import { runCheck } from "./aiVisibilityRuns";
 import { setSchedule } from "./aiVisibilitySchedule";
 import { getTracker } from "./aiVisibilityState";
 import { configuration, customer } from "./aiVisibilityTestFixtures";
+import { sendCreditsExhaustedEvent } from "@/server/email/onboarding-drip";
 
 const { testDb, workflow, hosted, credits } = await vi.hoisted(async () => {
   const { createAiVisibilityTestDb } = await import("../aiVisibilityTestDb");
@@ -28,6 +29,9 @@ vi.mock("@/server/lib/runtime-env", () => ({
 vi.mock("@/server/billing/subscription", () => ({
   getOrCreateOrganizationCustomer: async () => ({ id: "organization" }),
   getUsageCreditsRemaining: credits,
+}));
+vi.mock("@/server/email/onboarding-drip", () => ({
+  sendCreditsExhaustedEvent: vi.fn(),
 }));
 
 const projectId = "project";
@@ -188,6 +192,7 @@ describe("AI visibility checks", () => {
     expect((await repo.getTracker(projectId))?.lastSkipReason).toBe(
       "INSUFFICIENT_CREDITS",
     );
+    expect(sendCreditsExhaustedEvent).toHaveBeenCalledWith(customer);
   });
 
   it("starts a check that top-up credits cover after research overdrew monthly credits", async () => {

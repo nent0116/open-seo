@@ -77,6 +77,10 @@ vi.mock("@/server/lib/posthog", () => ({
   captureServerEvent: vi.fn(),
 }));
 
+vi.mock("@/server/email/onboarding-drip", () => ({
+  sendCreditsExhaustedEvent: vi.fn(),
+}));
+
 // Mock every section module the client wraps so meterDataforseoCall's
 // `execute()` resolves to a controllable fixture.
 vi.mock("@/server/lib/dataforseo/labs", () => ({
@@ -144,6 +148,7 @@ import { DataforseoChargedTaskError } from "@/server/lib/dataforseo/envelope";
 import { AppError } from "@/server/lib/errors";
 import { fetchBacklinksSummary } from "@/server/lib/dataforseo/backlinks";
 import {
+  fetchLocalSerp,
   fetchRankCheckSerp,
   postLocalSerpTasks,
 } from "@/server/lib/dataforseo/serp";
@@ -404,46 +409,72 @@ describe("meterDataforseoCall", () => {
   });
 });
 
-it("keeps live AI estimates in USD and converts to credits only at the billing seam", async () => {
-  setupHostedMode();
-  mockMonthlyBalance(6);
-  vi.mocked(fetchAiTrackingLiveAnswer).mockResolvedValueOnce({
-    data: { status: "completed", result: {} },
-    billing: {
-      costUsd: 0.004,
-      path: [
-        "v3",
-        "ai_optimization",
-        "chat_gpt",
-        "llm_scraper",
-        "live",
-        "advanced",
-      ],
-    },
-  });
+it.each([
+  { provider: "AI", costUsd: 0.004, credits: 6 },
+  { provider: "Maps", costUsd: 0.002, credits: 3 },
+])(
+  "keeps live $provider estimates in USD until the billing seam",
+  async ({ provider, costUsd, credits }) => {
+    setupHostedMode();
+    mockMonthlyBalance(credits);
+    const client = createDataforseoClient(billingCustomer);
+    let result;
+    if (provider === "AI") {
+      vi.mocked(fetchAiTrackingLiveAnswer).mockResolvedValueOnce({
+        data: { status: "completed", result: {} },
+        billing: {
+          costUsd,
+          path: [
+            "v3",
+            "ai_optimization",
+            "chat_gpt",
+            "llm_scraper",
+            "live",
+            "advanced",
+          ],
+        },
+      });
+      result = await client.aiSearch.trackingLiveBatch([
+        {
+          engine: "chatgpt",
+          task: { tag: "answer", prompt: "Which SEO tools?" },
+          locationCode: 2840,
+          languageCode: "en",
+        },
+      ]);
+    } else {
+      vi.mocked(fetchLocalSerp).mockResolvedValueOnce({
+        data: [],
+        billing: {
+          costUsd,
+          path: ["v3", "serp", "google", "maps", "live", "advanced"],
+        },
+      });
+      result = await client.serp.localBatch([
+        {
+          keyword: "coffee",
+          languageCode: "en",
+          searchType: "maps",
+          device: "desktop",
+          depth: 20,
+        },
+      ]);
+    }
 
-  const result = await createDataforseoClient(
-    billingCustomer,
-  ).aiSearch.trackingLiveBatch([
-    {
-      engine: "chatgpt",
-      task: { tag: "answer", prompt: "Which SEO tools?" },
-      locationCode: 2840,
-      languageCode: "en",
-    },
-  ]);
-
-  expect(enforceUsageLimitsMock).toHaveBeenCalledWith({
-    estimatedCostUsd: 0.004,
-    requests: 3,
-  });
-  expect(result).toMatchObject([{ status: "fulfilled" }]);
-  expect(checkMock.mock.calls[0][0]).toMatchObject({ requiredBalance: 6 });
-  expect(finalizeMock.mock.calls[0][0]).toMatchObject({
-    action: "confirm",
-    overrideValue: 6,
-  });
-});
+    expect(enforceUsageLimitsMock).toHaveBeenCalledWith({
+      estimatedCostUsd: costUsd,
+      requests: 3,
+    });
+    expect(result).toMatchObject([{ status: "fulfilled" }]);
+    expect(checkMock.mock.calls[0][0]).toMatchObject({
+      requiredBalance: credits,
+    });
+    expect(finalizeMock.mock.calls[0][0]).toMatchObject({
+      action: "confirm",
+      overrideValue: credits,
+    });
+  },
+);
 
 describe("rankCheckBatch", () => {
   const input = {
