@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { QueryError } from "@/client/components/QueryState";
 import { TablePagination } from "@/client/components/table/TablePagination";
 import { DomainPageLink } from "@/client/features/domain/components/DomainPageLink";
@@ -11,7 +12,11 @@ import {
   buildPagesSearchUpdate,
   countPageFilterConditions,
 } from "@/client/features/domain/domainFilterUtils";
-import { useDomainPagesQuery } from "@/client/features/domain/hooks/useDomainPagesQuery";
+import {
+  domainPagesQueryOptions,
+  useDomainPagesQuery,
+} from "@/client/features/domain/hooks/useDomainPagesQuery";
+import { useDomainExport } from "@/client/features/domain/hooks/useDomainExport";
 import { useDomainPageFilterPreferences } from "@/client/features/domain/useDomainFilterPreferences";
 import {
   EMPTY_DOMAIN_FILTERS,
@@ -21,7 +26,6 @@ import {
 } from "@/client/features/domain/types";
 import { pagesToTable } from "@/client/features/domain/utils";
 import type { DomainOverviewRouteState } from "@/client/features/domain/domainRouteState";
-import { exportRows, type ExportFormat } from "@/client/lib/exportRows";
 import {
   DOMAIN_KEYWORDS_PAGE_SIZES,
   MAX_DATAFORSEO_FILTER_CONDITIONS,
@@ -80,6 +84,7 @@ export function PagesTab({
   onPageChange,
   onPageSizeChange,
 }: Props) {
+  const queryClient = useQueryClient();
   const [showFilters, setShowFilters] = useState(false);
   // Scope filters consume part of DataForSEO's fixed filter budget.
   const maxConditions =
@@ -112,7 +117,7 @@ export function PagesTab({
     ? EMPTY_DOMAIN_FILTERS
     : restoredFilters;
 
-  const query = useDomainPagesQuery({
+  const queryInput = {
     projectId,
     domain: target,
     scope,
@@ -123,7 +128,8 @@ export function PagesTab({
     sortOrder: routeState.order,
     appliedFilters: appliedPagesFilters,
     enabled: Boolean(target),
-  });
+  };
+  const query = useDomainPagesQuery(queryInput);
 
   const rows = query.data?.pages ?? EMPTY_PAGES_ROWS;
   const totalCount = query.data?.totalCount ?? null;
@@ -150,17 +156,22 @@ export function PagesTab({
     [restoredFilters],
   );
 
-  const exportTable = useMemo(() => pagesToTable(rows), [rows]);
   const fileNamePrefix = target.replaceAll("/", "-");
 
-  const exportAll = (format: ExportFormat) =>
-    void exportRows({
-      format,
-      feature: "domain_overview",
-      ...exportTable,
-      filename: `${fileNamePrefix}-pages`,
-      records: rows,
-    });
+  const exportMutation = useDomainExport({
+    fetchPage: async (page) => {
+      const result = await queryClient.fetchQuery(
+        domainPagesQueryOptions({
+          ...queryInput,
+          page,
+          pageSize: 200,
+        }),
+      );
+      return { rows: result.pages, hasMore: result.hasMore };
+    },
+    toTable: pagesToTable,
+    filename: `${fileNamePrefix}-pages`,
+  });
 
   return (
     <DomainPagesTable
@@ -193,7 +204,9 @@ export function PagesTab({
             countLabel="ページ"
             totalCount={totalCount}
             fallbackCount={rows.length}
-            onExport={exportAll}
+            onExport={(format) => exportMutation.mutate(format)}
+            exporting={exportMutation.isPending}
+            exportDisabled={isFetching || query.isError || rows.length === 0}
             filterPanel={
               <DomainFilterPanel
                 activeFilterCount={activeFilterCount}

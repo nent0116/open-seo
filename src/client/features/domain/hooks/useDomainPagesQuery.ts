@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getDomainPagesPage } from "@/serverFunctions/domain";
 import { toPageSortMode } from "@/client/features/domain/utils";
 import type { ResearchScope } from "@/shared/researchScope";
@@ -21,9 +21,9 @@ type DomainPagesQueryInput = {
   enabled: boolean;
 };
 
-export function useDomainPagesQuery(input: DomainPagesQueryInput) {
+export function domainPagesQueryOptions(input: DomainPagesQueryInput) {
   const pageSortMode = toPageSortMode(input.sortMode);
-  return useQuery({
+  return queryOptions({
     enabled: input.enabled && Boolean(input.domain),
     queryKey: [
       "domain-pages",
@@ -53,4 +53,8 @@ export function useDomainPagesQuery(input: DomainPagesQueryInput) {
       }),
     staleTime: 60_000,
   });
+}
+
+export function useDomainPagesQuery(input: DomainPagesQueryInput) {
+  return useQuery(domainPagesQueryOptions(input));
 }

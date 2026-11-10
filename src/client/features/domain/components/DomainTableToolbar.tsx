@@ -18,6 +18,8 @@ type Props = {
   totalCount: number | null;
   fallbackCount: number;
   onExport: (format: ExportFormat) => void;
+  exporting: boolean;
+  exportDisabled: boolean;
   filterPanel: ReactNode;
   children?: ReactNode;
 };
@@ -32,6 +34,8 @@ export function DomainTableToolbar({
   totalCount,
   fallbackCount,
   onExport,
+  exporting,
+  exportDisabled,
   filterPanel,
   children,
 }: Props) {
@@ -42,6 +46,9 @@ export function DomainTableToolbar({
           <ExportMenu
             actions={["sheets", "copy-json", "csv", "excel"]}
             onExport={onExport}
+            busy={exporting}
+            disabled={exportDisabled}
+            scopes={[{ id: "all", label: "絞り込み結果の全件" }]}
           />
         }
       >

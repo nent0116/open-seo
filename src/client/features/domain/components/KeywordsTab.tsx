@@ -24,7 +24,11 @@ import {
   buildKeywordsSearchUpdate,
   countKeywordFilterConditions,
 } from "@/client/features/domain/domainFilterUtils";
-import { useDomainKeywordsQuery } from "@/client/features/domain/hooks/useDomainKeywordsQuery";
+import {
+  domainKeywordsQueryOptions,
+  useDomainKeywordsQuery,
+} from "@/client/features/domain/hooks/useDomainKeywordsQuery";
+import { useDomainExport } from "@/client/features/domain/hooks/useDomainExport";
 import { useSaveKeywordsMutation } from "@/client/features/domain/mutations";
 import { useDomainKeywordFilterPreferences } from "@/client/features/domain/useDomainFilterPreferences";
 import {
@@ -133,7 +137,7 @@ export function KeywordsTab({
     ? EMPTY_DOMAIN_FILTERS
     : restoredFilters;
 
-  const query = useDomainKeywordsQuery({
+  const queryInput = {
     projectId,
     domain: target,
     scope,
@@ -144,7 +148,8 @@ export function KeywordsTab({
     sortOrder: routeState.order,
     appliedFilters,
     enabled: Boolean(target),
-  });
+  };
+  const query = useDomainKeywordsQuery(queryInput);
 
   const rows = query.data?.keywords ?? EMPTY_KEYWORDS;
   const totalCount = query.data?.totalCount ?? null;
@@ -209,21 +214,26 @@ export function KeywordsTab({
     [restoredFilters],
   );
 
-  const exportTable = useMemo(() => keywordsToTable(rows), [rows]);
   const fileNamePrefix = target.replaceAll("/", "-");
   const selectedExportTable = useMemo(
     () => keywordsToTable(rows.filter((r) => selectedKeywords.has(r.keyword))),
     [rows, selectedKeywords],
   );
 
-  const exportAll = (format: ExportFormat) =>
-    void exportRows({
-      format,
-      feature: "domain_overview",
-      ...exportTable,
-      filename: `${fileNamePrefix}-keywords`,
-      records: rows,
-    });
+  const exportMutation = useDomainExport({
+    fetchPage: async (page) => {
+      const result = await queryClient.fetchQuery(
+        domainKeywordsQueryOptions({
+          ...queryInput,
+          page,
+          pageSize: 200,
+        }),
+      );
+      return { rows: result.keywords, hasMore: result.hasMore };
+    },
+    toTable: keywordsToTable,
+    filename: `${fileNamePrefix}-keywords`,
+  });
   const exportSelection = (format: ExportFormat) =>
     void exportRows({
       format,
@@ -298,7 +308,9 @@ export function KeywordsTab({
               countLabel="件のキーワード"
               totalCount={totalCount}
               fallbackCount={rows.length}
-              onExport={exportAll}
+              onExport={(format) => exportMutation.mutate(format)}
+              exporting={exportMutation.isPending}
+              exportDisabled={isFetching || query.isError || rows.length === 0}
               filterPanel={
                 <DomainFilterPanel
                   activeFilterCount={activeFilterCount}

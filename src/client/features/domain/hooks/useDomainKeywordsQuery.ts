@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getDomainKeywordsPage } from "@/serverFunctions/domain";
 import type { ResearchScope } from "@/shared/researchScope";
 import type {
@@ -46,9 +46,9 @@ function toFiltersPayload(
   };
 }
 
-export function useDomainKeywordsQuery(input: DomainKeywordsQueryInput) {
+export function domainKeywordsQueryOptions(input: DomainKeywordsQueryInput) {
   const filtersPayload = toFiltersPayload(input.appliedFilters);
-  return useQuery({
+  return queryOptions({
     enabled: input.enabled && Boolean(input.domain),
     queryKey: [
       "domain-keywords",
@@ -78,4 +78,8 @@ export function useDomainKeywordsQuery(input: DomainKeywordsQueryInput) {
       }),
     staleTime: 60_000,
   });
+}
+
+export function useDomainKeywordsQuery(input: DomainKeywordsQueryInput) {
+  return useQuery(domainKeywordsQueryOptions(input));
 }

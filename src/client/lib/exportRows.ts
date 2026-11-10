@@ -58,7 +58,8 @@ export async function exportRows(args: {
   } else {
     // "Excel" is the same CSV with an .xls extension, which Excel opens.
     downloadFile(
-      buildCsv(headers, rows),
+      // Excel needs a BOM to recognize Japanese text as UTF-8.
+      `\uFEFF${buildCsv(headers, rows)}`,
       `${filename}.${format === "excel" ? "xls" : "csv"}`,
       "text/csv",
     );

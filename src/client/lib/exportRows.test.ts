@@ -38,24 +38,27 @@ describe("exportRows", () => {
     },
   );
 
-  it("downloads Excel as CSV with an .xls name and tracks the export", async () => {
-    await exportRows({
-      format: "excel",
-      feature: "domain_overview",
-      headers: ["Keyword"],
-      rows: [["seo audit"]],
-      filename: "openseo.so-keywords",
-    });
+  it.each(["csv", "excel"] as const)(
+    "downloads %s with a UTF-8 BOM for Japanese text",
+    async (format) => {
+      await exportRows({
+        format,
+        feature: "domain_overview",
+        headers: ["キーワード"],
+        rows: [["日本語の検索"]],
+        filename: "openseo.so-keywords",
+      });
 
-    expect(downloadFile).toHaveBeenCalledWith(
-      '"Keyword"\n"seo audit"',
-      "openseo.so-keywords.xls",
-      "text/csv",
-    );
-    expect(captureClientEvent).toHaveBeenCalledWith("data:export", {
-      source_feature: "domain_overview",
-      format: "excel",
-      result_count: 1,
-    });
-  });
+      expect(downloadFile).toHaveBeenCalledWith(
+        '\uFEFF"キーワード"\n"日本語の検索"',
+        `openseo.so-keywords.${format === "excel" ? "xls" : "csv"}`,
+        "text/csv",
+      );
+      expect(captureClientEvent).toHaveBeenCalledWith("data:export", {
+        source_feature: "domain_overview",
+        format,
+        result_count: 1,
+      });
+    },
+  );
 });
