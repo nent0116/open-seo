@@ -1,10 +1,23 @@
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Clock } from "lucide-react";
 import { Alert, AlertDescription } from "@/client/components/ui/alert";
 import { InsufficientCreditsError } from "@/client/features/billing/InsufficientCreditsError";
-import { getStandardErrorMessage } from "@/client/lib/error-messages";
+import { isOutOfCreditsRunError } from "@/shared/rank-tracking";
 import type { useRankRunPolling } from "./useRankRunPolling";
 
-/** Warnings about the latest rank check: stale, failed, or incomplete. */
+function ReadWhatChangedLink() {
+  return (
+    <a
+      href="https://openseo.so/blogs/state-of-rank-tracking-november-2026"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-medium underline underline-offset-4"
+    >
+      Read what changed
+    </a>
+  );
+}
+
+/** The latest rank check's state: running, stale, failed, or incomplete. */
 export function RankRunAlerts({
   run,
 }: {
@@ -17,13 +30,28 @@ export function RankRunAlerts({
       <Alert variant="warning">
         <AlertTriangle />
         <AlertDescription className="text-foreground">
-          この実行は応答していない可能性があり、自動的に終了処理されます。
+          This check stopped responding. You can start a new one to replace it.
         </AlertDescription>
       </Alert>
     );
   }
 
-  if (run.status === "failed" && run.errorMessage === "INSUFFICIENT_CREDITS") {
+  if (run.status === "pending" || run.status === "running") {
+    return (
+      <Alert variant="info">
+        <Clock />
+        <AlertDescription className="text-foreground">
+          <p>
+            <span className="font-medium">This check takes about an hour</span>{" "}
+            because Google's results have been unreliable lately. You can leave
+            this page while it's running. <ReadWhatChangedLink />
+          </p>
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (run.status === "failed" && isOutOfCreditsRunError(run.errorMessage)) {
     return (
       <InsufficientCreditsError title="前回の順位チェックは実行されませんでした" />
     );
@@ -31,20 +59,22 @@ export function RankRunAlerts({
 
   if (run.status === "failed") {
     return (
-      <Alert variant="destructive">
+      <Alert variant="warning">
         <AlertTriangle />
         <AlertDescription className="text-foreground">
           <p>
-            <span className="font-medium">前回のチェックは失敗しました。</span>{" "}
-            {run.errorMessage &&
-              getStandardErrorMessage(new Error(run.errorMessage))}
+            <span className="font-medium">
+              We couldn't finish your last check.
+            </span>{" "}
+            Google's results have been unreliable for all rank trackers lately.
+            Please try again later. <ReadWhatChangedLink />
           </p>
         </AlertDescription>
       </Alert>
     );
   }
 
-  // A completed run only has an error message when some checks failed.
+  // A completed run only has an error message when some checks have no result.
   if (run.status === "completed" && run.errorMessage) {
     return (
       <Alert variant="warning">
@@ -52,9 +82,10 @@ export function RankRunAlerts({
         <AlertDescription className="text-foreground">
           <p>
             <span className="font-medium">
-              前回のチェックは一部未完了です。
+              Some keywords couldn't be checked.
             </span>{" "}
-            検索データの提供元でエラーが発生したため、一部のキーワードには前回の順位を表示しています。
+            Google's results have been unreliable for all rank trackers lately,
+            so these show their last known position. <ReadWhatChangedLink />
           </p>
         </AlertDescription>
       </Alert>

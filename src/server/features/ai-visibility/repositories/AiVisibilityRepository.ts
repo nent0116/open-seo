@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, inArray, isNull, lte, ne } from "drizzle-orm";
+import { chunk } from "remeda";
 import { db } from "@/db";
 import { runBatch } from "@/db/runBatch";
 import {
@@ -202,12 +203,24 @@ async function persistAnswer(input: {
     tx
       .delete(aiMatches)
       .where(eq(aiMatches.observationId, input.observationId)),
-    ...input.sources.map((s) =>
-      tx.insert(aiSources).values({ ...s, observationId: input.observationId }),
-    ),
-    ...input.matches.map((m) =>
-      tx.insert(aiMatches).values({ ...m, observationId: input.observationId }),
-    ),
+    // Multi-row inserts keep the transaction to a few round trips, so a
+    // collect step saving many answers does not hold pooled connections. D1
+    // allows 100 bound parameters per statement: 6 columns per source and 8
+    // per match.
+    ...chunk(
+      input.sources.map((source) => ({
+        ...source,
+        observationId: input.observationId,
+      })),
+      16,
+    ).map((rows) => tx.insert(aiSources).values(rows)),
+    ...chunk(
+      input.matches.map((match) => ({
+        ...match,
+        observationId: input.observationId,
+      })),
+      12,
+    ).map((rows) => tx.insert(aiMatches).values(rows)),
     tx
       .update(aiObservations)
       .set(input.values)
@@ -309,6 +322,20 @@ export const AiVisibilityRepository = {
     )[0] ?? null,
   updateRun: (id: string, values: Partial<RunRow>) =>
     db.update(aiRuns).set(values).where(eq(aiRuns.id, id)),
+  /**
+   * Updates a run only while it is queued or running, and reports whether it
+   * did, so a failed run can't be restarted by a workflow that read it first.
+   */
+  updateActiveRun: async (id: string, values: Partial<RunRow>) =>
+    (
+      await db
+        .update(aiRuns)
+        .set(values)
+        .where(
+          and(eq(aiRuns.id, id), inArray(aiRuns.status, ACTIVE_RUN_STATUSES)),
+        )
+        .returning({ id: aiRuns.id })
+    ).length > 0,
   getObservations,
   getObservation,
   listAnsweredPromptIds,
@@ -318,10 +345,36 @@ export const AiVisibilityRepository = {
           .select({
             runId: aiObservations.runId,
             status: aiObservations.status,
+            error: aiObservations.error,
           })
           .from(aiObservations)
           .where(inArray(aiObservations.runId, runIds))
       : Promise.resolve([]),
+  listPendingObservationIds: async (runId: string) =>
+    (
+      await db
+        .select({ id: aiObservations.id })
+        .from(aiObservations)
+        .where(
+          and(
+            eq(aiObservations.runId, runId),
+            eq(aiObservations.status, "pending"),
+          ),
+        )
+    ).map((row) => row.id),
+  listFailedObservationIds: async (runId: string, error: string) =>
+    (
+      await db
+        .select({ id: aiObservations.id })
+        .from(aiObservations)
+        .where(
+          and(
+            eq(aiObservations.runId, runId),
+            eq(aiObservations.status, "failed"),
+            eq(aiObservations.error, error),
+          ),
+        )
+    ).map((row) => row.id),
   getEvidence,
   persistAnswer,
   failPendingObservations,

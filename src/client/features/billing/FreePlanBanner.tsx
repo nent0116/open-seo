@@ -8,8 +8,16 @@ import { useCanManageBilling } from "@/client/features/team/organizationQueries"
 import { BILLING_ROUTE, SUBSCRIBE_ROUTE } from "@/shared/billing";
 
 export function FreePlanBanner() {
-  const { accountQuery, isFreePlan, isOutOfCredits, isLowCredits, refillDate } =
-    useCreditBalance();
+  const {
+    accountQuery,
+    isFreePlan,
+    isOutOfCredits,
+    isLowCredits,
+    refillDate,
+    autoReload,
+    autoReloadState,
+    isPausedByBudget,
+  } = useCreditBalance();
   const canManageBilling = useCanManageBilling();
   const showsOutOfCredits = Boolean(accountQuery.data) && isOutOfCredits;
 
@@ -22,15 +30,59 @@ export function FreePlanBanner() {
     return null;
   }
 
+  // Credits may be in the balance, but the budget holds them back; buying
+  // more would not help, only raising it does.
+  if (isPausedByBudget && autoReload) {
+    const until = refillDate
+      ? ` until ${refillDate}の補充をお待ちください`
+      : "";
+    return (
+      <AppBanner variant="warning">
+        {canManageBilling ? (
+          <>
+            You&rsquo;ve hit your ${autoReload.monthlyLimitUsd} monthly
+            auto-reload budget, so credits are paused{until}.{" "}
+            <Link
+              to={BILLING_ROUTE}
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Raise your budget
+            </Link>{" "}
+            to keep going.
+          </>
+        ) : (
+          <>
+            Your organization hit its monthly auto-reload budget, so credits are
+            paused{until}. Ask the owner to raise it.
+          </>
+        )}
+      </AppBanner>
+    );
+  }
+
+  // Out of credits with auto-reload on and working means Autumn is charging
+  // the card right now; a "buy more" notice would have them pay twice.
+  if (!isFreePlan && isOutOfCredits && autoReloadState === "on" && autoReload) {
+    return (
+      <AppBanner variant="info">
+        You&rsquo;re out of credits. Auto-reload is adding $
+        {autoReload.amountUsd} now.
+      </AppBanner>
+    );
+  }
+
   // Only the owner can change the plan or buy credits, so a link would lead
   // everyone else to a page where they can't act.
   if (!canManageBilling && (isOutOfCredits || isLowCredits)) {
     return (
       <AppBanner variant={isOutOfCredits ? "destructive" : "warning"}>
         {isOutOfCredits
-          ? "組織のクレジットをすべて使用しました。"
+          ? autoReloadState === "card_failed"
+            ? "Your organization is out of credits and its card was declined."
+            : "組織のクレジットをすべて使用しました。"
           : "組織のクレジット残高が少なくなっています。"}{" "}
-        追加が必要な場合は組織の所有者へ依頼してください。
+        Ask your organization owner to{" "}
+        {autoReloadState === "card_failed" ? "update it" : "add more"}.
       </AppBanner>
     );
   }
@@ -59,6 +111,23 @@ export function FreePlanBanner() {
           <>
             無料クレジットをすべて使用しました。{creditsActionLink}すると毎月$
             {BASE_PLAN_OFFER.monthlyCreditsUsd}相当のクレジットを利用できます。
+          </>
+        ) : autoReloadState === "card_failed" ? (
+          <>
+            You&rsquo;re out of credits and auto-reload couldn&rsquo;t charge
+            your card.{" "}
+            <Link
+              to={BILLING_ROUTE}
+              className="font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Update your card
+            </Link>{" "}
+            to keep going.
+          </>
+        ) : autoReloadState === "failed" ? (
+          <>
+            You&rsquo;re out of credits and auto-reload couldn&rsquo;t buy more.{" "}
+            {creditsActionLink} to keep going.
           </>
         ) : (
           <>

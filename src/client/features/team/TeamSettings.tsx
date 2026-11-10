@@ -21,6 +21,7 @@ import {
 } from "@/client/components/ui/table";
 import {
   InviteTeammateModal,
+  announceInvitation,
   inviteErrorMessage,
 } from "@/client/features/team/InviteTeammateModal";
 import { organizationContextQueryOptions } from "@/client/features/team/organizationQueries";
@@ -73,9 +74,9 @@ export function TeamSettings() {
   const resendMutation = useMutation({
     mutationKey: RESEND_KEY,
     mutationFn: (email: string) => sendTeamInvitation({ data: { email } }),
-    onSuccess: () => {
+    onSuccess: (result) => {
       captureClientEvent("team:invitation_resend");
-      toast.success("招待を再送しました");
+      announceInvitation(result, "招待を再送しました");
       void refreshTeam();
     },
     onError: (error: Error) => {

@@ -108,7 +108,8 @@ export function MemberRow({
               onRemove();
             }}
           >
-            このメンバーは直ちにアクセスできなくなります。
+            They lose access immediately. Search Console and Google Analytics
+            connections made with their Google account are disconnected.
           </ConfirmDialog>
         ) : null}
       </TableCell>

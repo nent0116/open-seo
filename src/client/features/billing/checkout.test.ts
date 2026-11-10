@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { organizationContextQueryOptions } from "@/client/features/team/organizationQueries";
 import { openUpgradeCheckout, prefetchUpgradeCheckout } from "./checkout";
+import { AUTUMN_PAID_PLAN_ID } from "@/shared/billing";
 
 const {
   queryClient,
@@ -8,6 +9,7 @@ const {
   getBillingAccount,
   getOrganizationContext,
   assign,
+  reportCheckoutStart,
 } = await vi.hoisted(async () => {
   const { QueryClient } = await import("@tanstack/query-core");
   return {
@@ -16,18 +18,21 @@ const {
     getBillingAccount: vi.fn(),
     getOrganizationContext: vi.fn(),
     assign: vi.fn(),
+    reportCheckoutStart: vi.fn(),
   };
 });
 vi.mock("@/client/tanstack-db", () => ({ queryClient }));
 vi.mock("@/serverFunctions/billing", () => ({
   createPlanCheckout,
   getBillingAccount,
+  reportCheckoutStart,
 }));
 vi.mock("@/serverFunctions/organization", () => ({ getOrganizationContext }));
 vi.mock("@/lib/auth-mode", () => ({ isHostedClientAuthMode: () => true }));
 vi.mock("@/client/lib/posthog", () => ({ captureClientEvent: vi.fn() }));
 
 beforeEach(() => {
+  reportCheckoutStart.mockResolvedValue(undefined);
   getBillingAccount.mockResolvedValue({ planStatus: "free" });
   getOrganizationContext.mockResolvedValue({
     organizationId: "organization-a",
@@ -44,7 +49,7 @@ afterEach(() => {
 });
 
 async function warmUpgradeCheckout() {
-  prefetchUpgradeCheckout();
+  prefetchUpgradeCheckout(AUTUMN_PAID_PLAN_ID);
   await vi.waitFor(() => expect(createPlanCheckout).toHaveBeenCalledOnce());
   await vi.waitFor(() => expect(queryClient.isFetching()).toBe(0));
 }
@@ -63,7 +68,7 @@ describe("upgrade checkout navigation", () => {
       "https://checkout.example/organization-b",
     );
 
-    await openUpgradeCheckout();
+    await openUpgradeCheckout(AUTUMN_PAID_PLAN_ID);
 
     expect(assign).toHaveBeenCalledWith(
       "https://checkout.example/organization-b",
@@ -74,7 +79,7 @@ describe("upgrade checkout navigation", () => {
     await warmUpgradeCheckout();
     createPlanCheckout.mockRejectedValue(new Error("Billing access denied"));
 
-    await expect(openUpgradeCheckout()).rejects.toThrow(
+    await expect(openUpgradeCheckout(AUTUMN_PAID_PLAN_ID)).rejects.toThrow(
       "Billing access denied",
     );
 

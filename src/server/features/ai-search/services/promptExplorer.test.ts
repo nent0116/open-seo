@@ -173,7 +173,7 @@ describe("Prompt Explorer countries", () => {
     );
   });
 
-  it("runs supported models and identifies skipped models without spending on them", async () => {
+  it("skips a model that doesn't list the country without spending on it, and runs Gemini without one", async () => {
     const result = await explorePrompt(
       promptExplorerInputSchema.parse(input),
       billing,
@@ -187,16 +187,16 @@ describe("Prompt Explorer countries", () => {
         message:
           "Claudeはブルガリアを検索対象国としてサポートしていません。上の「国を指定しない」を選択し、もう一度実行するとClaudeも含められます。",
       },
-      {
-        model: "gemini",
-        status: "error",
-        errorCode: "UNSUPPORTED_COUNTRY",
-        message:
-          "Geminiは国の指定をサポートしていません。上の「国を指定しない」を選択し、もう一度実行するとGeminiも含められます。",
-      },
+      { model: "gemini", status: "success", webSearchCountryCode: null },
       { model: "perplexity", status: "success", webSearchCountryCode: "BG" },
     ]);
-    expect(llmResponse).toHaveBeenCalledTimes(2);
+    expect(llmResponse).toHaveBeenCalledTimes(3);
+    expect(llmResponse).toHaveBeenCalledWith(
+      expect.objectContaining({
+        modelSlug: "gemini",
+        webSearchCountryCode: undefined,
+      }),
+    );
   });
 
   it.each([false, true])(

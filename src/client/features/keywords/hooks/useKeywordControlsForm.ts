@@ -10,6 +10,7 @@ import {
   type ResultLimit,
 } from "@/client/features/keywords/keywordResearchTypes";
 import { parseKeywordInput } from "@/client/features/keywords/state/keywordControllerActions";
+import { keywordWildcardError } from "@/shared/keyword-wildcard";
 
 type UseKeywordControlsFormInput = {
   keywordInput: string;
@@ -53,6 +54,13 @@ function getKeywordSearchValidationErrors(
         keyword: `キーワードは${MAX_KEYWORDS_PER_SUBMIT}件以内で、1行に1つ入力してください。`,
       },
     });
+  }
+
+  const wildcardError = keywords
+    .map((keyword) => keywordWildcardError(keyword, value.locationCode))
+    .find(Boolean);
+  if (wildcardError) {
+    return createFormValidationErrors({ fields: { keyword: wildcardError } });
   }
 
   return null;

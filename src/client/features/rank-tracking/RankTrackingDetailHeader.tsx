@@ -22,6 +22,7 @@ import {
   comparePeriodSchema,
   type ComparePeriod,
 } from "@/types/schemas/rank-tracking-search";
+import { parseDbTimestamp } from "@/client/lib/db-timestamp";
 
 const COMPARE_ITEMS: { value: ComparePeriod; label: string }[] = [
   { value: "1d", label: "前日比" },
@@ -87,8 +88,8 @@ export function RankTrackingDetailHeader({
           {run?.lastCheckedAt && (
             <>
               {" "}
-              ・前回：
-              {new Date(run.lastCheckedAt).toLocaleDateString("ja-JP")}
+              ・前回：{" "}
+              {parseDbTimestamp(run.lastCheckedAt).toLocaleDateString()}
             </>
           )}
           {costEstimate && costEstimate.keywordCount > 0 && (

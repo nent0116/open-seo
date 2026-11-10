@@ -14,18 +14,21 @@ export const setupSteps: {
   label: string;
   detail: string;
   icon: typeof Globe;
+  skipLabel: string;
 }[] = [
   {
     id: "competitor",
     label: "競合を調査",
     detail: "参考にすべきトピックやリンクを見つけます。",
     icon: Globe,
+    skipLabel: "Skip for now",
   },
   {
     id: "keywords",
     label: "キーワード候補を探す",
     detail: "1つのキーワードから、実際に検索されている語句を調べます。",
     icon: Lightbulb,
+    skipLabel: "Skip for now",
   },
   {
     id: "audit",
@@ -33,18 +36,21 @@ export const setupSteps: {
     detail:
       "リンク切れ、タグ不足、インデックス登録の問題をクロールで検出します。",
     icon: ClipboardCheck,
+    skipLabel: "Skip for now",
   },
   {
     id: "mcp",
     label: "AIエージェントを連携",
     detail: "Claudeなど、普段お使いのAIエージェントからOpenSEOを利用します。",
     icon: Bot,
+    skipLabel: "Skip for now",
   },
   {
     id: "team",
     label: "メンバーを招待",
     detail: "共同作業するメンバーを招待します。ひとりのままでも利用できます。",
     icon: Users,
+    skipLabel: "Skip",
   },
   {
     id: "project",
@@ -52,6 +58,7 @@ export const setupSteps: {
     detail:
       "別のプロジェクトを作成するか、AIエージェントにサイト一覧を設定してもらいます。",
     icon: FolderPlus,
+    skipLabel: "I only need one project",
   },
 ];
 
@@ -60,8 +67,8 @@ export function getStepStatus(
   step: DashboardSetupStep,
 ): "done" | "skipped" | "todo" {
   const completed: Record<DashboardSetupStep, boolean> = {
-    competitor: activation.competitorClickedAt !== null,
-    keywords: activation.keywordsClickedAt !== null,
+    competitor: activation.competitorResearchedAt !== null,
+    keywords: activation.keywordsResearchedAt !== null,
     audit: activation.hasAudit,
     mcp:
       activation.mcp.authorizedAt !== null ||
@@ -70,11 +77,9 @@ export function getStepStatus(
     project: activation.hasMultipleProjects,
   };
   if (completed[step]) return "done";
-  // Preserve previous MCP dismissals without treating them as authorization.
-  if (
-    activation.dismissedSteps.includes(step) ||
-    (step === "mcp" && activation.mcp.cardDismissedAt !== null)
-  )
-    return "skipped";
-  return "todo";
+  if (!activation.dismissedSteps.includes(step)) return "todo";
+  return completeWhenSkipped.has(step) ? "done" : "skipped";
 }
+
+// Skipping these marks them complete, so they never wait in "saved for later".
+const completeWhenSkipped = new Set<DashboardSetupStep>(["team", "project"]);
