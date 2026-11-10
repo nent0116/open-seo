@@ -232,7 +232,6 @@ function SubscribePage() {
             >
               メールアドレス {SUPPORT_EMAIL}
             </a>
-            。
           </>
         }
       />
@@ -430,7 +429,6 @@ function SubscribePage() {
             >
               {SUPPORT_EMAIL}
             </a>
-            。
           </span>
         </p>
       </div>

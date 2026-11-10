@@ -63,6 +63,9 @@ describe("AI visibility checks", () => {
       const starting = new Promise<void>((resolve) => {
         notifyStarting = resolve;
       });
+      // A failed create is retried unless the instance is confirmed to exist.
+      workflow.get.mockRejectedValue(new Error("not found"));
+      workflow.create.mockRejectedValue(new Error("Workflow unavailable"));
       workflow.create.mockImplementationOnce(() => {
         notifyStarting();
         return new Promise((_resolve, reject) => {
@@ -92,6 +95,7 @@ describe("AI visibility checks", () => {
       expect(await repo.getTracker(projectId)).toMatchObject({
         enabled: false,
       });
+      workflow.create.mockResolvedValue(undefined);
       const { run, state } = await setSchedule(
         { projectId, enabled: true },
         customer,
@@ -103,18 +107,21 @@ describe("AI visibility checks", () => {
   it("keeps scheduling disabled after startup fails and starts a fresh baseline on retry", async () => {
     const tracker = await repo.getTracker(projectId);
     await repo.updateTracker(tracker.id, { enabled: false });
-    workflow.create.mockRejectedValueOnce(new Error("Workflow unavailable"));
+    workflow.get.mockRejectedValue(new Error("not found"));
+    workflow.create.mockRejectedValue(new Error("Workflow unavailable"));
     await expect(
       setSchedule({ projectId, enabled: true }, customer),
     ).rejects.toThrow("Workflow unavailable");
     expect(await repo.getTracker(projectId)).toMatchObject({ enabled: false });
+    const [failedRun] = await repo.listRuns(projectId);
+    workflow.create.mockResolvedValue(undefined);
     const { run, state } = await setSchedule(
       { projectId, enabled: true },
       customer,
     );
     expect(run).toMatchObject({ trigger: "baseline", status: "queued" });
     expect(state.tracker).toMatchObject({ enabled: true });
-    expect(workflow.create).toHaveBeenCalledTimes(2);
+    expect(run?.id).not.toBe(failedRun.id);
   });
   it("runs one check at a time and points a second start at the running one", async () => {
     const run = await runCheck({ projectId, maxCostUsd: 1 }, customer);

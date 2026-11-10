@@ -2,6 +2,7 @@ import { expect, it, vi } from "vitest";
 import { postAiTrackingTasks } from "./ai-tracking";
 
 vi.mock("@/server/lib/runtime-env", () => ({
+  getOptionalEnvValue: async () => undefined,
   getRequiredEnvValue: async () => "test-key",
 }));
 
@@ -40,6 +41,8 @@ it("accepts only submitted tags once while retaining all provider charges", asyn
     locationCode: 2840,
     languageCode: "en",
   });
-  expect(result.data).toEqual([{ tag: "answer", taskId: "task" }]);
+  expect(result.data).toEqual([
+    { tag: "answer", taskId: "task", costUsd: 0.01 },
+  ]);
   expect(result.billing.costUsd).toBeCloseTo(0.06);
 });

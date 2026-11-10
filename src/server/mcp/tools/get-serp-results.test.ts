@@ -279,7 +279,7 @@ describe("PAA details", () => {
   };
 
   it("returns PAA questions and answer sources in structured and text content", async () => {
-    mockReads({ t1: completed(...[paa]) });
+    mockReads({ t1: completed(paa) });
 
     const result = await getSerpResultsTool.handler(
       {
@@ -346,25 +346,21 @@ describe("PAA details", () => {
     "reads $format already embedded in PAA without expanding the question",
     async ({ answer, expectedText }) => {
       mockReads({
-        t1: completed(
-          ...[
+        t1: completed({
+          type: "people_also_ask",
+          items: [
             {
-              type: "people_also_ask",
-              items: [
+              title: "How do I find food suppliers?",
+              expanded_element: [
                 {
-                  title: "How do I find food suppliers?",
-                  expanded_element: [
+                  type: "people_also_ask_ai_overview_expanded_element",
+                  items: [
                     {
-                      type: "people_also_ask_ai_overview_expanded_element",
-                      items: [
+                      ...answer,
+                      references: [
                         {
-                          ...answer,
-                          references: [
-                            {
-                              title: "Supplier guide",
-                              url: "https://example.com/suppliers",
-                            },
-                          ],
+                          title: "Supplier guide",
+                          url: "https://example.com/suppliers",
                         },
                       ],
                     },
@@ -373,7 +369,7 @@ describe("PAA details", () => {
               ],
             },
           ],
-        ),
+        }),
       });
 
       const result = await getSerpResultsTool.handler(

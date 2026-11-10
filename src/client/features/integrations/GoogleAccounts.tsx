@@ -87,15 +87,15 @@ export function GoogleAccounts({
           <span className="truncate">
             {props.accounts.length === 1
               ? accountLabel(props.accounts[0])
-              : `${props.accounts.length} Google accounts`}
+              : `${props.accounts.length}件のGoogleアカウント`}
           </span>
           <ChevronDown className="size-3.5 shrink-0" />
         </PopoverTrigger>
         <PopoverContent align="start" className="w-80">
           <PopoverHeader>
-            <PopoverTitle>Google accounts</PopoverTitle>
+            <PopoverTitle>Googleアカウント</PopoverTitle>
             <PopoverDescription>
-              Properties come from these accounts.
+              これらのアカウントからプロパティを取得しています。
             </PopoverDescription>
           </PopoverHeader>
           <AccountList
@@ -143,7 +143,7 @@ function AddAccountButton({
         pending={linking}
       >
         {linking ? null : <Plus className="size-4" />}
-        {linking ? "Opening Google…" : "Add Google account"}
+        {linking ? "Googleを開いています…" : "Googleアカウントを追加"}
       </Button>
     </div>
   );

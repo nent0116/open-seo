@@ -28,7 +28,7 @@ describe("formatCompactDate", () => {
   // west of UTC. Comparing against local midnight fails there.
   it("shows the calendar date it was given", () => {
     expect(formatCompactDate("2026-03-01")).toBe(
-      new Date(2026, 2, 1).toLocaleDateString(undefined, {
+      new Date(2026, 2, 1).toLocaleDateString("ja-JP", {
         month: "short",
         day: "numeric",
         year: "numeric",
@@ -40,7 +40,7 @@ describe("formatCompactDate", () => {
 describe("formatMonthLabel", () => {
   it("labels the month it was given", () => {
     expect(formatMonthLabel("2026-03-01")).toBe(
-      new Date(2026, 2, 1).toLocaleDateString(undefined, {
+      new Date(2026, 2, 1).toLocaleDateString("ja-JP", {
         month: "short",
         year: "2-digit",
       }),

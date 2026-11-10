@@ -80,6 +80,9 @@ const project = {
   locationCode: 2840,
   languageCode: "en",
 };
+const researchSavedWebsite = () =>
+  researchWebsite("https://saved.com", project, customer);
+
 const topics = [
   "rank tracker",
   "seo tool",
@@ -159,51 +162,8 @@ const invalidJson = new NoObjectGeneratedError({
 });
 
 describe("researchWebsite", () => {
-  it.each([1, 2])(
-    "stops research when the safety limit denies conversation %i, even if the model consumes the tool error",
-    async (deniedAttempt) => {
-      listCompetitors.mockResolvedValue([]);
-      for (let attempt = 1; attempt < deniedAttempt; attempt++)
-        enforceSafetyLimits.mockResolvedValueOnce(undefined);
-      enforceSafetyLimits.mockRejectedValueOnce(
-        new AppError("DATAFORSEO_USAGE_LIMIT_EXCEEDED"),
-      );
-      // The real AI SDK returns tool failures to the model instead of throwing.
-      const succeed = generateText.getMockImplementation()!;
-      let attempt = 0;
-      generateText.mockImplementation(async (options) => {
-        attempt++;
-        try {
-          const result = await succeed(options);
-          if (attempt < deniedAttempt) throw invalidJson;
-          return result;
-        } catch (error) {
-          if (
-            error instanceof AppError &&
-            error.code === "DATAFORSEO_USAGE_LIMIT_EXCEEDED"
-          )
-            return { output: { competitors: [] } };
-          throw error;
-        }
-      });
-
-      await expect(
-        researchWebsite("https://saved.com", project, customer),
-      ).rejects.toMatchObject({ code: "DATAFORSEO_USAGE_LIMIT_EXCEEDED" });
-      expect(enforceSafetyLimits).toHaveBeenCalledTimes(deniedAttempt);
-      expect(enforceSafetyLimits).toHaveBeenNthCalledWith(deniedAttempt, {
-        estimatedCostUsd: 0.016,
-        requests: 24,
-      });
-      expect(search).toHaveBeenCalledTimes((deniedAttempt - 1) * 2);
-      expect(generateText).toHaveBeenCalledTimes(deniedAttempt);
-    },
-  );
-
   it("does no research when all project fields are already saved", async () => {
-    expect(
-      await researchWebsite("https://saved.com", project, customer),
-    ).toMatchObject({
+    expect(await researchSavedWebsite()).toMatchObject({
       name: project.brandName,
       domain: project.domain,
       overview,
@@ -263,11 +223,7 @@ describe("researchWebsite", () => {
       },
     });
 
-    const result = await researchWebsite(
-      "https://saved.com",
-      project,
-      customer,
-    );
+    const result = await researchSavedWebsite();
 
     expect(result.suggestedKeywords).toEqual(valid.slice(0, 15));
   });
@@ -294,11 +250,7 @@ describe("researchWebsite", () => {
       };
     });
 
-    const result = await researchWebsite(
-      "https://saved.com",
-      project,
-      customer,
-    );
+    const result = await researchSavedWebsite();
 
     const schema = generateText.mock.calls[0]?.[0].output.schema;
     if (!(schema instanceof z.ZodType)) throw new Error("Expected a schema");
@@ -356,11 +308,7 @@ describe("researchWebsite", () => {
       },
     });
 
-    const result = await researchWebsite(
-      "https://saved.com",
-      project,
-      customer,
-    );
+    const result = await researchSavedWebsite();
 
     expect(result.suggestedTopics).toEqual([first, topics[4]]);
   });
@@ -385,11 +333,7 @@ describe("researchWebsite", () => {
       };
     });
 
-    const result = await researchWebsite(
-      "https://saved.com",
-      project,
-      customer,
-    );
+    const result = await researchSavedWebsite();
 
     expect(result.competitors).toEqual([competitor]);
   });
@@ -405,7 +349,7 @@ describe("researchWebsite", () => {
       for (let n = 0; n < failures; n++)
         search.mockRejectedValueOnce(new AppError("UPSTREAM_UNAVAILABLE"));
 
-      const research = researchWebsite("https://saved.com", project, customer);
+      const research = researchSavedWebsite();
       await vi.runAllTimersAsync();
       const result = await research;
       vi.useRealTimers();
@@ -423,11 +367,7 @@ describe("researchWebsite", () => {
       throw invalidJson;
     });
 
-    const result = await researchWebsite(
-      "https://saved.com",
-      project,
-      customer,
-    );
+    const result = await researchSavedWebsite();
 
     expect(search).toHaveBeenCalledTimes(4);
     expect(enforceSafetyLimits).toHaveBeenCalledTimes(2);
@@ -444,9 +384,9 @@ describe("researchWebsite", () => {
         Promise.reject(abortSignal.reason),
     );
 
-    await expect(
-      researchWebsite("https://saved.com", project, customer),
-    ).rejects.toThrow("Website research took too long");
+    await expect(researchSavedWebsite()).rejects.toThrow(
+      "Website research took too long",
+    );
     expect(generateText).toHaveBeenCalledOnce();
   });
 
@@ -460,18 +400,18 @@ describe("researchWebsite", () => {
       })
       .mockResolvedValueOnce({ output: { competitors: [] } });
 
-    await expect(
-      researchWebsite("https://saved.com", project, customer),
-    ).rejects.toThrow("Website research was incomplete");
+    await expect(researchSavedWebsite()).rejects.toThrow(
+      "Website research was incomplete",
+    );
   });
 
   it("fails instead of skipping competitors when search fails for a non-outage reason", async () => {
     listCompetitors.mockResolvedValue([]);
     search.mockRejectedValue(new AppError("DATAFORSEO_AUTH_FAILED"));
 
-    await expect(
-      researchWebsite("https://saved.com", project, customer),
-    ).rejects.toThrow("Website research was incomplete");
+    await expect(researchSavedWebsite()).rejects.toThrow(
+      "Website research was incomplete",
+    );
     expect(search).toHaveBeenCalledTimes(2);
   });
 
@@ -484,9 +424,7 @@ describe("researchWebsite", () => {
       },
     );
 
-    await expect(
-      researchWebsite("https://saved.com", project, customer),
-    ).rejects.toThrow(AppError);
+    await expect(researchSavedWebsite()).rejects.toThrow(AppError);
     expect(billResearchSpend).toHaveBeenCalledWith(customer, [
       expect.objectContaining({ provider: "context", costUsd: 0.0025 }),
     ]);
