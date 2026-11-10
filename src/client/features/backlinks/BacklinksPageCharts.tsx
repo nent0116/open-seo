@@ -21,12 +21,12 @@ import {
 
 const trendChartConfig = {
   backlinks: { label: "被リンク", color: "#2563eb" },
-  referringDomains: { label: "参照ドメイン", color: "#14b8a6" },
+  referringDomains: { label: "参照ドメイン", color: "#e69f00" },
 } satisfies ChartConfig;
 
 const newLostChartConfig = {
-  lostBacklinks: { label: "消失した被リンク", color: "#ef4444" },
-  newBacklinks: { label: "新規の被リンク", color: "#16a34a" },
+  lostBacklinks: { label: "消失した被リンク", color: "#d55e00" },
+  newBacklinks: { label: "新規の被リンク", color: "#2563eb" },
 } satisfies ChartConfig;
 
 const tooltip = (

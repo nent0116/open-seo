@@ -25,16 +25,19 @@ vi.mock(
   }),
 );
 vi.mock("@/server/lib/runtime-env", () => ({
-  isHostedServerAuthMode: async () => false,
-  getRequiredEnvValue: async () => "test-key",
   getOptionalEnvValue: async () => undefined,
 }));
-vi.mock("@/server/lib/openrouter", () => ({ buildChatAgentModel: vi.fn() }));
-vi.mock("@/server/billing/subscription", () => ({
-  checkUsageCreditsDepleted: vi.fn(),
+vi.mock("@/server/lib/openrouter", () => ({
+  buildChatAgentModel: vi.fn(),
+  requireOpenRouterAccess: async () => "test-key",
 }));
 vi.mock("@/server/billing/researchSpend", () => ({
   billResearchSpend: vi.fn(),
+  withResearchAdmission: async (
+    _customer: unknown,
+    _refusal: string,
+    work: () => Promise<unknown>,
+  ) => work(),
 }));
 vi.mock("@/server/lib/chatAgent", () => ({
   requireOpenRouterCostUsd: vi.fn(),
@@ -80,6 +83,8 @@ it.each([undefined, "Requested topic"])(
     });
     await expect(
       generateAiPrompts({ ...input, topic }, customer),
-    ).rejects.toThrow();
+    ).rejects.toMatchObject({
+      issues: [{ code: "too_big", maximum: 100 }],
+    });
   },
 );

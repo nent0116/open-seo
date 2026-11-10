@@ -1,4 +1,5 @@
 import { GscPropertySetupHelp, hasNoGscWebsites } from "./GscPropertySetupHelp";
+import { GoogleAccounts, accountLabel, accountStatus } from "./GoogleAccounts";
 import { GoogleAccountRemovalDialog } from "@/client/features/integrations/GoogleAccountRemovalDialog";
 import { QueryError } from "@/client/components/QueryState";
 import { Spinner } from "@/client/components/Spinner";
@@ -14,9 +15,7 @@ import {
   ComboboxLabel,
   ComboboxList,
 } from "@/client/components/ui/combobox";
-import { GSC_SELF_HOSTED_SETUP_DOCS_URL } from "@/shared/gsc";
 import { useState, type ReactNode } from "react";
-import { Plus } from "lucide-react";
 
 const GSC_SETUP_GUIDE_URL =
   "https://openseo.so/blogs/google-search-console-setup";
@@ -51,25 +50,6 @@ type PropertyGroup = {
   label: string;
   items: PropertyOption[];
 };
-
-function accountLabel(account: GooglePickerAccount) {
-  return account.email ?? `Googleアカウント・${account.accountId.slice(-6)}`;
-}
-
-function accountStatus(account: GooglePickerAccount, provider: "gsc" | "ga4") {
-  if (account.requiresReconnect) return "連携の有効期限が切れました";
-  if (account.unavailable) {
-    return account.apiDisabled
-      ? "Search Console APIが有効になっていません"
-      : "プロパティを読み込めませんでした";
-  }
-  if (account.properties.length === 0) {
-    return provider === "gsc"
-      ? "ウェブサイトが見つかりませんでした"
-      : "プロパティが見つかりませんでした";
-  }
-  return null;
-}
 
 function matchesProperty(option: PropertyOption, query: string) {
   return `${option.name} ${option.detail ?? ""} ${option.id}`
@@ -248,103 +228,35 @@ export function GooglePropertyPicker({
               )}
             </div>
           )}
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-muted-foreground">
-              Googleアカウント
+          <GoogleAccounts
+            inline={readOnly}
+            accounts={accounts}
+            provider={provider}
+            loading={loading}
+            linking={linking}
+            saving={saving}
+            onReconnect={onReconnect}
+            onRetry={onRetry}
+            onRemove={setRemoving}
+          />
+          {provider === "gsc" &&
+          !loading &&
+          !emptyGsc &&
+          accounts.some(
+            (account) => accountStatus(account, provider) !== null,
+          ) ? (
+            <p className="text-xs text-muted-foreground">
+              連携できない場合{" "}
+              <a
+                href={GSC_SETUP_GUIDE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-4"
+              >
+                設定ガイド ↗
+              </a>
             </p>
-            {accounts.map((account) => {
-              const label = accountLabel(account);
-              const status = loading ? null : accountStatus(account, provider);
-              return (
-                <div
-                  key={account.accountId}
-                  className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-sm"
-                >
-                  <span className="min-w-0 break-all">
-                    {label}
-                    {status ? (
-                      <span className="text-muted-foreground"> · {status}</span>
-                    ) : null}
-                    {account.apiDisabled ? (
-                      <>
-                        {" "}
-                        <a
-                          href={`${GSC_SELF_HOSTED_SETUP_DOCS_URL}#troubleshooting`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline underline-offset-4"
-                        >
-                          有効にする方法 ↗
-                        </a>
-                      </>
-                    ) : null}
-                  </span>
-                  <span className="flex shrink-0 items-center">
-                    {account.requiresReconnect ? (
-                      <Button
-                        variant="ghost"
-                        size="xs"
-                        onClick={onReconnect}
-                        aria-label={`再連携：${label}`}
-                        disabled={linking}
-                        aria-busy={linking}
-                      >
-                        {linking ? "Googleを開いています…" : "再連携"}
-                      </Button>
-                    ) : account.unavailable ? (
-                      <Button
-                        variant="ghost"
-                        size="xs"
-                        onClick={onRetry}
-                        aria-label={`再試行：${label}`}
-                      >
-                        もう一度試す
-                      </Button>
-                    ) : null}
-                    <Button
-                      variant="ghost"
-                      size="xs"
-                      className="text-destructive"
-                      disabled={saving}
-                      onClick={() => setRemoving(account)}
-                      aria-label={`削除：${label}`}
-                    >
-                      削除
-                    </Button>
-                  </span>
-                </div>
-              );
-            })}
-            <Button
-              variant="ghost"
-              size="xs"
-              className="-ml-2"
-              onClick={onReconnect}
-              disabled={saving || linking}
-              pending={linking}
-            >
-              {linking ? null : <Plus className="size-4" />}
-              {linking ? "Googleを開いています…" : "Googleアカウントを追加"}
-            </Button>
-            {provider === "gsc" &&
-            !loading &&
-            !emptyGsc &&
-            accounts.some(
-              (account) => accountStatus(account, provider) !== null,
-            ) ? (
-              <p className="text-xs text-muted-foreground">
-                連携できない場合{" "}
-                <a
-                  href={GSC_SETUP_GUIDE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline underline-offset-4"
-                >
-                  設定ガイド ↗
-                </a>
-              </p>
-            ) : null}
-          </div>
+          ) : null}
         </div>
       ) : null}
       {renderActions ? (

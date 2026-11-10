@@ -8,11 +8,11 @@ export function RankTrackingChangesAlert() {
       <AlertDescription className="text-foreground">
         <p>
           <span className="font-medium">
-            順位計測で一部の結果を再確認するようになりました。
+            Rank tracking now reads every keyword several times.
           </span>{" "}
           9月以降、Googleから順位計測ツールに返される検索結果が不完全になる場合があります。{" "}
           <a
-            href="https://openseo.so/blogs/rank-tracking-changes"
+            href="https://openseo.so/blogs/state-of-rank-tracking-november-2026"
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium underline underline-offset-4"

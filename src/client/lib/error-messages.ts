@@ -1,6 +1,10 @@
 import { FREE_MAX_AUDIT_PAGES } from "@/shared/audit-limits";
+import { GATEWAY_RENDERING_NOT_SET_UP_MESSAGE } from "@/shared/audit-rendering";
 import { isErrorCode, type ErrorCode } from "@/shared/error-codes";
-import { isHostedClientAuthMode } from "@/lib/auth-mode";
+import {
+  isEveryAppClientAuthMode,
+  isHostedClientAuthMode,
+} from "@/lib/auth-mode";
 
 /**
  * Copy for an error we did not expect. Hosted users cannot read our logs, so
@@ -12,14 +16,20 @@ export const UNEXPECTED_ERROR_MESSAGE = isHostedClientAuthMode()
 
 const STANDARD_MESSAGES: Record<ErrorCode, string> = {
   UNAUTHENTICATED: "ログインしてから、もう一度お試しください。",
-  AUTH_CONFIG_MISSING:
-    "OpenSEOの認証が設定されていません。READMEの手順に従ってCloudflare Accessを設定してください。",
+  AUTH_CONFIG_MISSING: isEveryAppClientAuthMode()
+    ? "Every Appゲートウェイに接続できません。管理者はpnpm everyapp statusで設定を確認してください。"
+    : "OpenSEOの認証が設定されていません。READMEの手順に従ってCloudflare Accessを設定してください。",
+  PAYMENT_METHOD_REQUIRED:
+    "登録済みカードへの請求に失敗しました。請求ポータルでカードを追加または更新し、もう一度お試しください。",
+  PAYMENT_ACTION_REQUIRED:
+    "銀行側で処理または確認が必要です。少し待って残高を確認してください。反映されない場合は「クレジットを購入」からチャージしてから、自動チャージを有効にしてください。",
   PAYMENT_REQUIRED:
     "OpenSEOを利用するには、有効なホスト版サブスクリプションが必要です。",
   INSUFFICIENT_CREDITS:
     "クレジットが不足しています。続行するにはクレジットを追加するか、プランをアップグレードしてください。",
-  AUDIT_RENDERING_UNAVAILABLE:
-    "この環境ではJavaScriptレンダリングが設定されていません。管理者に設定を依頼してください。",
+  AUDIT_RENDERING_UNAVAILABLE: isEveryAppClientAuthMode()
+    ? GATEWAY_RENDERING_NOT_SET_UP_MESSAGE
+    : "この環境ではJavaScriptレンダリングが設定されていません。管理者に設定を依頼してください。",
   FORBIDDEN: "このリソースへのアクセス権がありません。",
   NOT_FOUND: "指定されたリソースが見つかりませんでした。",
   AUDIT_CAPACITY_REACHED:
@@ -38,8 +48,9 @@ const STANDARD_MESSAGES: Record<ErrorCode, string> = {
     "連携中のDataForSEOアカウントで、請求または残高の問題が発生しています。",
   AI_VISIBILITY_ERROR:
     "AI検索での表示状況を確認できませんでした。追跡設定を確認し、もう一度お試しください。",
-  DATAFORSEO_AUTH_FAILED:
-    "DataForSEOがAPIキーを拒否しました。DATAFORSEO_API_KEYにDataForSEOの「ログイン名:パスワード」をBase64エンコードした値が設定されているか、アカウントの認証とAPIの利用権限が有効か確認してください。",
+  DATAFORSEO_AUTH_FAILED: isEveryAppClientAuthMode()
+    ? "Every AppゲートウェイのDataForSEO APIキーが未設定、または拒否されました。管理者はpnpm everyapp secret set DATAFORSEO_API_KEYで設定してください。"
+    : "DataForSEOがAPIキーを拒否しました。DATAFORSEO_API_KEYにDataForSEOの「ログイン名:パスワード」をBase64エンコードした値が設定されているか、アカウントの認証とAPIの利用権限が有効か確認してください。",
   DATAFORSEO_USAGE_LIMIT_EXCEEDED:
     "DataForSEOの安全上限に達したため、API呼び出しを停止しました。設定画面で利用状況と上限を確認してください。",
   RATE_LIMITED:

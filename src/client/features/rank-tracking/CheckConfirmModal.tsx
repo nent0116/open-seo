@@ -1,15 +1,12 @@
 import { ConfirmDialog } from "@/client/components/ConfirmDialog";
 import type { RankTrackingConfig } from "@/types/schemas/rank-tracking";
-import {
-  devicesCount,
-  KEYWORDS_PER_BATCH,
-  SECONDS_PER_BATCH,
-} from "@/shared/rank-tracking";
+import { devicesCount, RANK_CHECK_DURATION_COPY } from "@/shared/rank-tracking";
 
 export function CheckConfirmModal({
   keywordCount,
   devices,
   costUsd,
+  isScheduled,
   isPending,
   onRunNow,
   onCancel,
@@ -18,37 +15,40 @@ export function CheckConfirmModal({
   devices: RankTrackingConfig["devices"];
   /** Server estimate; it prices each keyword's text (operators cost 5x). */
   costUsd: number | undefined;
+  /** Whether the tracker also checks on a schedule. */
+  isScheduled: boolean;
   isPending: boolean;
   onRunNow: () => void;
   onCancel: () => void;
 }) {
   const dc = devicesCount(devices);
-  const totalChecks = keywordCount * dc;
-  const liveTime =
-    Math.ceil(totalChecks / KEYWORDS_PER_BATCH) * SECONDS_PER_BATCH;
-
-  const eta = liveTime < 60 ? `${liveTime}秒` : `${Math.ceil(liveTime / 60)}分`;
 
   return (
     <ConfirmDialog
-      title={`${keywordCount}件のキーワードをチェックしますか？`}
-      confirmLabel="今すぐ実行"
+      title={`Check ${keywordCount} keyword${keywordCount !== 1 ? "s" : ""}件のキーワードをチェックしますか？`}
+      confirmLabel="Start check"
       pending={isPending}
       onConfirm={onRunNow}
       onClose={onCancel}
     >
-      {keywordCount}キーワード × {dc}デバイス = {totalChecks}
-      回の検索結果チェック。結果取得まで約{eta}です。
-      {costUsd != null ? (
-        <>
-          {" "}
-          費用上限：{" "}
-          <span className="font-mono font-semibold text-foreground">
-            ${costUsd.toFixed(2)}
+      <span className="flex flex-col gap-1">
+        <span>
+          {keywordCount} keyword{keywordCount !== 1 ? "s" : ""} &times; {dc}{" "}
+          デバイス ={dc !== 1 ? "s" : ""}
+        </span>
+        {costUsd != null ? (
+          <span>
+            費用上限：{" "}
+            <span className="font-mono font-semibold text-foreground">
+              ${costUsd.toFixed(2)}
+            </span>
           </span>
-          。
-        </>
-      ) : null}
+        ) : null}
+        <span>
+          {RANK_CHECK_DURATION_COPY}
+          {isScheduled ? " Your scheduled tracking won't change." : null}
+        </span>
+      </span>
     </ConfirmDialog>
   );
 }

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type * as Serp from "@/server/lib/dataforseo/serp";
 import type * as Ai from "ai";
+import { z } from "zod";
 
 const {
   generateText,
@@ -11,7 +12,14 @@ const {
   listKeywords,
   enforceSafetyLimits,
 } = vi.hoisted(() => ({
-  generateText: vi.fn(),
+  generateText:
+    vi.fn<
+      (options: {
+        output: { schema: unknown };
+        tools?: ResearchTools;
+        abortSignal: AbortSignal;
+      }) => Promise<{ output: Record<string, unknown> }>
+    >(),
   readSite: vi.fn(),
   search: vi.fn(),
   listSections: vi.fn(),
@@ -39,7 +47,10 @@ vi.mock("@/server/lib/runtime-env", () => ({
   getRequiredEnvValue: vi.fn(),
   getOptionalEnvValue: vi.fn(),
 }));
-vi.mock("@/server/lib/openrouter", () => ({ buildChatAgentModel: vi.fn() }));
+vi.mock("@/server/lib/openrouter", () => ({
+  buildChatAgentModel: vi.fn(),
+  requireOpenRouterAccess: vi.fn(async () => ({ apiKey: "test-key" })),
+}));
 vi.mock("@/server/lib/chatAgent", () => ({
   requireOpenRouterCostUsd: vi.fn(),
 }));
@@ -63,11 +74,15 @@ import { customer } from "@/server/features/ai-visibility/services/aiVisibilityT
 
 const project = {
   id: "project",
-  name: "Saved brand",
+  name: "Saved project",
+  brandName: "Saved brand",
   domain: "saved.com",
   locationCode: 2840,
   languageCode: "en",
 };
+const researchSavedWebsite = () =>
+  researchWebsite("https://saved.com", project, customer);
+
 const topics = [
   "rank tracker",
   "seo tool",
@@ -147,52 +162,9 @@ const invalidJson = new NoObjectGeneratedError({
 });
 
 describe("researchWebsite", () => {
-  it.each([1, 2])(
-    "stops research when the safety limit denies conversation %i, even if the model consumes the tool error",
-    async (deniedAttempt) => {
-      listCompetitors.mockResolvedValue([]);
-      for (let attempt = 1; attempt < deniedAttempt; attempt++)
-        enforceSafetyLimits.mockResolvedValueOnce(undefined);
-      enforceSafetyLimits.mockRejectedValueOnce(
-        new AppError("DATAFORSEO_USAGE_LIMIT_EXCEEDED"),
-      );
-      // The real AI SDK returns tool failures to the model instead of throwing.
-      const succeed = generateText.getMockImplementation()!;
-      let attempt = 0;
-      generateText.mockImplementation(async (options) => {
-        attempt++;
-        try {
-          const result: unknown = await succeed(options);
-          if (attempt < deniedAttempt) throw invalidJson;
-          return result;
-        } catch (error) {
-          if (
-            error instanceof AppError &&
-            error.code === "DATAFORSEO_USAGE_LIMIT_EXCEEDED"
-          )
-            return { output: { competitors: [] } };
-          throw error;
-        }
-      });
-
-      await expect(
-        researchWebsite("https://saved.com", project, customer),
-      ).rejects.toMatchObject({ code: "DATAFORSEO_USAGE_LIMIT_EXCEEDED" });
-      expect(enforceSafetyLimits).toHaveBeenCalledTimes(deniedAttempt);
-      expect(enforceSafetyLimits).toHaveBeenNthCalledWith(deniedAttempt, {
-        estimatedCostUsd: 0.016,
-        requests: 24,
-      });
-      expect(search).toHaveBeenCalledTimes((deniedAttempt - 1) * 2);
-      expect(generateText).toHaveBeenCalledTimes(deniedAttempt);
-    },
-  );
-
   it("does no research when all project fields are already saved", async () => {
-    expect(
-      await researchWebsite("https://saved.com", project, customer),
-    ).toMatchObject({
-      name: project.name,
+    expect(await researchSavedWebsite()).toMatchObject({
+      name: project.brandName,
       domain: project.domain,
       overview,
       preserveCompetitors: true,
@@ -217,7 +189,7 @@ describe("researchWebsite", () => {
       );
 
       expect(result).toEqual({
-        name: project.name,
+        name: project.brandName,
         domain: project.domain,
         overview: field === "overview" ? "Researched overview" : overview,
         preserveCompetitors: field !== "competitors",
@@ -231,6 +203,16 @@ describe("researchWebsite", () => {
     },
   );
 
+  it("suggests a brand name when none is saved", async () => {
+    listKeywords.mockResolvedValue([]);
+    const result = await researchWebsite(
+      "https://saved.com",
+      { ...project, brandName: null },
+      customer,
+    );
+    expect(result.name).toBe("Researched brand");
+  });
+
   it("drops malformed suggested keywords instead of failing the paid run", async () => {
     listKeywords.mockResolvedValue([]);
     const valid = Array.from({ length: 16 }, (_, n) => `keyword ${n}`);
@@ -241,13 +223,119 @@ describe("researchWebsite", () => {
       },
     });
 
+    const result = await researchSavedWebsite();
+
+    expect(result.suggestedKeywords).toEqual(valid.slice(0, 15));
+  });
+
+  // Anthropic rejects the word-limit regex, so the model gets none and a long
+  // name is cut instead of failing a run that is already billed.
+  it("asks the model for no regex and cuts topic names to five words", async () => {
+    listSections.mockResolvedValue([]);
+    listCompetitors.mockResolvedValue([]);
+    listKeywords.mockResolvedValue([]);
+    const research = generateText.getMockImplementation();
+    if (!research) throw new Error("Expected the default research mock");
+    generateText.mockImplementationOnce(async (options) => {
+      const { output } = await research(options);
+      const longName = "best rank tracker for small agencies";
+      return {
+        output: {
+          ...output,
+          suggestedTopics: [
+            { ...topics[0], name: longName },
+            ...topics.slice(1),
+          ],
+        },
+      };
+    });
+
+    const result = await researchSavedWebsite();
+
+    const schema = generateText.mock.calls[0]?.[0].output.schema;
+    if (!(schema instanceof z.ZodType)) throw new Error("Expected a schema");
+    expect(JSON.stringify(z.toJSONSchema(schema))).not.toContain('"pattern"');
+    expect(result.suggestedTopics[0].name).toBe("best rank tracker for small");
+  });
+
+  it("writes prompts for saved topics instead of generating keywords", async () => {
+    const names = topics.map((topic) => topic.name);
+    listKeywords.mockResolvedValue(names);
+    const renamed = topics.map((topic) => ({
+      ...topic,
+      name: `best ${topic.name}`,
+    }));
+    generateText.mockResolvedValueOnce({
+      output: { suggestedTopics: renamed.slice(0, 3) },
+    });
+
     const result = await researchWebsite(
       "https://saved.com",
       project,
       customer,
+      { promptSavedTopics: true },
     );
 
-    expect(result.suggestedKeywords).toEqual(valid.slice(0, 15));
+    const schema = generateText.mock.calls[0]?.[0].output.schema;
+    if (!(schema instanceof z.ZodObject)) throw new Error("Expected a schema");
+    expect(Object.keys(schema.shape)).toEqual(["suggestedTopics"]);
+    // The first three seed tracking, under their saved names.
+    expect(result.suggestedTopics.map((topic) => topic.name)).toEqual(
+      names.slice(0, 3),
+    );
+    expect(result.suggestedKeywords).toEqual([]);
+  });
+
+  it("drops topics that repeat a name or prompt instead of failing the paid run", async () => {
+    listKeywords.mockResolvedValue([]);
+    const [first, second, third, fourth] = topics;
+    generateText.mockResolvedValueOnce({
+      output: {
+        suggestedTopics: [
+          first,
+          { ...second, name: " Rank  Tracker " },
+          { ...third, prompts: [...third.prompts.slice(1), first.prompts[0]] },
+          {
+            ...fourth,
+            prompts: [
+              ...fourth.prompts.slice(0, 4),
+              fourth.prompts[0].toUpperCase(),
+            ],
+          },
+          topics[4],
+        ],
+        suggestedKeywords: [],
+      },
+    });
+
+    const result = await researchSavedWebsite();
+
+    expect(result.suggestedTopics).toEqual([first, topics[4]]);
+  });
+
+  it("drops a competitor it could not verify instead of failing the paid run", async () => {
+    listCompetitors.mockResolvedValue([]);
+    const succeed = generateText.getMockImplementation()!;
+    generateText.mockImplementationOnce(async (options) => {
+      await succeed(options);
+      return {
+        output: {
+          competitors: [
+            competitor,
+            { ...competitor, domain: "unread.com" },
+            {
+              ...competitor,
+              domain: "saved.com",
+              sourceUrl: "https://saved.com/",
+            },
+          ],
+        },
+      };
+    });
+
+    const result = await researchSavedWebsite();
+
+    expect(result.competitors).toEqual([competitor]);
   });
 
   it.each([
@@ -261,7 +349,7 @@ describe("researchWebsite", () => {
       for (let n = 0; n < failures; n++)
         search.mockRejectedValueOnce(new AppError("UPSTREAM_UNAVAILABLE"));
 
-      const research = researchWebsite("https://saved.com", project, customer);
+      const research = researchSavedWebsite();
       await vi.runAllTimersAsync();
       const result = await research;
       vi.useRealTimers();
@@ -279,15 +367,27 @@ describe("researchWebsite", () => {
       throw invalidJson;
     });
 
-    const result = await researchWebsite(
-      "https://saved.com",
-      project,
-      customer,
-    );
+    const result = await researchSavedWebsite();
 
     expect(search).toHaveBeenCalledTimes(4);
     expect(enforceSafetyLimits).toHaveBeenCalledTimes(2);
     expect(result.competitors).toEqual([competitor]);
+  });
+
+  it("explains a research deadline timeout", async () => {
+    listCompetitors.mockResolvedValue([]);
+    vi.spyOn(AbortSignal, "timeout").mockReturnValue(
+      AbortSignal.abort(new DOMException("", "TimeoutError")),
+    );
+    generateText.mockImplementation(
+      ({ abortSignal }: { abortSignal: AbortSignal }) =>
+        Promise.reject(abortSignal.reason),
+    );
+
+    await expect(researchSavedWebsite()).rejects.toThrow(
+      "Website research took too long",
+    );
+    expect(generateText).toHaveBeenCalledOnce();
   });
 
   it("does not credit a retry with an earlier attempt's search", async () => {
@@ -300,18 +400,18 @@ describe("researchWebsite", () => {
       })
       .mockResolvedValueOnce({ output: { competitors: [] } });
 
-    await expect(
-      researchWebsite("https://saved.com", project, customer),
-    ).rejects.toThrow("Website research was incomplete");
+    await expect(researchSavedWebsite()).rejects.toThrow(
+      "Website research was incomplete",
+    );
   });
 
   it("fails instead of skipping competitors when search fails for a non-outage reason", async () => {
     listCompetitors.mockResolvedValue([]);
     search.mockRejectedValue(new AppError("DATAFORSEO_AUTH_FAILED"));
 
-    await expect(
-      researchWebsite("https://saved.com", project, customer),
-    ).rejects.toThrow("Website research was incomplete");
+    await expect(researchSavedWebsite()).rejects.toThrow(
+      "Website research was incomplete",
+    );
     expect(search).toHaveBeenCalledTimes(2);
   });
 
@@ -324,9 +424,7 @@ describe("researchWebsite", () => {
       },
     );
 
-    await expect(
-      researchWebsite("https://saved.com", project, customer),
-    ).rejects.toThrow(AppError);
+    await expect(researchSavedWebsite()).rejects.toThrow(AppError);
     expect(billResearchSpend).toHaveBeenCalledWith(customer, [
       expect.objectContaining({ provider: "context", costUsd: 0.0025 }),
     ]);

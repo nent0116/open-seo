@@ -23,8 +23,11 @@ import {
 } from "@/client/features/audit/launch/types";
 import type { useLaunchController } from "@/client/features/audit/launch/useLaunchController";
 import { getFieldError, getFormError } from "@/client/lib/forms";
-import { isHostedClientAuthMode } from "@/lib/auth-mode";
-import { RENDERED_MAX_AUDIT_PAGES } from "@/shared/audit-limits";
+import {
+  isEveryAppClientAuthMode,
+  isHostedClientAuthMode,
+} from "@/lib/auth-mode";
+import { PAID_MAX_AUDIT_PAGES } from "@/shared/audit-limits";
 import { renderingEstimateText } from "@/shared/audit-rendering";
 import { SUBSCRIBE_ROUTE } from "@/shared/billing";
 
@@ -32,7 +35,6 @@ type Props = {
   launchForm: ReturnType<typeof useLaunchController>["launchForm"];
   commitMaxPagesInput: () => number;
   maxPagesLimit: number;
-  paidMaxPagesLimit: number;
   canRenderJavaScript?: boolean;
   outOfCredits?: boolean;
 };
@@ -41,7 +43,6 @@ export function LaunchFormCard({
   commitMaxPagesInput,
   launchForm,
   maxPagesLimit,
-  paidMaxPagesLimit,
   canRenderJavaScript,
   outOfCredits,
 }: Props) {
@@ -100,7 +101,6 @@ export function LaunchFormCard({
               launchForm={launchForm}
               commitMaxPagesInput={commitMaxPagesInput}
               maxPagesLimit={maxPagesLimit}
-              paidMaxPagesLimit={paidMaxPagesLimit}
             />
             <div className="space-y-4">
               <LighthouseOptions launchForm={launchForm} />
@@ -123,7 +123,6 @@ function LaunchOptions({
   launchForm,
   commitMaxPagesInput,
   maxPagesLimit,
-  paidMaxPagesLimit,
 }: Props) {
   return (
     <Field className="rounded-lg border border-border p-3">
@@ -150,18 +149,15 @@ function LaunchOptions({
         )}
       </launchForm.Field>
       <FieldDescription>
-        {MIN_PAGES}～{maxPagesLimit.toLocaleString("ja-JP")}
+        Enter any value from {MIN_PAGES} ～ {maxPagesLimit.toLocaleString()}
         の範囲で入力してください。
-        {maxPagesLimit === RENDERED_MAX_AUDIT_PAGES
-          ? "JavaScriptをレンダリングする監査では、このページ数が上限です。"
-          : null}
-        {maxPagesLimit < paidMaxPagesLimit ? (
+        {maxPagesLimit < PAID_MAX_AUDIT_PAGES ? (
           <>
             {" "}
             <Link to={SUBSCRIBE_ROUTE} search={{ upgrade: true }}>
               アップグレード
             </Link>{" "}
-            すると最大{paidMaxPagesLimit.toLocaleString("ja-JP")}
+            すると最大 {PAID_MAX_AUDIT_PAGES.toLocaleString()}{" "}
             ページまでクロールできます。
           </>
         ) : null}
@@ -250,7 +246,15 @@ function RenderingOptions({
           }
         </launchForm.Subscribe>
       )}
-      {canRenderJavaScript === false && (
+      {canRenderJavaScript === false && isEveryAppClientAuthMode() && (
+        <FieldDescription>
+          JavaScript rendering isn't set up on your Every App gateway yet. An
+          owner or admin sets it with{" "}
+          <code>pnpm everyapp secret set CONTEXT_API_KEY</code>
+          の範囲で入力してください。
+        </FieldDescription>
+      )}
+      {canRenderJavaScript === false && !isEveryAppClientAuthMode() && (
         <FieldDescription>
           この環境にはブラウザがないため、レンダリングにはContext.dev
           APIキーが必要です。 <code>CONTEXT_API_KEY</code>

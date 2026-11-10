@@ -10,6 +10,7 @@ import {
   PROSE_MAX_CHARS,
   type ProjectContextSectionKey,
 } from "@/types/schemas/projectContext";
+import { BrandNameSection } from "./BrandNameSection";
 import { CompetitorsSection } from "./CompetitorsSection";
 import { KeyPagesSection } from "./KeyPagesSection";
 import {
@@ -67,6 +68,11 @@ export function ProjectContextPage({ projectId }: { projectId: string }) {
             Claude
             Codeなど、接続したMCPクライアントが参照するプロジェクト情報です。作業前に読み込み、得た情報を書き戻します。誤りがあれば修正してください。
           </p>
+
+          <BrandNameSection
+            projectId={projectId}
+            brandName={context.brandName}
+          />
 
           <ProseSections
             projectId={projectId}

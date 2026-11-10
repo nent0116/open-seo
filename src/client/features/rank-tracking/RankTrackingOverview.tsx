@@ -26,11 +26,12 @@ import {
   TrendEmptyState,
   TrendRangeToggle,
 } from "./RankTrackingTrendChart";
+import { parseDbTimestamp } from "@/client/lib/db-timestamp";
 
 const BUCKETS = [
-  { key: "top3", label: "上位3位", color: "#16a34a" },
-  { key: "top4to10", label: "4–10", color: "#2563eb" },
-  { key: "top11to20", label: "11–20", color: "#f59e0b" },
+  { key: "top3", label: "上位3位", color: "#1e40af" },
+  { key: "top4to10", label: "4–10", color: "#56b4e9" },
+  { key: "top11to20", label: "11–20", color: "#e69f00" },
   { key: "notRanking", label: "20位圏外", color: "#6b7280" },
   // Missing data, not a ranking: lighter fill so it doesn't read as lost
   // positions.
@@ -38,7 +39,7 @@ const BUCKETS = [
     key: "notChecked",
     label: "未確認",
     color: "#d1d5db",
-    hint: "チェックに失敗し、順位を記録できませんでした。",
+    hint: "No result from Google on this check.",
   },
 ] as const;
 
@@ -69,7 +70,7 @@ export function RankTrackingOverview({
   const chartData = useMemo(
     () =>
       (trend ?? []).map((p) => ({
-        checkedAt: new Date(p.checkedAt).getTime(),
+        checkedAt: parseDbTimestamp(p.checkedAt).getTime(),
         top3: p.top3,
         top4to10: p.top4to10,
         top11to20: p.top11to20,

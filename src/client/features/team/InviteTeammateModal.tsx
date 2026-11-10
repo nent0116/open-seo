@@ -14,6 +14,7 @@ import {
 } from "@/client/components/ui/dialog";
 import { getErrorCode } from "@/client/lib/error-messages";
 import { captureClientEvent } from "@/client/lib/posthog";
+import { isHostedClientAuthMode, usesBetterAuthClient } from "@/lib/auth-mode";
 import { sendTeamInvitation } from "@/serverFunctions/organization";
 
 const inviteSchema = z.object({
@@ -31,6 +32,29 @@ export function inviteErrorMessage(error: Error) {
   return "招待を送信できませんでした。";
 }
 
+// Without an email transport (the standalone Docker edition) the server hands
+// back the invitation link for the inviter to pass on; with one, it was sent.
+export function announceInvitation(
+  result: { invitationId: string; inviteUrl?: string },
+  sentMessage: string,
+) {
+  if (!result.inviteUrl) {
+    toast.success(sentMessage);
+    return;
+  }
+  const inviteUrl = result.inviteUrl;
+  void (
+    navigator.clipboard?.writeText(inviteUrl) ?? Promise.reject(new Error())
+  ).then(
+    () => toast.success("Invitation link copied"),
+    () =>
+      toast.success("Invitation link", {
+        description: inviteUrl,
+        duration: 20000,
+      }),
+  );
+}
+
 export function InviteTeammateModal({
   onClose,
   onInvited,
@@ -43,9 +67,9 @@ export function InviteTeammateModal({
   const inviteMutation = useMutation({
     mutationFn: (inviteeEmail: string) =>
       sendTeamInvitation({ data: { email: inviteeEmail } }),
-    onSuccess: () => {
+    onSuccess: (result) => {
       captureClientEvent("team:invitation_send");
-      toast.success("招待を送信しました");
+      announceInvitation(result, "招待を送信しました");
       onInvited();
       onClose();
     },
@@ -63,6 +87,8 @@ export function InviteTeammateModal({
       onInvited();
     },
   });
+
+  const sharesLink = usesBetterAuthClient() && !isHostedClientAuthMode();
 
   const form = useAppForm({
     defaultValues: { email: "" },
@@ -84,7 +110,9 @@ export function InviteTeammateModal({
             <DialogHeader>
               <DialogTitle>メンバーを招待</DialogTitle>
               <DialogDescription>
-                管理者として参加し、請求を除く各プロジェクトのすべての機能を利用できます。招待リンクの有効期限は7日間です。
+                {sharesLink
+                  ? "They'll join as an Admin with full access to each project. Share the invitation link with them; they create their account from it. It expires in 7 days."
+                  : "They'll join as an Admin with full access to each project except for billing. The invitation link expires in 7 days."}
               </DialogDescription>
             </DialogHeader>
             <form.AppField name="email">

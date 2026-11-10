@@ -9,15 +9,17 @@ import {
 } from "@/client/features/auth/AuthPage";
 import { getFormError } from "@/client/lib/forms";
 import { authClient } from "@/lib/auth-client";
-import { isHostedClientAuthMode } from "@/lib/auth-mode";
+import { isHostedClientAuthMode, usesBetterAuthClient } from "@/lib/auth-mode";
 import { getSignInSearch, normalizeAuthRedirect } from "@/lib/auth-redirect";
 import { z } from "zod";
+import { pageHead } from "@/client/lib/pageHead";
 
 const forgotPasswordSchema = z.object({
   email: z.string().trim().email("有効なメールアドレスを入力してください。"),
 });
 
 export const Route = createFileRoute("/forgot-password")({
+  head: () => pageHead("パスワードをお忘れですか？"),
   validateSearch: authRedirectSearchSchema,
   component: ForgotPasswordPage,
 });
@@ -26,6 +28,9 @@ function ForgotPasswordPage() {
   const search = Route.useSearch();
   const redirectTo = normalizeAuthRedirect(search.redirect);
   const isHostedMode = isHostedClientAuthMode();
+  // Self-hosted accounts have no email transport; the operator resets
+  // passwords with the admin command.
+  const isOperatorReset = !isHostedMode && usesBetterAuthClient();
 
   const form = useAppForm({
     defaultValues: {
@@ -89,7 +94,9 @@ function ForgotPasswordPage() {
                   ? undefined
                   : isHostedMode
                     ? "メールアドレスを入力すると、パスワード再設定用のリンクをお送りします。"
-                    : "現在、パスワードの再設定を利用できません。"
+                    : isOperatorReset
+                      ? "Ask your server administrator to reset your password."
+                      : "現在、パスワードの再設定を利用できません。"
               }
               footer={
                 <p className="text-sm">
